@@ -7,6 +7,8 @@ namespace Modl
 {
     public class Update<C> : Change<C> where C : Modl<C>, new()
     {
+        public Update(string databaseName) : base(databaseName) { }
+
         protected string ValuesToString()
         {
             return string.Join(",", ChangeValues.Select(x => x.Key + "='" + x.Value + "'"));

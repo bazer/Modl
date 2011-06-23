@@ -7,6 +7,8 @@ namespace Modl
 {
     public class Insert<C> : Change<C> where C : Modl<C>, new()
     {
+        public Insert(string databaseName) : base(databaseName) { }
+
         protected string ValuesToString()
         {
             return string.Format("({0}) VALUES ({1})",

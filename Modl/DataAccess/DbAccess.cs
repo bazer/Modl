@@ -5,75 +5,77 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
+using Modl.DatabaseProviders;
 
 namespace Modl.DataAccess
 {
     public class DbAccess
     {
-        static public int ExecuteNonQuery(params IQuery[] statements)
+        static public void ExecuteNonQuery(params IQuery[] queries)
         {
-            return ExecuteNonQuery(new List<IQuery>(statements));
+            ExecuteNonQuery(new List<IQuery>(queries));
         }
 
-        static public int ExecuteNonQuery(List<IQuery> statements)
+        static public void ExecuteNonQuery(List<IQuery> queries)
         {
-            if (statements.Count == 0)
-                return 0;
-
-            return ExecuteNonQuery(Helper.ToSqlCommand(statements));
+            ExecuteNonQuery(DatabaseProvider.GetDbCommands(queries));
         }
 
-        static public int ExecuteNonQuery(IDbCommand command)
+        static public void ExecuteNonQuery(List<IDbCommand> commands)
         {
-            using (IDbConnection connection = new SqlConnection(Config.ConnectionString))
+            for (int i = 0; i < commands.Count; i++)
             {
-                connection.Open();
-                command.Connection = connection;
-                int result = command.ExecuteNonQuery();
-                connection.Close();
-                return result;
+                if (commands[i].Connection.State != ConnectionState.Open)
+                    commands[i].Connection.Open();
+
+                commands[i].ExecuteNonQuery();
+
+                if (i + 1 == commands.Count || commands[i].Connection != commands[i + 1].Connection)
+                    commands[i].Connection.Close();
             }
         }
 
-        static public T ExecuteScalar<T>(params IQuery[] statements)
+        static public T ExecuteScalar<T>(params IQuery[] queries)
         {
-            return ExecuteScalar<T>(new List<IQuery>(statements));
+            return ExecuteScalar<T>(new List<IQuery>(queries));
         }
 
-        static public T ExecuteScalar<T>(List<IQuery> statements)
+        static public T ExecuteScalar<T>(List<IQuery> queries)
         {
-            return ExecuteScalar<T>(Helper.ToSqlCommand(statements));
+            return ExecuteScalar<T>( DatabaseProvider.GetDbCommands(queries));
         }
 
-        static public T ExecuteScalar<T>(IDbCommand command)
+        static public T ExecuteScalar<T>(List<IDbCommand> commands)
 		{
-            using (IDbConnection connection = new SqlConnection(Config.ConnectionString))
+            T result = default(T);
+            
+            for (int i = 0; i < commands.Count; i++)
             {
-                connection.Open();
-                command.Connection = connection;
-				T result = (T)Convert.ChangeType(command.ExecuteScalar(), typeof(T));
-                connection.Close();
-				return result;
+                if (commands[i].Connection.State != ConnectionState.Open)
+                    commands[i].Connection.Open();
+
+                object o = commands[i].ExecuteScalar();
+
+                if (i+1 == commands.Count || commands[i].Connection != commands[i+1].Connection)
+                    commands[i].Connection.Close();
+
+                if (o != null)
+                    result = (T)Convert.ChangeType(o, typeof(T));
             }
+
+            return result;
 		}
 
-        static public IDataReader ExecuteReader(params IQuery[] statements)
+        static public DbDataReader ExecuteReader(IQuery query)
         {
-            return ExecuteReader(new List<IQuery>(statements));
+            return ExecuteReader(query.ToDbCommand());
         }
 
-        static public IDataReader ExecuteReader(List<IQuery> statements)
+        static public DbDataReader ExecuteReader(IDbCommand command)
         {
-            return ExecuteReader(Helper.ToSqlCommand(statements));
-        }
-
-        static public IDataReader ExecuteReader(IDbCommand command)
-        {
-            IDbConnection connection = new SqlConnection(Config.ConnectionString);
-            command.Connection = connection;
-            connection.Open();
+            command.Connection.Open();
             
-            return command.ExecuteReader(CommandBehavior.CloseConnection);
+            return (DbDataReader)command.ExecuteReader(CommandBehavior.CloseConnection);
         }
     }
 }

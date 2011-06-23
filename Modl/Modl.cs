@@ -11,6 +11,8 @@ using Modl.DataAccess;
 using Modl.Exceptions;
 using System.Data;
 using System.Data.SqlServerCe;
+using Modl.DatabaseProviders;
+using System.Data.Common;
 
 
 namespace Modl
@@ -47,6 +49,25 @@ namespace Modl
         internal static string IdName = "Id";
         //protected static string NameField;
         public string Table { get { return TableName; } }
+
+        public static string databaseName = null;
+        public static string DatabaseName
+        {
+            get
+            {
+                if (databaseName == null)
+                    databaseName = Config.DatabaseProviders.First().Key;
+
+                return databaseName;
+            }
+            set
+            {
+                databaseName = value;
+            }
+        }
+
+        protected static DatabaseProvider dbProvider { get { return Config.DatabaseProviders[databaseName]; } }
+
 
         public static dynamic Constants = new ModlFields();
         public static Dictionary<string, Type> Types = new Dictionary<string, Type>();
@@ -106,7 +127,7 @@ namespace Modl
             return Get(DbAccess.ExecuteReader(statement), throwExceptionOnNotFound, true);
         }
 
-        protected static C Get(IDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        protected static C Get(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {
             var c = new C();
 
@@ -128,10 +149,16 @@ namespace Modl
         {
             var list = new List<C>();
 
-            using (IDataReader reader = DbAccess.ExecuteReader(statement))
-                //if (reader.HasRows)
-                    while (reader.Read())
-                        list.Add(Get(reader, singleRow: false));
+            using (DbDataReader reader = DbAccess.ExecuteReader(statement))
+            {
+                while (!reader.IsClosed)
+                {
+                    C c = Get(reader, singleRow: false);
+
+                    if (c != null)
+                        list.Add(c);
+                }
+            }
 
             return list;
         }
@@ -148,7 +175,7 @@ namespace Modl
 
         public static C GetWhere<T>(bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>();
+            var select = new Select<C>(DatabaseName);
 
             foreach (var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -158,7 +185,7 @@ namespace Modl
 
         public static List<C> GetAll()
         {
-            return GetList(new Select<C>());
+            return GetList(new Select<C>(DatabaseName));
         }
 
         public static List<C> GetAllWhere<T>(string field, T value)
@@ -168,7 +195,7 @@ namespace Modl
 
         public static List<C> GetAllWhere<T>(params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>();
+            var select = new Select<C>(DatabaseName);
 
             foreach(var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -211,13 +238,10 @@ namespace Modl
             Fields.Dictionary[name] = value;
         }
 
-        private bool Load(IDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        private bool Load(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {
-            if (((SqlDataReader)reader).HasRows)
+            if (reader.Read())
             {
-                if (singleRow)
-                    reader.Read();
-
                 id = Helper.GetSafeValue(reader, IdName, 0);
 
                 var dictionary = Fields.Dictionary as IDictionary<string, object>;
@@ -251,7 +275,7 @@ namespace Modl
             }
         }
 
-        public virtual void Save(DbTransaction dbTransaction = null)
+        public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
         {
             Change<C> statement = BaseGetSaveStatement();
 
@@ -271,11 +295,11 @@ namespace Modl
 
             if (isNew)
             {
-                statement = new Insert<C>();
+                statement = new Insert<C>(DatabaseName);
             }
             else
             {
-                statement = new Update<C>();
+                statement = new Update<C>(DatabaseName);
                 ((Update<C>)statement).Where(IdName).EqualTo(id);
             }
 
@@ -308,22 +332,22 @@ namespace Modl
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
 
             if (statement is Insert<C>)
-                id = DbAccess.ExecuteScalar<int>(statement, new Literal("select SCOPE_IDENTITY()"));
+                id = DbAccess.ExecuteScalar<int>(statement, dbProvider.GetLastIdQuery());
             else
                 DbAccess.ExecuteNonQuery(statement);
 
             isNew = false;
         }
 
-        protected void BaseTransactionSave(Change<C> statement, DbTransaction trans)
+        protected void BaseTransactionSave(Change<C> statement, Modl.DataAccess.DbTransaction trans)
         {
             if (isDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
 
-            if (statement is Insert<C>)
-                id = trans.ExecuteScalar<int>(statement, new Literal("select SCOPE_IDENTITY()"));
-            else
-                trans.ExecuteNonQuery(statement);
+            //if (statement is Insert<C>)
+            //    id = trans.ExecuteScalar<int>(statement, new Literal("select SCOPE_IDENTITY()"));
+            //else
+            //    trans.ExecuteNonQuery(statement);
 
             isNew = false;
         }
@@ -332,7 +356,7 @@ namespace Modl
         {
             LogDelete();
 
-            Delete<C> statement = new Delete<C>();
+            Delete<C> statement = new Delete<C>(DatabaseName);
             statement.Where(IdName).EqualTo(id);
 
             DbAccess.ExecuteNonQuery(statement);
@@ -417,7 +441,7 @@ namespace Modl
 
         public Select<C> Select()
         {
-            return new Select<C>();
+            return new Select<C>(DatabaseName);
         }
 
         public Where<C, K> Where<K>(string key) //where K : Query<C, K>

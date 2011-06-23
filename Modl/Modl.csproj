@@ -44,6 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="DatabaseProviders\SqlCeProvider.cs" />
+    <Compile Include="DatabaseProviders\DatabaseProvider.cs" />
+    <Compile Include="DatabaseProviders\SqlServerProvider.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
     <Compile Include="Modl.cs" />
     <Compile Include="ModlFields.cs" />

@@ -59,13 +59,6 @@ namespace Modl
                 return Activator.CreateInstance(type);
         }
 
-        public static IDbCommand ToSqlCommand(List<IQuery> queries)
-        {
-            var command = new SqlCommand();
-
-            command.CommandText = string.Join("\r\n", queries.Select(x => x.ToString()));
-
-            return command;
-        }
+        
     }
 }

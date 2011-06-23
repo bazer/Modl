@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
+using System.Data;
+using Modl.DatabaseProviders;
 
 namespace Modl
 {
     public class Literal : IQuery
     {
         private string sql;
-
-        public Literal(string sql)
+        protected DatabaseProvider provider;
+        public DatabaseProvider DatabaseProvider { get { return provider; } }
+        
+        public Literal(string databaseName, string sql)
         {
             this.sql = sql;
+            provider = Config.DatabaseProviders[databaseName];
         }
 
         public override string ToString()
@@ -20,7 +25,7 @@ namespace Modl
             return sql;
         }
 
-        public SqlCommand ToSqlCommand()
+        public IDbCommand ToDbCommand()
         {
             throw new NotImplementedException();
         }

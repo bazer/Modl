@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
+using System.Data;
+using Modl.DatabaseProviders;
 
 namespace Modl
 {
     public interface IQuery
     {
-        SqlCommand ToSqlCommand();
+        DatabaseProvider DatabaseProvider { get; }
+        IDbCommand ToDbCommand();
     }
 
     public abstract class Query<C, T> : IQuery 
@@ -17,9 +20,16 @@ namespace Modl
     {
         protected List<QueryPart<C>> queryParts = new List<QueryPart<C>>();
         protected ModlBase owner;
+        protected DatabaseProvider provider;
+        public DatabaseProvider DatabaseProvider { get { return provider; } }
 
         public Query()
         { 
+        }
+
+        public Query(string databaseName)
+        {
+            provider = Config.DatabaseProviders[databaseName];
         }
 
         public Query(C owner)
@@ -55,14 +65,14 @@ namespace Modl
             return (T)this;
         }
 
-        public SqlCommand ToSqlCommand()
-        {
-            return new SqlCommand();
-        }
-
         protected string QueryPartsToString()
         {
             return string.Join("\r\n", queryParts.Select(x => x.ToString()));
+        }
+
+        public IDbCommand ToDbCommand()
+        {
+            return DatabaseProvider.ToDbCommand(this);
         }
     }
 }
