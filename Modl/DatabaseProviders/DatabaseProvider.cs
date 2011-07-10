@@ -11,7 +11,7 @@ namespace Modl.DatabaseProviders
     {
         SqlServer,
         SqlCE,
-        MySql
+        MySQL
     }
 
     public abstract class DatabaseProvider
@@ -41,6 +41,8 @@ namespace Modl.DatabaseProviders
                 providerName = SqlServerProvider.ProviderNames[0];
             else if (SqlCeProvider.Type == providerType)
                 providerName = SqlCeProvider.ProviderNames[0];
+            else if (MySQLProvider.Type == providerType)
+                providerName = MySQLProvider.ProviderNames[0];
 
             return GetNewDatabaseProvider(new ConnectionStringSettings(databaseName, connectionString, providerName));
         }
@@ -48,9 +50,8 @@ namespace Modl.DatabaseProviders
         public static DatabaseProvider GetNewDatabaseProvider(ConnectionStringSettings connectionConfig)
         {
             DatabaseProvider provider = SqlServerProvider.GetNewOnMatch(connectionConfig);
-
-            if (provider == null)
-                provider = SqlCeProvider.GetNewOnMatch(connectionConfig);
+            provider = provider ?? SqlCeProvider.GetNewOnMatch(connectionConfig);
+            provider = provider ?? MySQLProvider.GetNewOnMatch(connectionConfig);
 
             if (provider == null)
                 throw new Exception(string.Format("Found no DatabaseProvider matching \"{0}\"", connectionConfig.ProviderName));

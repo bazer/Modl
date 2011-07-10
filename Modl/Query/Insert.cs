@@ -19,7 +19,7 @@ namespace Modl
 
         public override string ToString()
         {
-            return string.Format("INSERT INTO {0} {1};", Modl<C>.TableName, ValuesToString());
+            return string.Format("INSERT INTO {0} {1}", Modl<C>.TableName, ValuesToString());
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Modl
 
         public override string ToString()
         {
-            return string.Format("UPDATE {0} SET {1}\r\nWHERE\r\n{2};", Modl<C>.TableName, ValuesToString(), QueryPartsToString());
+            return string.Format("UPDATE {0} SET {1}\r\nWHERE\r\n{2}", Modl<C>.TableName, ValuesToString(), QueryPartsToString());
         }
     }
 }

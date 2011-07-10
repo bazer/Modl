@@ -40,7 +40,7 @@ namespace Modl.DatabaseProviders
 
         public override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
-            var connection = GetConnection();
+            //var connection = GetConnection();
             var commands = new List<IDbCommand>();
 
             commands.Add(new SqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (SqlConnection)GetConnection()));

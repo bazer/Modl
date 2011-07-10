@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Configuration;
 using Modl.DatabaseProviders;
@@ -16,11 +17,12 @@ namespace Modl
         static Config()
         {
             if (ConfigurationManager.ConnectionStrings.Count > 1)
-                AddDatabaseProvider(ConfigurationManager.ConnectionStrings[1]);
+                AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
         }
 
         public static IDbConnection GetConnection(string databaseName)
         {
+            
             return DatabaseProviders[databaseName].GetConnection();
         }
 
