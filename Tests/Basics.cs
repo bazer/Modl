@@ -11,6 +11,26 @@ namespace Tests
     public class Basics
     {
         [TestMethod]
+        public void SqlServerCRUD()
+        {
+            Car.DbKey = "SqlServerDb";
+            CRUD();
+        }
+
+        [TestMethod]
+        public void SqlServerCeCRUD()
+        {
+            Car.DbKey = "SqlServerCeDb";
+            CRUD();
+        }
+
+        [TestMethod]
+        public void MySQLCRUD()
+        {
+            Car.DbKey = "MySQLDb";
+            CRUD();
+        }
+        
         public void CRUD()
         {
             Car car = new Car();

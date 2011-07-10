@@ -16,8 +16,12 @@ namespace Modl
 
         static Config()
         {
-            if (ConfigurationManager.ConnectionStrings.Count > 1)
-                AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
+            foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
+                if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
+                    AddDatabaseProvider(connString);
+
+            //if (ConfigurationManager.ConnectionStrings.Count > 1)
+            //    AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
         }
 
         public static IDbConnection GetConnection(string databaseName)

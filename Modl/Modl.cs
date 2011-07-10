@@ -50,13 +50,13 @@ namespace Modl
         //protected static string NameField;
         public string Table { get { return TableName; } }
 
-        public static string databaseName = null;
-        public static string DatabaseName
+        private static string databaseName = null;
+        public static string DbKey
         {
             get
             {
                 if (databaseName == null)
-                    databaseName = Config.DatabaseProviders.First().Key;
+                    databaseName = Config.DatabaseProviders.Last().Key;
 
                 return databaseName;
             }
@@ -175,7 +175,7 @@ namespace Modl
 
         public static C GetWhere<T>(bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>(DatabaseName);
+            var select = new Select<C>(DbKey);
 
             foreach (var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -185,7 +185,7 @@ namespace Modl
 
         public static List<C> GetAll()
         {
-            return GetList(new Select<C>(DatabaseName));
+            return GetList(new Select<C>(DbKey));
         }
 
         public static List<C> GetAllWhere<T>(string field, T value)
@@ -195,7 +195,7 @@ namespace Modl
 
         public static List<C> GetAllWhere<T>(params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>(DatabaseName);
+            var select = new Select<C>(DbKey);
 
             foreach(var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -295,11 +295,11 @@ namespace Modl
 
             if (isNew)
             {
-                statement = new Insert<C>(DatabaseName);
+                statement = new Insert<C>(DbKey);
             }
             else
             {
-                statement = new Update<C>(DatabaseName);
+                statement = new Update<C>(DbKey);
                 ((Update<C>)statement).Where(IdName).EqualTo(id);
             }
 
@@ -356,7 +356,7 @@ namespace Modl
         {
             LogDelete();
 
-            Delete<C> statement = new Delete<C>(DatabaseName);
+            Delete<C> statement = new Delete<C>(DbKey);
             statement.Where(IdName).EqualTo(id);
 
             DbAccess.ExecuteNonQuery(statement);
@@ -441,7 +441,7 @@ namespace Modl
 
         public Select<C> Select()
         {
-            return new Select<C>(DatabaseName);
+            return new Select<C>(DbKey);
         }
 
         public Where<C, K> Where<K>(string key) //where K : Query<C, K>
