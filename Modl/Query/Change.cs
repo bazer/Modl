@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Modl.DatabaseProviders;
 
 namespace Modl
 {
     public abstract class Change<C> : Query<C, Change<C>> where C : Modl<C>, new()
     {
-        public Change(string databaseName) : base(databaseName) { }
+        public Change(DatabaseProvider database) : base(database) { }
 
         protected Dictionary<string, object> ChangeValues = new Dictionary<string, object>();
 

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Modl.DatabaseProviders;
 
 namespace Modl
 {
     public class Delete<C> : Query<C, Delete<C>> where C : Modl<C>, new()
     {
-        public Delete(string databaseName) : base(databaseName) { }
+        public Delete(DatabaseProvider database) : base(database) { }
 
         public override string ToString()
         {

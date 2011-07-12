@@ -15,3 +15,6 @@
 /Modl.vsmdi
 /Modl/Modl.csproj.user
 /TraceAndTestImpact.testsettings
+*.suo
+*.psess
+*.vsp

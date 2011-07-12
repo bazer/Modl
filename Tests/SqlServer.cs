@@ -10,13 +10,28 @@ namespace Tests
     [TestClass]
     public class SqlServer
     {
+        string databaseName = "SqlServerDb";
         Basics basics = new Basics();
 
         [TestMethod]
-        public void CRUD()
+        public void GlobalCRUD()
         {
-            basics.SwitchDatabase("SqlServerDb");
+            basics.SwitchDatabase(databaseName);
             basics.CRUD();
+        }
+
+        [TestMethod]
+        public void StaticCRUD()
+        {
+            basics.SwitchDatabase("SqlServerCeDb");
+            basics.SwitchStaticDatabaseAndCRUD(databaseName);
+        }
+
+        [TestMethod]
+        public void InstanceCRUD()
+        {
+            basics.SwitchDatabase("SqlServerCeDb");
+            basics.SwitchInstanceDatabaseAndCRUD(databaseName);
         }
     }
 }

@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Data.SqlClient;
-using System.Dynamic;
 using System.Reflection;
 using System.Web.Mvc;
-using System.Diagnostics;
 using Modl.DataAccess;
-using Modl.Exceptions;
-using System.Data;
-using System.Data.SqlServerCe;
 using Modl.DatabaseProviders;
-using System.Data.Common;
+using Modl.Exceptions;
 
 
 namespace Modl
@@ -20,6 +15,7 @@ namespace Modl
     public interface IModl
     {
         int Id { get; }
+        //IModl Get(int id, bool throwExceptionOnNotFound = true);
         //string Table { get; }
     }
 
@@ -29,6 +25,8 @@ namespace Modl
         public int Id { get { return id; } }
 
         public static string TableName;
+
+        //IModl Get(int id, bool throwExceptionOnNotFound = true);
     }
 
     [ModelBinder(typeof(ModlBinder))]
@@ -50,7 +48,7 @@ namespace Modl
         //protected static string NameField;
         public string Table { get { return TableName; } }
 
-        public static string DatabaseName
+        public string DatabaseName
         {
             get
             {
@@ -58,10 +56,21 @@ namespace Modl
             }
         }
         
-        //private DatabaseProvider instanceDbProvider = null;
+        private DatabaseProvider instanceDbProvider = null;
         private static DatabaseProvider staticDbProvider = null;
 
-        public static DatabaseProvider Database 
+        public DatabaseProvider Database
+        {
+            get
+            {
+                if (instanceDbProvider == null)
+                    instanceDbProvider = DefaultDatabase;
+
+                return instanceDbProvider;
+            }
+        }
+
+        public static DatabaseProvider DefaultDatabase 
         {
             get 
             {
@@ -72,14 +81,19 @@ namespace Modl
             }
         }
 
-        public static void SetDatabase(string databaseName)
+        public static void SetDefaultDatabase(string databaseName)
         {
-            SetDatabase(Config.GetDatabase(databaseName));
+            SetDefaultDatabase(Config.GetDatabase(databaseName));
         }
 
-        public static void SetDatabase(DatabaseProvider database)
+        public static void SetDefaultDatabase(DatabaseProvider database)
         {
             staticDbProvider = database;
+        }
+
+        public static void ClearDefaultDatabase()
+        {
+            staticDbProvider = null;
         }
 
         //public void SetDbProvider(DatabaseProvider dbProvider)
@@ -117,6 +131,28 @@ namespace Modl
             SetDefaults();
         }
 
+        public static C New()
+        {
+            var c = new C();
+            return c;
+        }
+
+        public static C New(string databaseName)
+        {
+            var c = new C();
+            c.instanceDbProvider = Config.GetDatabase(databaseName);
+
+            return c;
+        }
+
+        public static C New(DatabaseProvider database)
+        {
+            var c = new C();
+            c.instanceDbProvider = database;
+
+            return c;
+        }
+
         protected virtual void SetDefaults()
         {
             foreach (PropertyInfo property in typeof(C).GetProperties())
@@ -131,24 +167,25 @@ namespace Modl
             }
         }
 
-        public static bool Exists(int id)
+        public static bool Exists(int id, DatabaseProvider database = null)
         {
-            return Get(id, false) != null;
+            return Get(id, database, false) != null;
         }
 
-        public static C Get(int id, bool throwExceptionOnNotFound = true)
+        public static C Get(int id, DatabaseProvider database = null, bool throwExceptionOnNotFound = true)
         {
-            return GetWhere(IdName, id, throwExceptionOnNotFound);
+            return GetWhere(IdName, id, database, throwExceptionOnNotFound);
         }
 
         protected static C Get(Select<C> statement, bool throwExceptionOnNotFound = true)
         {
-            return Get(DbAccess.ExecuteReader(statement), throwExceptionOnNotFound, true);
+            
+            return Get(DbAccess.ExecuteReader(statement), statement.DatabaseProvider, throwExceptionOnNotFound, true);
         }
 
-        protected static C Get(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        protected static C Get(DbDataReader reader, DatabaseProvider database, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {
-            var c = new C();
+            var c = Modl<C>.New(database); //new C();
 
             if (c.Load(reader, throwExceptionOnNotFound, singleRow))
                 return c;
@@ -172,7 +209,7 @@ namespace Modl
             {
                 while (!reader.IsClosed)
                 {
-                    C c = Get(reader, singleRow: false);
+                    C c = Get(reader, statement.DatabaseProvider, singleRow: false);
 
                     if (c != null)
                         list.Add(c);
@@ -182,19 +219,19 @@ namespace Modl
             return list;
         }
 
-        public static C GetWhere<T>(string field, T value, bool throwExceptionOnNotFound = true)
+        public static C GetWhere<T>(string field, T value, DatabaseProvider database = null, bool throwExceptionOnNotFound = true)
         {
-            return GetWhere(throwExceptionOnNotFound, Tuple.Create(field, value));
+            return GetWhere(database, throwExceptionOnNotFound, Tuple.Create(field, value));
         }
 
         public static C GetWhere<T>(params Tuple<string, T>[] fields)
         {
-            return GetWhere(true, fields);
+            return GetWhere(null, true, fields);
         }
 
-        public static C GetWhere<T>(bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
+        public static C GetWhere<T>(DatabaseProvider database = null, bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>(DatabaseName);
+            var select = new Select<C>(database ?? DefaultDatabase);
 
             foreach (var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -202,19 +239,24 @@ namespace Modl
             return Get(select, throwExceptionOnNotFound);
         }
 
-        public static List<C> GetAll()
+        public static List<C> GetAll(DatabaseProvider database = null)
         {
-            return GetList(new Select<C>(DatabaseName));
+            return GetList(new Select<C>(database ?? DefaultDatabase));
         }
 
-        public static List<C> GetAllWhere<T>(string field, T value)
+        public static List<C> GetAllWhere<T>(string field, T value, DatabaseProvider database = null)
         {
-            return GetAllWhere(Tuple.Create(field, value));
+            return GetAllWhere(database, Tuple.Create(field, value));
         }
-
+        
         public static List<C> GetAllWhere<T>(params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>(DatabaseName);
+            return GetAllWhere(null, fields);
+        }
+
+        public static List<C> GetAllWhere<T>(DatabaseProvider database = null, params Tuple<string, T>[] fields)
+        {
+            var select = new Select<C>(database ?? DefaultDatabase);
 
             foreach(var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -314,11 +356,11 @@ namespace Modl
 
             if (isNew)
             {
-                statement = new Insert<C>(DatabaseName);
+                statement = new Insert<C>(Database);
             }
             else
             {
-                statement = new Update<C>(DatabaseName);
+                statement = new Update<C>(Database);
                 ((Update<C>)statement).Where(IdName).EqualTo(id);
             }
 
@@ -375,7 +417,7 @@ namespace Modl
         {
             LogDelete();
 
-            Delete<C> statement = new Delete<C>(DatabaseName);
+            Delete<C> statement = new Delete<C>(Database);
             statement.Where(IdName).EqualTo(id);
 
             DbAccess.ExecuteNonQuery(statement);
@@ -460,7 +502,7 @@ namespace Modl
 
         public Select<C> Select()
         {
-            return new Select<C>(DatabaseName);
+            return new Select<C>(Database);
         }
 
         public Where<C, K> Where<K>(string key) //where K : Query<C, K>

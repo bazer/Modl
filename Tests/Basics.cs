@@ -1,29 +1,33 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ExampleModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ExampleModel;
+using Modl;
+using Modl.DatabaseProviders;
 
 namespace Tests
 {
     [TestClass]
     public class Basics
     {
-        public void CRUD()
+        public void SwitchDatabase(string databaseName)
         {
-            Car car = new Car
-            {
-                Name = "BMW M3",
-                Manufacturer = "BMW"
-            };
+            Modl.Config.DefaultDatabase = Modl.Config.GetDatabase(databaseName);
 
-            Assert.IsTrue(car.IsNew);
+            Assert.AreEqual(databaseName, Modl.Config.DefaultDatabase.Name);
+            Assert.AreEqual(Modl.Config.DefaultDatabase, Car.DefaultDatabase);
+            Assert.AreEqual(Modl.Config.DefaultDatabase, Modl.Config.GetDatabase(Car.New().DatabaseName));
+        }
+
+        public void CRUD(DatabaseProvider database = null)
+        {
+
+            Car car = NewModl<Car>(database);
+            car.Name = "BMW M3";
+            car.Manufacturer = "BMW";
             car.Save();
             Assert.IsTrue(!car.IsNew);
 
-            Car car2 = Car.Get(car.Id);
-            Assert.IsTrue(!car2.IsNew);
+
+            Car car2 = GetModl<Car>(car.Id, database); // Car.Get(car.Id);
             Assert.AreEqual(car.Id, car2.Id);
             Assert.AreEqual(car.Name, car2.Name);
             Assert.AreEqual(car.Manufacturer, car2.Manufacturer);
@@ -32,20 +36,55 @@ namespace Tests
             Assert.AreEqual("Mercedes", car2.Manufacturer);
             car2.Save();
 
-            Car car3 = Car.Get(car.Id);
+            Car car3 = GetModl<Car>(car.Id, database);
             Assert.AreEqual("Mercedes", car3.Manufacturer);
             car3.Delete();
             Assert.IsTrue(car3.IsDeleted);
-            Assert.AreEqual(null, Car.Get(car.Id, false));
+            Assert.AreEqual(null, GetModl<Car>(car.Id, database, false));
         }
 
-        public void SwitchDatabase(string databaseName)
+        public T NewModl<T>(DatabaseProvider database) where T : Modl<T>, new()
         {
-            Modl.Config.DefaultDatabase = Modl.Config.GetDatabase(databaseName);
+            T modl;
 
-            Assert.AreEqual(databaseName, Modl.Config.DefaultDatabase.Name);
-            Assert.AreEqual(Modl.Config.DefaultDatabase, Modl.Config.GetDatabase(Car.DatabaseName));
-            Assert.AreEqual(Modl.Config.DefaultDatabase, Car.Database);
+            if (database == null)
+                modl = Modl<T>.New();
+            else
+                modl = Modl<T>.New(database);
+
+            Assert.IsTrue(modl.IsNew);
+
+            return modl;
+        }
+
+        public T GetModl<T>(int id, DatabaseProvider database, bool throwExceptionOnNotFound = true) where T : Modl<T>, new()
+        {
+            T modl = Modl<T>.Get(id, database, throwExceptionOnNotFound);
+
+            //if (databaseName == null)
+                //modl = Modl<T>.Get(id, throwExceptionOnNotFound: throwExceptionOnNotFound);
+            //else
+            //    modl = Modl<T>.Get(id, Modl.Config.GetDatabase(databaseName), throwExceptionOnNotFound);
+
+            if (!throwExceptionOnNotFound && modl != null)
+                Assert.IsTrue(!modl.IsNew);
+
+            return modl;
+        }
+
+        public void SwitchStaticDatabaseAndCRUD(string databaseName)
+        {
+            Car.SetDefaultDatabase(databaseName);
+            Assert.AreEqual(databaseName, Car.DefaultDatabase.Name);
+
+            CRUD();
+
+            Car.ClearDefaultDatabase();
+        }
+
+        public void SwitchInstanceDatabaseAndCRUD(string databaseName)
+        {
+            CRUD(Modl.Config.GetDatabase(databaseName));
         }
     }
 }

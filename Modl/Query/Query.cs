@@ -27,9 +27,9 @@ namespace Modl
         { 
         }
 
-        public Query(string databaseName)
+        public Query(DatabaseProvider database)
         {
-            provider = Config.GetDatabase(databaseName);
+            provider = database;
         }
 
         public Query(C owner)

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Modl.DatabaseProviders;
 
 namespace Modl
 {
     public class Select<C> : Query<C, Select<C>> where C : Modl<C>, new()
     {
-        public Select(string databaseName) : base(databaseName) { }
+        public Select(DatabaseProvider database) : base(database) { }
 
         public override string ToString()
         {

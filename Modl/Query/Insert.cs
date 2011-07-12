@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Modl.DatabaseProviders;
 
 namespace Modl
 {
     public class Insert<C> : Change<C> where C : Modl<C>, new()
     {
-        public Insert(string databaseName) : base(databaseName) { }
+        public Insert(DatabaseProvider database) : base(database) { }
 
         protected string ValuesToString()
         {
