@@ -10,33 +10,15 @@ namespace Tests
     [TestClass]
     public class Basics
     {
-        [TestMethod]
-        public void SqlServerCRUD()
-        {
-            Car.DbKey = "SqlServerDb";
-            CRUD();
-        }
-
-        [TestMethod]
-        public void SqlServerCeCRUD()
-        {
-            Car.DbKey = "SqlServerCeDb";
-            CRUD();
-        }
-
-        [TestMethod]
-        public void MySQLCRUD()
-        {
-            Car.DbKey = "MySQLDb";
-            CRUD();
-        }
-        
         public void CRUD()
         {
-            Car car = new Car();
+            Car car = new Car
+            {
+                Name = "BMW M3",
+                Manufacturer = "BMW"
+            };
+
             Assert.IsTrue(car.IsNew);
-            car.Name = "BMW M3";
-            car.Manufacturer = "BMW";
             car.Save();
             Assert.IsTrue(!car.IsNew);
 
@@ -55,6 +37,15 @@ namespace Tests
             car3.Delete();
             Assert.IsTrue(car3.IsDeleted);
             Assert.AreEqual(null, Car.Get(car.Id, false));
+        }
+
+        public void SwitchDatabase(string databaseName)
+        {
+            Modl.Config.DefaultDatabase = Modl.Config.GetDatabase(databaseName);
+
+            Assert.AreEqual(databaseName, Modl.Config.DefaultDatabase.Name);
+            Assert.AreEqual(Modl.Config.DefaultDatabase, Modl.Config.GetDatabase(Car.DatabaseName));
+            Assert.AreEqual(Modl.Config.DefaultDatabase, Car.Database);
         }
     }
 }

@@ -50,23 +50,42 @@ namespace Modl
         //protected static string NameField;
         public string Table { get { return TableName; } }
 
-        private static string databaseName = null;
-        public static string DbKey
+        public static string DatabaseName
         {
             get
             {
-                if (databaseName == null)
-                    databaseName = Config.DatabaseProviders.Last().Key;
-
-                return databaseName;
+                return Database.Name;
             }
-            set
+        }
+        
+        //private DatabaseProvider instanceDbProvider = null;
+        private static DatabaseProvider staticDbProvider = null;
+
+        public static DatabaseProvider Database 
+        {
+            get 
             {
-                databaseName = value;
+                if (staticDbProvider == null)
+                    return Config.DefaultDatabase;
+
+                return staticDbProvider;
             }
         }
 
-        protected static DatabaseProvider dbProvider { get { return Config.DatabaseProviders[databaseName]; } }
+        public static void SetDatabase(string databaseName)
+        {
+            SetDatabase(Config.GetDatabase(databaseName));
+        }
+
+        public static void SetDatabase(DatabaseProvider database)
+        {
+            staticDbProvider = database;
+        }
+
+        //public void SetDbProvider(DatabaseProvider dbProvider)
+        //{
+        //    instanceDbProvider = dbProvider;
+        //}
 
 
         public static dynamic Constants = new ModlFields();
@@ -175,7 +194,7 @@ namespace Modl
 
         public static C GetWhere<T>(bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>(DbKey);
+            var select = new Select<C>(DatabaseName);
 
             foreach (var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -185,7 +204,7 @@ namespace Modl
 
         public static List<C> GetAll()
         {
-            return GetList(new Select<C>(DbKey));
+            return GetList(new Select<C>(DatabaseName));
         }
 
         public static List<C> GetAllWhere<T>(string field, T value)
@@ -195,7 +214,7 @@ namespace Modl
 
         public static List<C> GetAllWhere<T>(params Tuple<string, T>[] fields)
         {
-            var select = new Select<C>(DbKey);
+            var select = new Select<C>(DatabaseName);
 
             foreach(var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
@@ -295,11 +314,11 @@ namespace Modl
 
             if (isNew)
             {
-                statement = new Insert<C>(DbKey);
+                statement = new Insert<C>(DatabaseName);
             }
             else
             {
-                statement = new Update<C>(DbKey);
+                statement = new Update<C>(DatabaseName);
                 ((Update<C>)statement).Where(IdName).EqualTo(id);
             }
 
@@ -332,7 +351,7 @@ namespace Modl
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
 
             if (statement is Insert<C>)
-                id = DbAccess.ExecuteScalar<int>(statement, dbProvider.GetLastIdQuery());
+                id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
             else
                 DbAccess.ExecuteNonQuery(statement);
 
@@ -356,7 +375,7 @@ namespace Modl
         {
             LogDelete();
 
-            Delete<C> statement = new Delete<C>(DbKey);
+            Delete<C> statement = new Delete<C>(DatabaseName);
             statement.Where(IdName).EqualTo(id);
 
             DbAccess.ExecuteNonQuery(statement);
@@ -441,7 +460,7 @@ namespace Modl
 
         public Select<C> Select()
         {
-            return new Select<C>(DbKey);
+            return new Select<C>(DatabaseName);
         }
 
         public Where<C, K> Where<K>(string key) //where K : Query<C, K>

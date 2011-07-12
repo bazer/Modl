@@ -46,6 +46,9 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MySQL.cs" />
+    <Compile Include="SqlServerCe.cs" />
+    <Compile Include="SqlServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Basics.cs" />
   </ItemGroup>

@@ -12,7 +12,7 @@ namespace Modl
     public class Config
     {
         //public static string ConnectionString { get; set; }
-        public static Dictionary<string, DatabaseProvider> DatabaseProviders = new Dictionary<string, DatabaseProvider>();
+        private static Dictionary<string, DatabaseProvider> DatabaseProviders = new Dictionary<string, DatabaseProvider>();
 
         static Config()
         {
@@ -24,9 +24,29 @@ namespace Modl
             //    AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
         }
 
+        private static DatabaseProvider defaultDbProvider = null;
+        public static DatabaseProvider DefaultDatabase
+        {
+            get
+            {
+                if (defaultDbProvider == null)
+                    defaultDbProvider = Config.DatabaseProviders.Last().Value;
+
+                return defaultDbProvider;
+            }
+            set
+            {
+                defaultDbProvider = value;
+            }
+        }
+
+        public static DatabaseProvider GetDatabase(string databaseName)
+        {
+            return DatabaseProviders[databaseName];
+        }
+
         public static IDbConnection GetConnection(string databaseName)
         {
-            
             return DatabaseProviders[databaseName].GetConnection();
         }
 

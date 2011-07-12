@@ -17,7 +17,7 @@ namespace Modl
         public Literal(string databaseName, string sql)
         {
             this.sql = sql;
-            provider = Config.DatabaseProviders[databaseName];
+            provider = Config.GetDatabase(databaseName);
         }
 
         public override string ToString()
