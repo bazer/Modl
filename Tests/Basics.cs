@@ -1,6 +1,7 @@
 ﻿using ExampleModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
+using Modl.DatabaseProviders;
 
 namespace Tests
 {
@@ -36,13 +37,11 @@ namespace Tests
 
         public void CRUD(Database database = null)
         {
-
             Car car = NewModl<Car>(database);
             car.Name = "BMW M3";
             car.Manufacturer = "BMW";
             car.Save();
             Assert.IsTrue(!car.IsNew);
-
 
             Car car2 = GetModl<Car>(car.Id, database); // Car.Get(car.Id);
             Assert.AreEqual(car.Id, car2.Id);

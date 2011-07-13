@@ -10,20 +10,20 @@ namespace Modl.DatabaseProviders
 {
     public class MySQLProvider : Database
     {
-        public static new DatabaseType Type = DatabaseType.MySQL;
-        public static new string[] ProviderNames = new string[1] { "MySql.Data.MySqlClient" };
+        public static new DatabaseType Type { get { return DatabaseType.MySQL; } }
+        internal static new string[] ProviderNames = new string[1] { "MySql.Data.MySqlClient" };
 
-        protected MySQLProvider(string name, string connectionString) : base(name, connectionString) { }
+        protected MySQLProvider(string name, string connectionString, string provider) : base(name, connectionString, provider) { }
 
         internal override IDbConnection GetConnection()
         {
             return new MySqlConnection(ConnectionString);
         }
 
-        public static MySQLProvider GetNewOnMatch(ConnectionStringSettings connectionConfig)
+        internal static MySQLProvider GetNewOnMatch(ConnectionStringSettings connectionConfig)
         {
             if (ProviderNames.Contains(connectionConfig.ProviderName))
-                return new MySQLProvider(connectionConfig.Name, connectionConfig.ConnectionString);
+                return new MySQLProvider(connectionConfig.Name, connectionConfig.ConnectionString, connectionConfig.ProviderName);
 
             return null;
         }

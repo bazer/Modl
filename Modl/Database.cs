@@ -17,16 +17,19 @@ namespace Modl
 
     public abstract class Database
     {
-        public DatabaseType Type { get; protected set; }
-        public string Name { get; protected set; }
-        public string ConnectionString { get; protected set; }
-        public string[] ProviderNames { get; protected set; }
+        public readonly DatabaseType Type;
+        public readonly string Name;
+        public readonly string ConnectionString;
+        public readonly string Provider;
+
+        protected string[] ProviderNames { get; set; }
         protected IDbConnection activeConnection;
 
-        protected Database(string name, string connectionString)
+        protected Database(string name, string connectionString, string provider)
         {
             Name = name;
             ConnectionString = connectionString;
+            Provider = provider;
         }
 
         internal abstract IDbConnection GetConnection();

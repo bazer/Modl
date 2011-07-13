@@ -10,10 +10,10 @@ namespace Modl.DatabaseProviders
 {
     public class SqlCeProvider : Database
     {
-        public static new DatabaseType Type = DatabaseType.SqlCE;
-        public static new string[] ProviderNames = new string[1] { "Microsoft.SQLSERVER.CE.OLEDB.4.0" };
+        public static new DatabaseType Type { get { return DatabaseType.SqlCE; } }
+        internal static new string[] ProviderNames = new string[1] { "Microsoft.SQLSERVER.CE.OLEDB.4.0" };
 
-        protected SqlCeProvider(string name, string connectionString) : base(name, connectionString) { }
+        protected SqlCeProvider(string name, string connectionString, string provider) : base(name, connectionString, provider) { }
 
         internal override IDbConnection GetConnection()
         {
@@ -23,10 +23,10 @@ namespace Modl.DatabaseProviders
             return activeConnection;
         }
 
-        public static SqlCeProvider GetNewOnMatch(ConnectionStringSettings connectionConfig)
+        internal static SqlCeProvider GetNewOnMatch(ConnectionStringSettings connectionConfig)
         {
             if (ProviderNames.Contains(connectionConfig.ProviderName))
-                return new SqlCeProvider(connectionConfig.Name, connectionConfig.ConnectionString);
+                return new SqlCeProvider(connectionConfig.Name, connectionConfig.ConnectionString, connectionConfig.ProviderName);
 
             return null;
         }
