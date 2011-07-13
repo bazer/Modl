@@ -10,7 +10,7 @@ namespace Modl
 {
     public interface IQuery
     {
-        DatabaseProvider DatabaseProvider { get; }
+        Database DatabaseProvider { get; }
         IDbCommand ToDbCommand();
     }
 
@@ -20,14 +20,14 @@ namespace Modl
     {
         protected List<QueryPart<C>> queryParts = new List<QueryPart<C>>();
         protected ModlBase owner;
-        protected DatabaseProvider provider;
-        public DatabaseProvider DatabaseProvider { get { return provider; } }
+        protected Database provider;
+        public Database DatabaseProvider { get { return provider; } }
 
         public Query()
         { 
         }
 
-        public Query(DatabaseProvider database)
+        public Query(Database database)
         {
             provider = database;
         }

@@ -18,7 +18,7 @@ namespace Modl.DataAccess
 
         static public void ExecuteNonQuery(List<IQuery> queries)
         {
-            ExecuteNonQuery(DatabaseProvider.GetDbCommands(queries));
+            ExecuteNonQuery(Database.GetDbCommands(queries));
         }
 
         static public void ExecuteNonQuery(List<IDbCommand> commands)
@@ -42,7 +42,7 @@ namespace Modl.DataAccess
 
         static public T ExecuteScalar<T>(List<IQuery> queries)
         {
-            return ExecuteScalar<T>( DatabaseProvider.GetDbCommands(queries));
+            return ExecuteScalar<T>( Database.GetDbCommands(queries));
         }
 
         static public T ExecuteScalar<T>(List<IDbCommand> commands)

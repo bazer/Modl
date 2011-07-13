@@ -8,7 +8,7 @@ namespace Modl
 {
     public abstract class Change<C> : Query<C, Change<C>> where C : Modl<C>, new()
     {
-        public Change(DatabaseProvider database) : base(database) { }
+        public Change(Database database) : base(database) { }
 
         protected Dictionary<string, object> ChangeValues = new Dictionary<string, object>();
 

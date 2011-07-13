@@ -8,7 +8,7 @@ namespace Modl
 {
     public class Select<C> : Query<C, Select<C>> where C : Modl<C>, new()
     {
-        public Select(DatabaseProvider database) : base(database) { }
+        public Select(Database database) : base(database) { }
 
         public override string ToString()
         {

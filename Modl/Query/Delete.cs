@@ -8,7 +8,7 @@ namespace Modl
 {
     public class Delete<C> : Query<C, Delete<C>> where C : Modl<C>, new()
     {
-        public Delete(DatabaseProvider database) : base(database) { }
+        public Delete(Database database) : base(database) { }
 
         public override string ToString()
         {

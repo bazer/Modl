@@ -8,7 +8,7 @@ namespace Modl
 {
     public class Insert<C> : Change<C> where C : Modl<C>, new()
     {
-        public Insert(DatabaseProvider database) : base(database) { }
+        public Insert(Database database) : base(database) { }
 
         protected string ValuesToString()
         {

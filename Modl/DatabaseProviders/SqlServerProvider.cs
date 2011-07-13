@@ -8,7 +8,7 @@ using System.Configuration;
 
 namespace Modl.DatabaseProviders
 {
-    public class SqlServerProvider : DatabaseProvider
+    public class SqlServerProvider : Database
     {
         public static new DatabaseType Type = DatabaseType.SqlServer;
         public static new string[] ProviderNames = new string[1] { "System.Data.SqlClient" };

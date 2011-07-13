@@ -7,16 +7,34 @@ namespace Tests
     [TestClass]
     public class Basics
     {
-        public void SwitchDatabase(string databaseName)
+        [TestMethod]
+        public void CRUDDatabases()
         {
-            Modl.Config.DefaultDatabase = Modl.Config.GetDatabaseProvider(databaseName);
+            var databases = Database.GetAll();
+            Assert.IsTrue(databases.Count > 0);
 
-            Assert.AreEqual(databaseName, Modl.Config.DefaultDatabase.Name);
-            Assert.AreEqual(Modl.Config.DefaultDatabase, Car.DefaultDatabase);
-            Assert.AreEqual(Modl.Config.DefaultDatabase, Modl.Config.GetDatabaseProvider(Car.New().DatabaseName));
+            Database.Remove("SqlServerDb");
+            Assert.AreEqual(databases.Count - 1, Database.GetAll().Count);
+
+            Database.RemoveAll();
+            Assert.AreEqual(0, Database.GetAll().Count);
+
+            foreach (var db in databases)
+                Database.Add(db);
+
+            Assert.AreEqual(databases.Count, Database.GetAll().Count);
         }
 
-        public void CRUD(DatabaseProvider database = null)
+        public void SwitchDatabase(string databaseName)
+        {
+            Database.Default = Database.Get(databaseName);
+
+            Assert.AreEqual(databaseName, Database.Default.Name);
+            Assert.AreEqual(Database.Default, Car.DefaultDatabase);
+            Assert.AreEqual(Database.Default, Database.Get(Car.New().DatabaseName));
+        }
+
+        public void CRUD(Database database = null)
         {
 
             Car car = NewModl<Car>(database);
@@ -42,7 +60,7 @@ namespace Tests
             Assert.AreEqual(null, GetModl<Car>(car.Id, database, false));
         }
 
-        public T NewModl<T>(DatabaseProvider database) where T : Modl<T>, new()
+        public T NewModl<T>(Database database) where T : Modl<T>, new()
         {
             T modl;
 
@@ -56,14 +74,9 @@ namespace Tests
             return modl;
         }
 
-        public T GetModl<T>(int id, DatabaseProvider database, bool throwExceptionOnNotFound = true) where T : Modl<T>, new()
+        public T GetModl<T>(int id, Database database, bool throwExceptionOnNotFound = true) where T : Modl<T>, new()
         {
             T modl = Modl<T>.Get(id, database, throwExceptionOnNotFound);
-
-            //if (databaseName == null)
-                //modl = Modl<T>.Get(id, throwExceptionOnNotFound: throwExceptionOnNotFound);
-            //else
-            //    modl = Modl<T>.Get(id, Modl.Config.GetDatabase(databaseName), throwExceptionOnNotFound);
 
             if (!throwExceptionOnNotFound && modl != null)
                 Assert.IsTrue(!modl.IsNew);
@@ -83,12 +96,12 @@ namespace Tests
 
         public void SwitchInstanceDatabaseAndCRUD(string databaseName)
         {
-            CRUD(Modl.Config.GetDatabaseProvider(databaseName));
+            CRUD(Database.Get(databaseName));
         }
 
         public void GetFromDatabaseProvider(string databaseName)
         {
-            var db = DatabaseProvider.GetDatabaseProvider(databaseName);
+            var db = Database.Get(databaseName);
 
             var car = db.New<Car>();
             car.Manufacturer = "Saab";

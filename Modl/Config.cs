@@ -12,20 +12,20 @@ namespace Modl
     public class Config
     {
         //public static string ConnectionString { get; set; }
-        private static Dictionary<string, DatabaseProvider> DatabaseProviders = new Dictionary<string, DatabaseProvider>();
+        protected static Dictionary<string, Database> DatabaseProviders = new Dictionary<string, Database>();
 
         static Config()
         {
             foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
                 if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
-                    AddDatabaseProvider(connString);
+                    Database.AddFromConnectionString(connString);
 
             //if (ConfigurationManager.ConnectionStrings.Count > 1)
             //    AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
         }
 
-        private static DatabaseProvider defaultDbProvider = null;
-        public static DatabaseProvider DefaultDatabase
+        private static Database defaultDbProvider = null;
+        internal static Database DefaultDatabase
         {
             get
             {
@@ -40,34 +40,38 @@ namespace Modl
             }
         }
 
-        public static DatabaseProvider GetDatabaseProvider(string databaseName)
+        internal static Database AddDatabase(Database database)
+        {
+            DatabaseProviders[database.Name] = database;
+
+            return database;
+        }
+
+        internal static Database GetDatabase(string databaseName)
         {
             return DatabaseProviders[databaseName];
         }
 
-        public static IDbConnection GetConnection(string databaseName)
+        internal static List<Database> GetAllDatabases()
         {
-            return DatabaseProviders[databaseName].GetConnection();
+            return DatabaseProviders.Values.ToList();
         }
 
-        public static void AddDatabaseProvider(ConnectionStringSettings connectionConfig)
+        internal static void RemoveDatabase(string databaseName)
         {
-            DatabaseProviders[connectionConfig.Name] = DatabaseProvider.GetNewDatabaseProvider(connectionConfig);
+            DatabaseProviders.Remove(databaseName);
         }
 
-        public static void AddDatabaseProvider(string databaseName)
+        internal static void RemoveAllDatabases()
         {
-            AddDatabaseProvider(ConfigurationManager.ConnectionStrings[databaseName]);
+            DatabaseProviders.Clear();
         }
 
-        public static void AddDatabaseProvider(string databaseName, string connectionString, string providerName)
-        {
-            DatabaseProviders[databaseName] = DatabaseProvider.GetNewDatabaseProvider(new ConnectionStringSettings(databaseName, connectionString, providerName));
-        }
+        //public static IDbConnection GetConnection(string databaseName)
+        //{
+        //    return DatabaseProviders[databaseName].GetConnection();
+        //}
 
-        public static void AddDatabaseProvider(string databaseName, string connectionString, DatabaseType providerType)
-        {
-            DatabaseProviders[databaseName] = DatabaseProvider.GetNewDatabaseProvider(databaseName, connectionString, providerType);
-        }
+        
     }
 }

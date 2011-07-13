@@ -8,7 +8,7 @@ using MySql.Data.MySqlClient;
 
 namespace Modl.DatabaseProviders
 {
-    public class MySQLProvider : DatabaseProvider
+    public class MySQLProvider : Database
     {
         public static new DatabaseType Type = DatabaseType.MySQL;
         public static new string[] ProviderNames = new string[1] { "MySql.Data.MySqlClient" };

@@ -11,13 +11,13 @@ namespace Modl
     public class Literal : IQuery
     {
         private string sql;
-        protected DatabaseProvider provider;
-        public DatabaseProvider DatabaseProvider { get { return provider; } }
+        protected Database provider;
+        public Database DatabaseProvider { get { return provider; } }
         
         public Literal(string databaseName, string sql)
         {
             this.sql = sql;
-            provider = Config.GetDatabaseProvider(databaseName);
+            provider = Config.GetDatabase(databaseName);
         }
 
         public override string ToString()

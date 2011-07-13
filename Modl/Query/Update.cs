@@ -8,7 +8,7 @@ namespace Modl
 {
     public class Update<C> : Change<C> where C : Modl<C>, new()
     {
-        public Update(DatabaseProvider database) : base(database) { }
+        public Update(Database database) : base(database) { }
 
         protected string ValuesToString()
         {

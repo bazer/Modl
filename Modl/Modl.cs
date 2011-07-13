@@ -55,10 +55,10 @@ namespace Modl
             }
         }
         
-        private DatabaseProvider instanceDbProvider = null;
-        private static DatabaseProvider staticDbProvider = null;
+        private Database instanceDbProvider = null;
+        private static Database staticDbProvider = null;
 
-        public DatabaseProvider Database
+        public Database Database
         {
             get
             {
@@ -69,7 +69,7 @@ namespace Modl
             }
         }
 
-        public static DatabaseProvider DefaultDatabase 
+        public static Database DefaultDatabase 
         {
             get 
             {
@@ -82,10 +82,10 @@ namespace Modl
 
         public static void SetDefaultDatabase(string databaseName)
         {
-            SetDefaultDatabase(Config.GetDatabaseProvider(databaseName));
+            SetDefaultDatabase(Config.GetDatabase(databaseName));
         }
 
-        public static void SetDefaultDatabase(DatabaseProvider database)
+        public static void SetDefaultDatabase(Database database)
         {
             staticDbProvider = database;
         }
@@ -139,12 +139,12 @@ namespace Modl
         public static C New(string databaseName)
         {
             var c = new C();
-            c.instanceDbProvider = Config.GetDatabaseProvider(databaseName);
+            c.instanceDbProvider = Config.GetDatabase(databaseName);
 
             return c;
         }
 
-        public static C New(DatabaseProvider database)
+        public static C New(Database database)
         {
             var c = new C();
             c.instanceDbProvider = database;
@@ -166,12 +166,12 @@ namespace Modl
             }
         }
 
-        public static bool Exists(int id, DatabaseProvider database = null)
+        public static bool Exists(int id, Database database = null)
         {
             return Get(id, database, false) != null;
         }
 
-        public static C Get(int id, DatabaseProvider database = null, bool throwExceptionOnNotFound = true)
+        public static C Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
         {
             return GetWhere(IdName, id, database, throwExceptionOnNotFound);
         }
@@ -182,7 +182,7 @@ namespace Modl
             return Get(DbAccess.ExecuteReader(statement), statement.DatabaseProvider, throwExceptionOnNotFound, true);
         }
 
-        protected static C Get(DbDataReader reader, DatabaseProvider database, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        protected static C Get(DbDataReader reader, Database database, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {
             var c = Modl<C>.New(database); //new C();
 
@@ -218,7 +218,7 @@ namespace Modl
             return list;
         }
 
-        public static C GetWhere<T>(string field, T value, DatabaseProvider database = null, bool throwExceptionOnNotFound = true)
+        public static C GetWhere<T>(string field, T value, Database database = null, bool throwExceptionOnNotFound = true)
         {
             return GetWhere(database, throwExceptionOnNotFound, Tuple.Create(field, value));
         }
@@ -228,7 +228,7 @@ namespace Modl
             return GetWhere(null, true, fields);
         }
 
-        public static C GetWhere<T>(DatabaseProvider database = null, bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
+        public static C GetWhere<T>(Database database = null, bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
         {
             var select = new Select<C>(database ?? DefaultDatabase);
 
@@ -238,12 +238,12 @@ namespace Modl
             return Get(select, throwExceptionOnNotFound);
         }
 
-        public static List<C> GetAll(DatabaseProvider database = null)
+        public static List<C> GetAll(Database database = null)
         {
             return GetList(new Select<C>(database ?? DefaultDatabase));
         }
 
-        public static List<C> GetAllWhere<T>(string field, T value, DatabaseProvider database = null)
+        public static List<C> GetAllWhere<T>(string field, T value, Database database = null)
         {
             return GetAllWhere(database, Tuple.Create(field, value));
         }
@@ -253,7 +253,7 @@ namespace Modl
             return GetAllWhere(null, fields);
         }
 
-        public static List<C> GetAllWhere<T>(DatabaseProvider database = null, params Tuple<string, T>[] fields)
+        public static List<C> GetAllWhere<T>(Database database = null, params Tuple<string, T>[] fields)
         {
             var select = new Select<C>(database ?? DefaultDatabase);
 

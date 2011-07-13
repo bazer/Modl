@@ -8,7 +8,7 @@ using System.Data.SqlServerCe;
 
 namespace Modl.DatabaseProviders
 {
-    public class SqlCeProvider : DatabaseProvider
+    public class SqlCeProvider : Database
     {
         public static new DatabaseType Type = DatabaseType.SqlCE;
         public static new string[] ProviderNames = new string[1] { "Microsoft.SQLSERVER.CE.OLEDB.4.0" };
