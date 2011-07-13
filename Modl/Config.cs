@@ -40,7 +40,7 @@ namespace Modl
             }
         }
 
-        public static DatabaseProvider GetDatabase(string databaseName)
+        public static DatabaseProvider GetDatabaseProvider(string databaseName)
         {
             return DatabaseProviders[databaseName];
         }

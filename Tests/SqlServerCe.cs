@@ -33,5 +33,12 @@ namespace Tests
             basics.SwitchDatabase("SqlServerDb");
             basics.SwitchInstanceDatabaseAndCRUD(databaseName);
         }
+
+        [TestMethod]
+        public void GetFromDatabaseProvider()
+        {
+            basics.SwitchDatabase("SqlServerDb");
+            basics.GetFromDatabaseProvider(databaseName);
+        }
     }
 }

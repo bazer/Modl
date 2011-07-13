@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using Modl.DataAccess;
-using Modl.DatabaseProviders;
 using Modl.Exceptions;
 
 
@@ -83,7 +82,7 @@ namespace Modl
 
         public static void SetDefaultDatabase(string databaseName)
         {
-            SetDefaultDatabase(Config.GetDatabase(databaseName));
+            SetDefaultDatabase(Config.GetDatabaseProvider(databaseName));
         }
 
         public static void SetDefaultDatabase(DatabaseProvider database)
@@ -140,7 +139,7 @@ namespace Modl
         public static C New(string databaseName)
         {
             var c = new C();
-            c.instanceDbProvider = Config.GetDatabase(databaseName);
+            c.instanceDbProvider = Config.GetDatabaseProvider(databaseName);
 
             return c;
         }

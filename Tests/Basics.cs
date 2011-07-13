@@ -1,7 +1,6 @@
 ﻿using ExampleModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
-using Modl.DatabaseProviders;
 
 namespace Tests
 {
@@ -10,11 +9,11 @@ namespace Tests
     {
         public void SwitchDatabase(string databaseName)
         {
-            Modl.Config.DefaultDatabase = Modl.Config.GetDatabase(databaseName);
+            Modl.Config.DefaultDatabase = Modl.Config.GetDatabaseProvider(databaseName);
 
             Assert.AreEqual(databaseName, Modl.Config.DefaultDatabase.Name);
             Assert.AreEqual(Modl.Config.DefaultDatabase, Car.DefaultDatabase);
-            Assert.AreEqual(Modl.Config.DefaultDatabase, Modl.Config.GetDatabase(Car.New().DatabaseName));
+            Assert.AreEqual(Modl.Config.DefaultDatabase, Modl.Config.GetDatabaseProvider(Car.New().DatabaseName));
         }
 
         public void CRUD(DatabaseProvider database = null)
@@ -84,7 +83,23 @@ namespace Tests
 
         public void SwitchInstanceDatabaseAndCRUD(string databaseName)
         {
-            CRUD(Modl.Config.GetDatabase(databaseName));
+            CRUD(Modl.Config.GetDatabaseProvider(databaseName));
+        }
+
+        public void GetFromDatabaseProvider(string databaseName)
+        {
+            var db = DatabaseProvider.GetDatabaseProvider(databaseName);
+
+            var car = db.New<Car>();
+            car.Manufacturer = "Saab";
+            car.Name = "9000";
+            car.Save();
+
+            var car2 = db.Get<Car>(car.Id);
+            Assert.AreEqual(car.Database, car2.Database);
+            Assert.AreEqual(car.DatabaseName, car2.DatabaseName);
+            Assert.AreEqual(car.Manufacturer, car2.Manufacturer); 
+            Assert.AreEqual(car.Name, car2.Name);
         }
     }
 }

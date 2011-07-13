@@ -15,7 +15,7 @@ namespace Modl.DatabaseProviders
 
         protected SqlCeProvider(string name, string connectionString) : base(name, connectionString) { }
 
-        public override IDbConnection GetConnection()
+        internal override IDbConnection GetConnection()
         {
             //if (activeConnection.State != ConnectionState.Closed)
                 activeConnection = new SqlCeConnection(ConnectionString);
@@ -31,17 +31,17 @@ namespace Modl.DatabaseProviders
             return null;
         }
 
-        public override IQuery GetLastIdQuery()
+        internal override IQuery GetLastIdQuery()
         {
             return new Literal(Name, "SELECT @@IDENTITY");
         }
 
-        public override IDbCommand ToDbCommand(IQuery query)
+        internal override IDbCommand ToDbCommand(IQuery query)
         {
             return new SqlCeCommand(query.ToString(), (SqlCeConnection)GetConnection());
         }
 
-        public override List<IDbCommand> ToDbCommands(List<IQuery> queries)
+        internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
             var connection = GetConnection();
 

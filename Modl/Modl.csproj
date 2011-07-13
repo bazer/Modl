@@ -47,7 +47,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="DatabaseProviders\MySQLProvider.cs" />
     <Compile Include="DatabaseProviders\SqlCeProvider.cs" />
-    <Compile Include="DatabaseProviders\DatabaseProvider.cs" />
+    <Compile Include="DatabaseProvider.cs" />
     <Compile Include="DatabaseProviders\SqlServerProvider.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
     <Compile Include="Modl.cs" />

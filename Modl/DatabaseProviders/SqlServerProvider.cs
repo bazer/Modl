@@ -15,7 +15,7 @@ namespace Modl.DatabaseProviders
 
         protected SqlServerProvider(string name, string connectionString) : base(name, connectionString) { }
 
-        public override IDbConnection GetConnection()
+        internal override IDbConnection GetConnection()
         {
             return new SqlConnection(ConnectionString);
         }
@@ -28,17 +28,17 @@ namespace Modl.DatabaseProviders
             return null;
         }
 
-        public override IQuery GetLastIdQuery()
+        internal override IQuery GetLastIdQuery()
         {
             return new Literal(Name, "SELECT SCOPE_IDENTITY()");
         }
 
-        public override IDbCommand ToDbCommand(IQuery query)
+        internal override IDbCommand ToDbCommand(IQuery query)
         {
             return new SqlCommand(query.ToString(), (SqlConnection)GetConnection());
         }
 
-        public override List<IDbCommand> ToDbCommands(List<IQuery> queries)
+        internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
             //var connection = GetConnection();
             var commands = new List<IDbCommand>();

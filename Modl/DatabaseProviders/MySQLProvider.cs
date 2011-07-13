@@ -15,7 +15,7 @@ namespace Modl.DatabaseProviders
 
         protected MySQLProvider(string name, string connectionString) : base(name, connectionString) { }
 
-        public override IDbConnection GetConnection()
+        internal override IDbConnection GetConnection()
         {
             return new MySqlConnection(ConnectionString);
         }
@@ -28,17 +28,17 @@ namespace Modl.DatabaseProviders
             return null;
         }
 
-        public override IQuery GetLastIdQuery()
+        internal override IQuery GetLastIdQuery()
         {
             return new Literal(Name, "SELECT last_insert_id()");
         }
 
-        public override IDbCommand ToDbCommand(IQuery query)
+        internal override IDbCommand ToDbCommand(IQuery query)
         {
             return new MySqlCommand(query.ToString(), (MySqlConnection)GetConnection());
         }
 
-        public override List<IDbCommand> ToDbCommands(List<IQuery> queries)
+        internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
             //var connection = GetConnection();
             var commands = new List<IDbCommand>();

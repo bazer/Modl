@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Configuration;
+using Modl.DatabaseProviders;
 
-namespace Modl.DatabaseProviders
+namespace Modl
 {
     public enum DatabaseType
     {
@@ -16,10 +17,10 @@ namespace Modl.DatabaseProviders
 
     public abstract class DatabaseProvider
     {
-        public DatabaseType Type;
-        public string Name;
-        public string ConnectionString;
-        public string[] ProviderNames;
+        public DatabaseType Type { get; protected set; }
+        public string Name { get; protected set; }
+        public string ConnectionString { get; protected set; }
+        public string[] ProviderNames { get; protected set; }
         protected IDbConnection activeConnection;
 
         protected DatabaseProvider(string name, string connectionString)
@@ -28,12 +29,12 @@ namespace Modl.DatabaseProviders
             ConnectionString = connectionString;
         }
 
-        public abstract IDbConnection GetConnection();
-        public abstract IDbCommand ToDbCommand(IQuery query);
-        public abstract List<IDbCommand> ToDbCommands(List<IQuery> queries);
-        public abstract IQuery GetLastIdQuery();
+        internal abstract IDbConnection GetConnection();
+        internal abstract IDbCommand ToDbCommand(IQuery query);
+        internal abstract List<IDbCommand> ToDbCommands(List<IQuery> queries);
+        internal abstract IQuery GetLastIdQuery();
 
-        public static DatabaseProvider GetNewDatabaseProvider(string databaseName, string connectionString, DatabaseType providerType)
+        internal static DatabaseProvider GetNewDatabaseProvider(string databaseName, string connectionString, DatabaseType providerType)
         {
             string providerName = null;
 
@@ -47,7 +48,7 @@ namespace Modl.DatabaseProviders
             return GetNewDatabaseProvider(new ConnectionStringSettings(databaseName, connectionString, providerName));
         }
 
-        public static DatabaseProvider GetNewDatabaseProvider(ConnectionStringSettings connectionConfig)
+        internal static DatabaseProvider GetNewDatabaseProvider(ConnectionStringSettings connectionConfig)
         {
             DatabaseProvider provider = SqlServerProvider.GetNewOnMatch(connectionConfig);
             provider = provider ?? SqlCeProvider.GetNewOnMatch(connectionConfig);
@@ -59,9 +60,29 @@ namespace Modl.DatabaseProviders
             return provider;
         }
 
-        public static List<IDbCommand> GetDbCommands(List<IQuery> queries)
+        internal static List<IDbCommand> GetDbCommands(List<IQuery> queries)
         {
             return queries.GroupBy(x => x.DatabaseProvider).SelectMany(x => x.Key.ToDbCommands(x.ToList())).ToList();
+        }
+
+        public static DatabaseProvider GetDatabaseProvider(string databaseName)
+        {
+            return Config.GetDatabaseProvider(databaseName);
+        }
+
+        public T New<T>() where T : Modl<T>, new()
+        {
+            return Modl<T>.New(this);
+        }
+
+        public T Get<T>(int id, bool throwExceptionOnNotFound = true) where T : Modl<T>, new()
+        {
+            return Modl<T>.Get(id, this, throwExceptionOnNotFound);
+        }
+
+        public bool Exists<T>(int id) where T : Modl<T>, new()
+        {
+            return Modl<T>.Exists(id, this);
         }
     }
 }
