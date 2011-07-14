@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Web.Mvc;
 using Modl.DataAccess;
 using Modl.Exceptions;
+using Modl.Fields;
 
 
 namespace Modl
@@ -20,8 +21,8 @@ namespace Modl
 
     public abstract class ModlBase : IModl
     {
-        internal int id = 0;
-        public int Id { get { return id; } }
+        //internal int id = 0;
+        public abstract int Id { get; }
 
         public static string TableName;
 
@@ -40,7 +41,7 @@ namespace Modl
         public bool IsDeleted { get { return isDeleted; } }
 
         //private int id = 0;
-        //public int Id { get { return id; } }
+        public override int Id { get { return store.Id; } }
 
         //public static string TableName;
         internal static string IdName = "Id";
@@ -95,16 +96,12 @@ namespace Modl
             staticDbProvider = null;
         }
 
-        //public void SetDbProvider(DatabaseProvider dbProvider)
-        //{
-        //    instanceDbProvider = dbProvider;
-        //}
-
-
-        public static dynamic Constants = new ModlFields();
-        public static Dictionary<string, Type> Types = new Dictionary<string, Type>();
-        protected dynamic Fields = new ModlFields();
-        protected dynamic Lazy = new ModlFields();
+        public static dynamic Constants;// = new DynamicFields();
+        //public static Dictionary<string, Type> Types = new Dictionary<string, Type>();
+        protected dynamic Fields;
+        protected dynamic F;
+        protected dynamic Lazy;// = new DynamicFields();
+        private Store<C> store;
 
         //public virtual string Name { get { return string.IsNullOrEmpty(NameField) ? "" : Fields.Dictionary[NameField].Trim(); } set { if (!string.IsNullOrEmpty(NameField)) Fields.Dictionary[NameField] = value; } }
         //public virtual Description
@@ -127,7 +124,13 @@ namespace Modl
 
         public Modl()
         {
-            SetDefaults();
+            store = new Store<C>(IdName);
+
+            Fields = store.Fields;
+            F = store.Fields;
+            //Lazy = new DynamicFields(store);
+
+            store.SetDefaults(this);
         }
 
         public static C New()
@@ -152,19 +155,7 @@ namespace Modl
             return c;
         }
 
-        protected virtual void SetDefaults()
-        {
-            foreach (PropertyInfo property in typeof(C).GetProperties())
-            {
-                if (property.CanWrite)
-                {
-                    property.SetValue(this, Helper.GetDefault(property.PropertyType), null);
-
-                    if (!Types.ContainsKey(Fields.LastInsertedMemberName))
-                        Types[Fields.LastInsertedMemberName] = property.PropertyType;
-                }
-            }
-        }
+        
 
         public static bool Exists(int id, Database database = null)
         {
@@ -186,8 +177,11 @@ namespace Modl
         {
             var c = Modl<C>.New(database); //new C();
 
-            if (c.Load(reader, throwExceptionOnNotFound, singleRow))
+            if (c.store.Load(reader, throwExceptionOnNotFound, singleRow))
+            {
+                c.isNew = false;
                 return c;
+            }
             else
                 return null;
         }
@@ -263,6 +257,16 @@ namespace Modl
             return GetList(select);
         }
 
+        //protected void SetValue<T>(string name, T value)
+        //{
+        //    Fields.SetValue(name, value);
+        //}
+
+        //protected T GetValue<T>(string name)
+        //{
+        //    return Fields.GetValue<T>(name);
+        //}
+
         protected delegate T FetchDelegate<T>();
         protected T GetLazy<T>(string name, FetchDelegate<T> fetchCode)
         {
@@ -298,48 +302,13 @@ namespace Modl
             Fields.Dictionary[name] = value;
         }
 
-        private bool Load(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
-        {
-            if (reader.Read())
-            {
-                id = Helper.GetSafeValue(reader, IdName, 0);
-
-                var dictionary = Fields.Dictionary as IDictionary<string, object>;
-                var keys = dictionary.Keys.ToList();
-
-                for (int i=0; i<dictionary.Count; i++)
-                {
-                    string key = keys[i];
-
-                    if (Types[key].GetInterface("IBcBase") != null)
-                        dictionary[key] = Helper.GetSafeValue(reader, key, dictionary[key], typeof(int?));
-                    else
-                        dictionary[key] = Helper.GetSafeValue(reader, key, dictionary[key], Types[key]);
-                }
-
-                isNew = false;
-
-                if (singleRow)
-                    reader.Close();
-
-                return true;
-            }
-            else
-            {
-                reader.Close();
-
-                if (throwExceptionOnNotFound)
-                    throw new RecordNotFoundException();
-                else
-                    return false;
-            }
-        }
+        
 
         public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
         {
             Change<C> statement = BaseGetSaveStatement();
 
-            BaseAddSaveFields(statement);
+            store.BaseAddSaveFields(statement);
 
             if (dbTransaction != null)
                 BaseTransactionSave(statement, dbTransaction);
@@ -360,31 +329,13 @@ namespace Modl
             else
             {
                 statement = new Update<C>(Database);
-                ((Update<C>)statement).Where(IdName).EqualTo(id);
+                ((Update<C>)statement).Where(IdName).EqualTo(Id);
             }
 
             return statement;
         }
 
-        protected void BaseAddSaveFields(Change<C> statement)
-        {
-            foreach (var field in (IDictionary<string, object>)Fields.Dictionary)
-            {
-                if (Types[field.Key].GetInterface("IBcBase") != null && !(field.Value is int))
-                {
-                    var value = field.Value as IModl;
-
-                    if (value == null)
-                        statement.With(field.Key, null);
-                    else if (value.Id == 0)
-                        throw new Exception("Can't save foreign key of unsaved object: " + value);
-                    else
-                        statement.With(field.Key, value.Id);
-                }
-                else
-                    statement.With(field.Key, field.Value);
-            }
-        }
+        
 
         protected void BaseSave(Change<C> statement)
         {
@@ -392,7 +343,7 @@ namespace Modl
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
 
             if (statement is Insert<C>)
-                id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
+                store.Id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
             else
                 DbAccess.ExecuteNonQuery(statement);
 
@@ -417,7 +368,7 @@ namespace Modl
             LogDelete();
 
             Delete<C> statement = new Delete<C>(Database);
-            statement.Where(IdName).EqualTo(id);
+            statement.Where(IdName).EqualTo(Id);
 
             DbAccess.ExecuteNonQuery(statement);
 

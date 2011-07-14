@@ -3,26 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Dynamic;
+using System.Data.Common;
 
-namespace Modl
+namespace Modl.Fields
 {
-    public class ModlFields : DynamicObject
+    public class DynamicFields<C> : DynamicObject where C : Modl<C>, new()
     {
-        public Dictionary<string, object> Dictionary = new Dictionary<string, object>();
-        public Dictionary<string, Type> Types = new Dictionary<string, Type>();
+        Store<C> store;
         string NameOfLastInsertedMember;
+
+        internal DynamicFields(Store<C> store)
+        {
+            this.store = store;
+        }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (!Dictionary.ContainsKey(binder.Name))
-                Dictionary[binder.Name] = null;
+            if (!store.Dictionary.ContainsKey(binder.Name))
+                store.Dictionary[binder.Name] = null;
 
-            return Dictionary.TryGetValue(binder.Name, out result);
+            return store.Dictionary.TryGetValue(binder.Name, out result);
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            Dictionary[binder.Name] = value;
+            store.Dictionary[binder.Name] = value;
             NameOfLastInsertedMember = binder.Name;
 
             return true;
@@ -35,5 +40,7 @@ namespace Modl
                 return NameOfLastInsertedMember;
             }
         }
+
+        
     }
 }
