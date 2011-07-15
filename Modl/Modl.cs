@@ -40,6 +40,7 @@ namespace Modl
         private bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
+        public bool IsDirty { get { return store.IsDirty; } }
         //private int id = 0;
         public override int Id { get { return store.Id; } }
 
@@ -55,7 +56,7 @@ namespace Modl
                 return Database.Name;
             }
         }
-        
+
         private Database instanceDbProvider = null;
         private static Database staticDbProvider = null;
 
@@ -70,9 +71,9 @@ namespace Modl
             }
         }
 
-        public static Database DefaultDatabase 
+        public static Database DefaultDatabase
         {
-            get 
+            get
             {
                 if (staticDbProvider == null)
                     return Config.DefaultDatabase;
@@ -126,8 +127,8 @@ namespace Modl
         {
             store = new Store<C>(IdName);
 
-            Fields = store.Fields;
-            F = store.Fields;
+            Fields = store.DynamicFields;
+            F = store.DynamicFields;
             //Lazy = new DynamicFields(store);
 
             store.SetDefaults(this);
@@ -155,7 +156,7 @@ namespace Modl
             return c;
         }
 
-        
+
 
         public static bool Exists(int id, Database database = null)
         {
@@ -169,7 +170,7 @@ namespace Modl
 
         protected static C Get(Select<C> statement, bool throwExceptionOnNotFound = true)
         {
-            
+
             return Get(DbAccess.ExecuteReader(statement), statement.DatabaseProvider, throwExceptionOnNotFound, true);
         }
 
@@ -241,7 +242,7 @@ namespace Modl
         {
             return GetAllWhere(database, Tuple.Create(field, value));
         }
-        
+
         public static List<C> GetAllWhere<T>(params Tuple<string, T>[] fields)
         {
             return GetAllWhere(null, fields);
@@ -251,7 +252,7 @@ namespace Modl
         {
             var select = new Select<C>(database ?? DefaultDatabase);
 
-            foreach(var field in fields)
+            foreach (var field in fields)
                 select.Where(field.Item1).EqualTo(field.Item2.ToString());
 
             return GetList(select);
@@ -302,7 +303,7 @@ namespace Modl
             Fields.Dictionary[name] = value;
         }
 
-        
+
 
         public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
         {
@@ -315,6 +316,7 @@ namespace Modl
             else
                 BaseSave(statement);
 
+            store.ResetFields();
             LogSave();
         }
 
@@ -335,7 +337,7 @@ namespace Modl
             return statement;
         }
 
-        
+
 
         protected void BaseSave(Change<C> statement)
         {
@@ -402,15 +404,15 @@ namespace Modl
 
         #endregion
 
-        
+
         protected static Tuple<string, T> Q<T>(string field, T value)
         {
             return Tuple.Create<string, T>(field, value);
         }
 
-        public static IEnumerable<SelectListItem> SelectList<T>(string textField, bool firstRow = false,string firstRowText = "Any")
+        public static IEnumerable<SelectListItem> SelectList<T>(string textField, bool firstRow = false, string firstRowText = "Any")
         {
-            return SelectList<T>(AllCached, textField, firstRow,firstRowText);
+            return SelectList<T>(AllCached, textField, firstRow, firstRowText);
         }
 
         public static IEnumerable<SelectListItem> SelectList<T>(IEnumerable<C> list, string textField, bool firstRow, string firstRowText = "Any")
@@ -434,7 +436,7 @@ namespace Modl
                         Value = "0"
                     }
                 );
-            }   
+            }
 
             return selectList;
         }

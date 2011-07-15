@@ -50,6 +50,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseProviders\SqlServerProvider.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
+    <Compile Include="Fields\Field.cs" />
     <Compile Include="Fields\Store.cs" />
     <Compile Include="Modl.cs" />
     <Compile Include="Fields\DynamicFields.cs" />

@@ -14,7 +14,7 @@ namespace Modl
         IDbCommand ToDbCommand();
     }
 
-    public abstract class Query<C, T> : IQuery 
+    public abstract class Query<C, T> : IQuery, IQueryable<C>
         where C : Modl<C>, new()
         where T : Query<C, T>
     {
@@ -73,6 +73,32 @@ namespace Modl
         public IDbCommand ToDbCommand()
         {
             return DatabaseProvider.ToDbCommand(this);
+        }
+
+
+        public IEnumerator<C> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Type ElementType
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public System.Linq.Expressions.Expression Expression
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IQueryProvider Provider
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

@@ -14,14 +14,58 @@ namespace Modl.Fields
         protected int id = 0;
         internal int Id { get { return id; } set { id = value; } }
 
-        public DynamicFields<C> Fields;
-        public Dictionary<string, object> Dictionary = new Dictionary<string, object>();
-        public Dictionary<string, Type> Types = new Dictionary<string, Type>();
+        public DynamicFields<C> DynamicFields;
+        public Dictionary<string, Field> Fields = new Dictionary<string, Field>();
+
+        string NameOfLastInsertedMember;
 
         public Store(string idName)
         {
             IdName = idName;
-            Fields = new DynamicFields<C>(this);
+            DynamicFields = new DynamicFields<C>(this);
+        }
+
+        public bool IsDirty
+        {
+            get
+            {
+                return Fields.Values.Any(x => x.IsDirty);
+            }
+        }
+
+        public T GetValue<T>(string name)
+        {
+            return (T)GetField<T>(name).Value;
+        }
+
+        public void SetValue<T>(string name, T value)
+        {
+            SetField<T>(name, value);
+            NameOfLastInsertedMember = name;
+        }
+
+        protected Field GetField<T>(string name)
+        {
+            if (!Fields.ContainsKey(name))
+                Fields[name] = new Field(default(T), typeof(T));
+
+            return (Field)Fields[name];
+        }
+
+        protected void SetField<T>(string name, T value)
+        {
+            if (!Fields.ContainsKey(name))
+                Fields[name] = new Field(value, typeof(T));
+            else
+                Fields[name].Value = value;
+        }
+
+        public string LastInsertedMemberName
+        {
+            get
+            {
+                return NameOfLastInsertedMember;
+            }
         }
 
         internal bool Load(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
@@ -30,17 +74,16 @@ namespace Modl.Fields
             {
                 id = Helper.GetSafeValue(reader, IdName, 0);
 
-                var dictionary = Dictionary as IDictionary<string, object>;
-                var keys = dictionary.Keys.ToList();
+                var keys = Fields.Keys.ToList();
 
-                for (int i = 0; i < dictionary.Count; i++)
+                for (int i = 0; i < Fields.Count; i++)
                 {
                     string key = keys[i];
 
-                    if (Types[key].GetInterface("IModl") != null)
-                        dictionary[key] = Helper.GetSafeValue(reader, key, dictionary[key], typeof(int?));
+                    if (Fields[key].Type.GetInterface("IModl") != null)
+                        SetField(key, Helper.GetSafeValue(reader, key, Fields[key].Value, typeof(int?)));
                     else
-                        dictionary[key] = Helper.GetSafeValue(reader, key, dictionary[key], Types[key]);
+                        SetField(key, Helper.GetSafeValue(reader, key, Fields[key].Value, Fields[key].Type));
                 }
 
                 if (singleRow)
@@ -66,18 +109,16 @@ namespace Modl.Fields
                 if (property.CanWrite)
                 {
                     property.SetValue(instance, Helper.GetDefault(property.PropertyType), null);
-
-                    if (!Types.ContainsKey(Fields.LastInsertedMemberName))
-                        Types[Fields.LastInsertedMemberName] = property.PropertyType;
+                    Fields[LastInsertedMemberName].Type = property.PropertyType;
                 }
             }
         }
 
         internal void BaseAddSaveFields(Change<C> statement)
         {
-            foreach (var field in (IDictionary<string, object>)Dictionary)
+            foreach (var field in Fields)
             {
-                if (Types[field.Key].GetInterface("IModl") != null && !(field.Value is int))
+                if (field.Value.Type.GetInterface("IModl") != null && !(field.Value.Value is int))
                 {
                     var value = field.Value as IModl;
 
@@ -89,8 +130,14 @@ namespace Modl.Fields
                         statement.With(field.Key, value.Id);
                 }
                 else
-                    statement.With(field.Key, field.Value);
+                    statement.With(field.Key, field.Value.Value);
             }
+        }
+
+        internal void ResetFields()
+        {
+            foreach (var field in Fields.Values)
+                field.Reset();
         }
     }
 }

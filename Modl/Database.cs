@@ -139,5 +139,10 @@ namespace Modl
         {
             return Modl<T>.Exists(id, this);
         }
+
+        public Select<T> Select<T>() where T : Modl<T>, new()
+        {
+            return new Select<T>(this);
+        }
     }
 }

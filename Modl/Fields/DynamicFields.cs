@@ -10,7 +10,6 @@ namespace Modl.Fields
     public class DynamicFields<C> : DynamicObject where C : Modl<C>, new()
     {
         Store<C> store;
-        string NameOfLastInsertedMember;
 
         internal DynamicFields(Store<C> store)
         {
@@ -19,28 +18,23 @@ namespace Modl.Fields
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (!store.Dictionary.ContainsKey(binder.Name))
-                store.Dictionary[binder.Name] = null;
+            result = store.GetValue<object>(binder.Name);
+            return true;
 
-            return store.Dictionary.TryGetValue(binder.Name, out result);
+            //if (!store.Dictionary.ContainsKey(binder.Name))
+            //    store.Dictionary[binder.Name] = null;
+
+            //return store.Dictionary.TryGetValue(binder.Name, out result);
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            store.Dictionary[binder.Name] = value;
-            NameOfLastInsertedMember = binder.Name;
+            store.SetValue(binder.Name, value);
+
+            //store.Dictionary[binder.Name] = value;
+            //NameOfLastInsertedMember = binder.Name;
 
             return true;
         }
-
-        public string LastInsertedMemberName
-        {
-            get
-            {
-                return NameOfLastInsertedMember;
-            }
-        }
-
-        
     }
 }

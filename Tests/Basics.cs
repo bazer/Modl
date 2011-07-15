@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
 using Modl.DatabaseProviders;
+using System.Linq;
 
 namespace Tests
 {
@@ -38,10 +39,13 @@ namespace Tests
         public void CRUD(Database database = null)
         {
             Car car = NewModl<Car>(database);
+            Assert.AreEqual(false, car.IsDirty);
             car.Name = "BMW M3";
             car.Manufacturer = "BMW";
+            Assert.AreEqual(true, car.IsDirty);
             car.Save();
             Assert.IsTrue(!car.IsNew);
+            Assert.AreEqual(false, car.IsDirty);
 
             Car car2 = GetModl<Car>(car.Id, database); // Car.Get(car.Id);
             Assert.AreEqual(car.Id, car2.Id);
@@ -112,6 +116,10 @@ namespace Tests
             Assert.AreEqual(car.DatabaseName, car2.DatabaseName);
             Assert.AreEqual(car.Manufacturer, car2.Manufacturer); 
             Assert.AreEqual(car.Name, car2.Name);
+
+            //db.Select<Car>().Where(x => x.Id == car.Id).ToList();
+
+            //db.Get<Car>(car.Id);
         }
     }
 }
