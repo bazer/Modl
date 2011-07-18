@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
 
-namespace Modl
+namespace Modl.Query
 {
     public class Insert<C> : Change<C> where C : Modl<C>, new()
     {

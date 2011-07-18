@@ -5,6 +5,8 @@ using System.Text;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using Modl.Query;
+using System.Linq.Expressions;
 
 namespace Modl.DatabaseProviders
 {
@@ -47,5 +49,10 @@ namespace Modl.DatabaseProviders
 
             return commands;
         }
+
+        //internal override object Execute(Expression expression)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
 using Modl.DatabaseProviders;
 using System.Linq;
+using System.Diagnostics;
+using System;
 
 namespace Tests
 {
@@ -26,6 +28,22 @@ namespace Tests
 
             Assert.AreEqual(databases.Count, Database.GetAll().Count);
         }
+
+        public TimeSpan PerformanceCRUD(string databaseName, int iterations)
+        {
+            SwitchDatabase(databaseName);
+
+            var watch = Stopwatch.StartNew();
+
+            for (int i = 0; i < iterations; i++)
+                CRUD();
+
+            watch.Stop();
+            Console.WriteLine(string.Format("{0} iterations for {1}: {2} ms.", iterations, databaseName, watch.Elapsed.TotalMilliseconds));
+
+            return watch.Elapsed;
+        }
+
 
         public void SwitchDatabase(string databaseName)
         {
@@ -117,8 +135,12 @@ namespace Tests
             Assert.AreEqual(car.Manufacturer, car2.Manufacturer); 
             Assert.AreEqual(car.Name, car2.Name);
 
-            //db.Select<Car>().Where(x => x.Id == car.Id).ToList();
+            car2.Delete();
 
+            db.Query<Car>().Where(x => x.Id == car.Id).ToList();
+            Car.Query(db).ToList();
+
+            
             //db.Get<Car>(car.Id);
         }
     }

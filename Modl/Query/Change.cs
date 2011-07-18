@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
 
-namespace Modl
+namespace Modl.Query
 {
     public abstract class Change<C> : Query<C, Change<C>> where C : Modl<C>, new()
     {

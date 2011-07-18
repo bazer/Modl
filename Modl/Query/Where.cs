@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Modl
+namespace Modl.Query
 {
     internal enum Relation
     {
@@ -37,17 +37,17 @@ namespace Modl
 
         public T EqualTo<V>(V value)
         {
-            return SetAndReturn(value, Modl.Relation.Equal);
+            return SetAndReturn(value, Modl.Query.Relation.Equal);
         }
 
         public T NotEqualTo<V>(V value)
         {
-            return SetAndReturn(value, Modl.Relation.NotEqual);
+            return SetAndReturn(value, Modl.Query.Relation.NotEqual);
         }
 
         public T Like<V>(V value)
         {
-            return SetAndReturn(value, Modl.Relation.Like);
+            return SetAndReturn(value, Modl.Query.Relation.Like);
         }
 
         private T SetAndReturn<V>(V value, Relation relation)
@@ -65,19 +65,19 @@ namespace Modl
 
         private string RelationToString(Relation relation)
         {
-            if (relation == Modl.Relation.Equal)
+            if (relation == Modl.Query.Relation.Equal)
                 return "=";
-            else if (relation == Modl.Relation.NotEqual)
+            else if (relation == Modl.Query.Relation.NotEqual)
                 return "<>";
-            else if (relation == Modl.Relation.Like)
+            else if (relation == Modl.Query.Relation.Like)
                 return "LIKE";
-            else if (relation == Modl.Relation.BiggerThan)
+            else if (relation == Modl.Query.Relation.BiggerThan)
                 return ">";
-            else if (relation == Modl.Relation.BiggerThanOrEqual)
+            else if (relation == Modl.Query.Relation.BiggerThanOrEqual)
                 return ">=";
-            else if (relation == Modl.Relation.SmallerThan)
+            else if (relation == Modl.Query.Relation.SmallerThan)
                 return "<";
-            else if (relation == Modl.Relation.SmallerThanOrEqual)
+            else if (relation == Modl.Query.Relation.SmallerThanOrEqual)
                 return "<=";
 
             return null;

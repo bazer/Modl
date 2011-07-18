@@ -5,6 +5,10 @@ using System.Text;
 using System.Data;
 using System.Configuration;
 using Modl.DatabaseProviders;
+using Modl.Query;
+using Modl.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Modl
 {
@@ -36,6 +40,7 @@ namespace Modl
         internal abstract IDbCommand ToDbCommand(IQuery query);
         internal abstract List<IDbCommand> ToDbCommands(List<IQuery> queries);
         internal abstract IQuery GetLastIdQuery();
+        //internal abstract object Execute(Expression expression);
 
         internal static Database GetNewDatabaseProvider(string databaseName, string connectionString, DatabaseType providerType)
         {
@@ -140,9 +145,45 @@ namespace Modl
             return Modl<T>.Exists(id, this);
         }
 
-        public Select<T> Select<T>() where T : Modl<T>, new()
+        public IQueryable<T> Query<T>() where T : Modl<T>, new()
         {
-            return new Select<T>(this);
+            return new LinqQuery<T>(this);
         }
+
+        //IQueryable<T> IQueryProvider.CreateQuery<T>(System.Linq.Expressions.Expression expression)
+        //{
+        //    return new LinqQuery<T>(this, expression);
+        //}
+
+        //IQueryable IQueryProvider.CreateQuery(System.Linq.Expressions.Expression expression)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //T IQueryProvider.Execute<T>(System.Linq.Expressions.Expression expression)
+        //{
+        //    //var select = new Select<T>(this, expression);
+
+        //    return (T)this.Execute(expression);
+        //}
+
+        //object IQueryProvider.Execute(System.Linq.Expressions.Expression expression)
+        //{
+        //    //return this.Execute(expression);
+        //    throw new NotImplementedException();
+        //}
+
+        //object Execute(Expression expression)
+        //{
+        //    //Type elementType = TypeSystem.GetElementType(expression.Type);
+            
+
+        //    //var method = expression.Type.GetMethods(BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.Public).Single(x => x.Name == "Get" && x.GetParameters().Count() == 2);
+        //    //return method.Invoke(null, new object[] { Convert.ToInt32(value.AttemptedValue), true });
+
+        //    //return Activator.CreateInstance(typeof(Modl<>).MakeGenericType(expression.Type), BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { reader }, null);
+        //}
+
+        
     }
 }

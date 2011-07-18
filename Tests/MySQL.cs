@@ -13,6 +13,12 @@ namespace Tests
         string databaseName = "MySQLDb";
         Basics basics = new Basics();
 
+        //[TestMethod]
+        public void PerformanceTest()
+        {
+            basics.PerformanceCRUD(databaseName, 100);
+        }
+
         [TestMethod]
         public void GlobalCRUD()
         {

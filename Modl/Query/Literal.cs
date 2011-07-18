@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Data;
 using Modl.DatabaseProviders;
 
-namespace Modl
+namespace Modl.Query
 {
     public class Literal : IQuery
     {

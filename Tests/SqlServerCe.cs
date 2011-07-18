@@ -13,6 +13,12 @@ namespace Tests
         string databaseName = "SqlServerCeDb";
         Basics basics = new Basics();
 
+        //[TestMethod]
+        public void PerformanceTest()
+        {
+            basics.PerformanceCRUD(databaseName, 100);
+        }
+
         [TestMethod]
         public void GlobalCRUD()
         {

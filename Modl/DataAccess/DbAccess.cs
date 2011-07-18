@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using Modl.DatabaseProviders;
+using Modl.Query;
 
 namespace Modl.DataAccess
 {

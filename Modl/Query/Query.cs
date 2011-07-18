@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Data;
 using Modl.DatabaseProviders;
 
-namespace Modl
+namespace Modl.Query
 {
     public interface IQuery
     {
@@ -14,7 +14,7 @@ namespace Modl
         IDbCommand ToDbCommand();
     }
 
-    public abstract class Query<C, T> : IQuery, IQueryable<C>
+    public abstract class Query<C, T> : IQuery
         where C : Modl<C>, new()
         where T : Query<C, T>
     {
@@ -45,25 +45,25 @@ namespace Modl
             return where;
         }
 
-        public T And()
-        {
-            return (T)this;
-        }
+        //public T And()
+        //{
+        //    return (T)this;
+        //}
 
-        public T And(T where)
-        {
-            return (T)this;
-        }
+        //public T And(T where)
+        //{
+        //    return (T)this;
+        //}
 
-        public T Or()
-        {
-            return (T)this;
-        }
+        //public T Or()
+        //{
+        //    return (T)this;
+        //}
 
-        public T Or(T where)
-        {
-            return (T)this;
-        }
+        //public T Or(T where)
+        //{
+        //    return (T)this;
+        //}
 
         protected string QueryPartsToString()
         {
@@ -73,32 +73,6 @@ namespace Modl
         public IDbCommand ToDbCommand()
         {
             return DatabaseProvider.ToDbCommand(this);
-        }
-
-
-        public IEnumerator<C> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Type ElementType
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public System.Linq.Expressions.Expression Expression
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public IQueryProvider Provider
-        {
-            get { throw new NotImplementedException(); }
         }
     }
 }

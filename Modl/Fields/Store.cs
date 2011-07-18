@@ -5,6 +5,7 @@ using System.Text;
 using System.Data.Common;
 using Modl.Exceptions;
 using System.Reflection;
+using Modl.Query;
 
 namespace Modl.Fields
 {
@@ -95,7 +96,7 @@ namespace Modl.Fields
             {
                 reader.Close();
 
-                if (throwExceptionOnNotFound)
+                if (singleRow && throwExceptionOnNotFound)
                     throw new RecordNotFoundException();
                 else
                     return false;

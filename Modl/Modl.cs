@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using Modl.DataAccess;
 using Modl.Exceptions;
 using Modl.Fields;
+using Modl.Query;
+using Modl.Linq;
 
 
 namespace Modl
@@ -156,8 +158,6 @@ namespace Modl
             return c;
         }
 
-
-
         public static bool Exists(int id, Database database = null)
         {
             return Get(id, database, false) != null;
@@ -195,7 +195,7 @@ namespace Modl
                 return AllCached.SingleOrDefault(x => x.Id == id);
         }
 
-        protected static List<C> GetList(Select<C> statement)
+        internal static List<C> GetList(Select<C> statement)
         {
             var list = new List<C>();
 
@@ -476,5 +476,10 @@ namespace Modl
         //{
         //    return new Where<C, Select<C>>(key);
         //}
+
+        public static IQueryable<C> Query(Database database = null)
+        {
+            return new LinqQuery<C>(database ?? DefaultDatabase);
+        }
     }
 }

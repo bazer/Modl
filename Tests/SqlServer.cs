@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ExampleModel;
+using System.Collections;
 
 namespace Tests
 {
@@ -12,6 +13,12 @@ namespace Tests
     {
         string databaseName = "SqlServerDb";
         Basics basics = new Basics();
+
+        //[TestMethod]
+        public void PerformanceTest()
+        {
+            basics.PerformanceCRUD(databaseName, 100);
+        }
 
         [TestMethod]
         public void GlobalCRUD()

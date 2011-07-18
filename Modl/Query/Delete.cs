@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
 
-namespace Modl
+namespace Modl.Query
 {
     public class Delete<C> : Query<C, Delete<C>> where C : Modl<C>, new()
     {
