@@ -28,14 +28,19 @@ namespace Modl.Linq
             this.provider = new LinqQueryProvider(database);
         }
 
-        public IEnumerator<T> GetEnumerator()
+        protected IEnumerator<T> GetList()
         {
             return Modl<T>.GetList(new Select<T>(database, expression)).GetEnumerator();
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            return GetList();
+        }
+
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return Modl<T>.GetList(new Select<T>(database, expression)).GetEnumerator();
+            return GetList();
         }
 
         public Type ElementType

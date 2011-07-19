@@ -10,6 +10,7 @@ using Modl.Exceptions;
 using Modl.Fields;
 using Modl.Query;
 using Modl.Linq;
+using System.Linq.Expressions;
 
 
 namespace Modl
@@ -112,6 +113,8 @@ namespace Modl
         static Modl()
         {
             typeof(C).TypeInitializer.Invoke(null, null);
+
+            Statics<C>.SetFieldName("Id", IdName);
         }
 
         public static List<C> AllCached
@@ -168,6 +171,8 @@ namespace Modl
             return GetWhere(IdName, id, database, throwExceptionOnNotFound);
         }
 
+        
+
         protected static C Get(Select<C> statement, bool throwExceptionOnNotFound = true)
         {
 
@@ -211,6 +216,11 @@ namespace Modl
             }
 
             return list;
+        }
+
+        public static C GetWhere(Expression<Func<C, bool>> query, Database database = null, bool throwExceptionOnNotFound = true)
+        {
+            return Get(new Select<C>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
 
         public static C GetWhere<T>(string field, T value, Database database = null, bool throwExceptionOnNotFound = true)
@@ -480,6 +490,11 @@ namespace Modl
         public static IQueryable<C> Query(Database database = null)
         {
             return new LinqQuery<C>(database ?? DefaultDatabase);
+        }
+
+        internal static string GetFieldName(string propertyName)
+        {
+            return Statics<C>.GetFieldName(propertyName);
         }
     }
 }

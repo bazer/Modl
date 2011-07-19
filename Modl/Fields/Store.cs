@@ -17,6 +17,7 @@ namespace Modl.Fields
 
         public DynamicFields<C> DynamicFields;
         public Dictionary<string, Field> Fields = new Dictionary<string, Field>();
+        
 
         string NameOfLastInsertedMember;
 
@@ -111,6 +112,7 @@ namespace Modl.Fields
                 {
                     property.SetValue(instance, Helper.GetDefault(property.PropertyType), null);
                     Fields[LastInsertedMemberName].Type = property.PropertyType;
+                    Statics<C>.SetFieldName(property.Name, LastInsertedMemberName);
                 }
             }
         }

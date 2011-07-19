@@ -66,9 +66,7 @@ namespace Tests
             Assert.AreEqual(false, car.IsDirty);
 
             Car car2 = GetModl<Car>(car.Id, database); // Car.Get(car.Id);
-            Assert.AreEqual(car.Id, car2.Id);
-            Assert.AreEqual(car.Name, car2.Name);
-            Assert.AreEqual(car.Manufacturer, car2.Manufacturer);
+            AssertEqual(car, car2);
 
             car2.Manufacturer = "Mercedes";
             Assert.AreEqual("Mercedes", car2.Manufacturer);
@@ -130,18 +128,74 @@ namespace Tests
             car.Save();
 
             var car2 = db.Get<Car>(car.Id);
-            Assert.AreEqual(car.Database, car2.Database);
-            Assert.AreEqual(car.DatabaseName, car2.DatabaseName);
-            Assert.AreEqual(car.Manufacturer, car2.Manufacturer); 
-            Assert.AreEqual(car.Name, car2.Name);
+            AssertEqual(car, car2);
 
             car2.Delete();
+        }
 
-            db.Query<Car>().Where(x => x.Id == car.Id).ToList();
-            Car.Query(db).ToList();
+        public void GetFromLinq()
+        {
+            var car = new Car();
+            car.Manufacturer = "Saab";
+            car.Name = "9000";
+            car.Save();
 
+            var cars = Car.Query().Where(x => x.Id == car.Id).ToList();
+            Assert.AreEqual(1, cars.Count);
+
+            var car2 = cars.First();
+            AssertEqual(car, car2);
             
-            //db.Get<Car>(car.Id);
+            car2.Delete();
+        }
+
+        public void GetFromLinqInstance(string databaseName)
+        {
+            var db = Database.Get(databaseName);
+
+            var car = db.New<Car>();
+            car.Manufacturer = "Saab";
+            car.Name = "9000";
+            car.Save();
+
+            var cars = db.Query<Car>().Where(x => x.Id == car.Id).ToList();
+            Assert.AreEqual(1, cars.Count);
+            
+            var car2 = cars.First();
+            AssertEqual(car, car2);
+
+            //var car2 = Car.Query(db).Where(x => x.Id == car.Id).First();
+            //var car3 = Car.GetWhere(x => x.Name == "9000", db);
+            //Assert.AreEqual("9000", car3.Name);
+
+            car2.Delete();
+        }
+
+        public void GetFromLinqAdvanced(string databaseName)
+        {
+            var db = Database.Get(databaseName);
+
+            var car = db.New<Car>();
+            car.Manufacturer = "Saab";
+            car.Name = "9000";
+            car.Save();
+
+            var cars = db.Query<Car>().Where(x => x.Id == car.Id && x.Manufacturer == car.Manufacturer && x.Name != "M5").ToList();
+            Assert.AreEqual(1, cars.Count);
+
+            var car2 = Car.Query(db).Where(x => x.Id == car.Id && x.Manufacturer == car.Manufacturer && x.Name != "M5").First();
+            AssertEqual(car, car2);
+            
+            car2.Delete();
+        }
+
+        public void AssertEqual(Car car1, Car car2)
+        {
+            Assert.AreEqual(car1.Database, car2.Database);
+            Assert.AreEqual(car1.DatabaseName, car2.DatabaseName);
+            Assert.AreEqual(car1.Id, car2.Id);
+            Assert.AreEqual(car1.Manufacturer, car2.Manufacturer);
+            Assert.AreEqual(car1.Name, car2.Name);
         }
     }
 }

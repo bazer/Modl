@@ -26,7 +26,7 @@ namespace Modl.Linq
             throw new NotImplementedException();
         }
 
-        public TResult Execute<TResult>(System.Linq.Expressions.Expression expression)
+        public T Execute<T>(System.Linq.Expressions.Expression expression)
         {
             throw new NotImplementedException();
         }

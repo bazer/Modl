@@ -6,6 +6,7 @@ using Modl.DatabaseProviders;
 using Modl.Linq;
 using System.Linq.Expressions;
 using System.Collections;
+using Modl.Linq.Parsers;
 
 namespace Modl.Query
 {
@@ -24,18 +25,18 @@ namespace Modl.Query
             : base(database)
         {
             this.expression = expression;
-            //var parser = new LinqParser();
-            //parser.Visit(expression);
+            var parser = new LinqParser<C>(this);
+            parser.ParseTree(expression);
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("SELECT * FROM {0}\r\n", Modl<C>.TableName);
+            sb.AppendFormat("SELECT * FROM {0} \r\n", Modl<C>.TableName);
 
             if (queryParts.Count > 0)
-                sb.AppendFormat("WHERE\r\n{1}", Modl<C>.TableName, QueryPartsToString());
+                sb.AppendFormat("WHERE\r\n {1}", Modl<C>.TableName, QueryPartsToString());
 
             return sb.ToString();
         }
