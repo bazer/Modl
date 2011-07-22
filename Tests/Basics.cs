@@ -51,14 +51,14 @@ namespace Tests
 
             Assert.AreEqual(databaseName, Database.Default.Name);
             Assert.AreEqual(Database.Default, Car.DefaultDatabase);
-            Assert.AreEqual(Database.Default, Database.Get(Car.New().DatabaseName));
+            Assert.AreEqual(Database.Default, Car.New().Database);
         }
 
         public void CRUD(Database database = null)
         {
             Car car = NewModl<Car>(database);
             Assert.AreEqual(false, car.IsDirty);
-            car.Name = "BMW M3";
+            car.Name = "M3";
             car.Manufacturer = "BMW";
             Assert.AreEqual(true, car.IsDirty);
             car.Save();
@@ -105,12 +105,12 @@ namespace Tests
 
         public void SwitchStaticDatabaseAndCRUD(string databaseName)
         {
-            Car.SetDefaultDatabase(databaseName);
+            Car.DefaultDatabase = Database.Get(databaseName);
             Assert.AreEqual(databaseName, Car.DefaultDatabase.Name);
 
             CRUD();
 
-            Car.ClearDefaultDatabase();
+            Car.DefaultDatabase = null;
         }
 
         public void SwitchInstanceDatabaseAndCRUD(string databaseName)
@@ -152,14 +152,17 @@ namespace Tests
         public void GetFromLinqInstance(string databaseName)
         {
             var db = Database.Get(databaseName);
-
+            
             var car = db.New<Car>();
             car.Manufacturer = "Saab";
             car.Name = "9000";
             car.Save();
-
+            
             var cars = db.Query<Car>().Where(x => x.Id == car.Id).ToList();
             Assert.AreEqual(1, cars.Count);
+
+            var selectList = db.Query<Car>().Where(x => x.Name != "dsklhfsd").AsEnumerable().AsSelectList(x => x.Manufacturer + " " + x.Name);
+            Assert.IsTrue(selectList.Count() > 0);
             
             var car2 = cars.First();
             AssertEqual(car, car2);
@@ -192,7 +195,7 @@ namespace Tests
         public void AssertEqual(Car car1, Car car2)
         {
             Assert.AreEqual(car1.Database, car2.Database);
-            Assert.AreEqual(car1.DatabaseName, car2.DatabaseName);
+            Assert.AreEqual(car1.Database.Name, car2.Database.Name);
             Assert.AreEqual(car1.Id, car2.Id);
             Assert.AreEqual(car1.Manufacturer, car2.Manufacturer);
             Assert.AreEqual(car1.Name, car2.Name);

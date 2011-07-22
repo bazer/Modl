@@ -67,7 +67,7 @@ namespace Modl.Query
 
         protected string QueryPartsToString()
         {
-            return string.Join("\r\n", queryParts.Select(x => x.ToString()));
+            return string.Join("AND \r\n", queryParts.Select(x => x.ToString()));
         }
 
         public IDbCommand ToDbCommand()

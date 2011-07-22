@@ -20,7 +20,6 @@ namespace ExampleModel
         {
             Query().Where(x => x.Name == name).Single();
 
-
             //return Get(
             //    Select().Where(x => x.Name == name).Where(x => x.Manufacturer.StartsWith("Merc") || x.Manufacturer.EndsWith("edes"));
 

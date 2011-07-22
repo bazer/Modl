@@ -50,6 +50,26 @@ namespace Modl.Query
             return SetAndReturn(value, Modl.Query.Relation.Like);
         }
 
+        public T GreaterThan<V>(V value)
+        {
+            return SetAndReturn(value, Modl.Query.Relation.BiggerThan);
+        }
+
+        public T GreaterThanOrEqual<V>(V value)
+        {
+            return SetAndReturn(value, Modl.Query.Relation.BiggerThanOrEqual);
+        }
+
+        public T LessThan<V>(V value)
+        {
+            return SetAndReturn(value, Modl.Query.Relation.SmallerThan);
+        }
+
+        public T LessThanOrEqual<V>(V value)
+        {
+            return SetAndReturn(value, Modl.Query.Relation.SmallerThanOrEqual);
+        }
+
         private T SetAndReturn<V>(V value, Relation relation)
         {
             this.Value = value;

@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Modl
 {
-    static class Extensions
+    public static class Extensions
     {
-
-        public static List<SelectListItem> GetAsSelectList(this List<IModl> list)
+        public static IEnumerable<SelectListItem> AsSelectList<T>(this IEnumerable<T> list, Func<T, string> text, Func<T, string> value = null) where T : Modl<T>, new()
         {
-            List<SelectListItem> selectLister = new List<SelectListItem>();
-            SelectListItem it;
+            if (value == null)
+                value = x => Helper.ConvertTo<int>(x.Id).ToString();
 
-            foreach (IModl o in list)
-            {
-                it = new SelectListItem();
-                it.Text = o.Id.ToString();
-                it.Value = o.Id.ToString();
-
-                selectLister.Add(it);
-            }
-
-            return selectLister;
+            return from c in list
+                   select new SelectListItem
+                   {
+                       Text = text.Invoke(c),
+                       Value = value.Invoke(c)
+                   };
         }
     }
 }

@@ -32,5 +32,17 @@ namespace Modl.Linq.Parsers
             
             return base.VisitMethodCall(node);
         }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            whereParser.Visit(node);
+            
+            return base.VisitBinary(node);
+        }
+
+        //protected override Expression VisitLambda<T>(Expression<T> node)
+        //{
+        //    return base.VisitLambda<T>(node);
+        //}
     }
 }

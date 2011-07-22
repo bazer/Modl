@@ -24,46 +24,25 @@ namespace Modl.Linq.Parsers
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var fields = GetFields(node);
+            var fields = LinqHelper.GetFields<T>(node);
             var where = select.Where(fields.Key);
 
             if (node.NodeType == ExpressionType.Equal)
                 where.EqualTo(fields.Value);
+            else if (node.NodeType == ExpressionType.NotEqual)
+                where.NotEqualTo(fields.Value);
+            else if (node.NodeType == ExpressionType.GreaterThan)
+                where.GreaterThan(fields.Value);
+            else if (node.NodeType == ExpressionType.GreaterThanOrEqual)
+                where.GreaterThanOrEqual(fields.Value);
+            else if (node.NodeType == ExpressionType.LessThan)
+                where.LessThan(fields.Value);
+            else if (node.NodeType == ExpressionType.LessThanOrEqual)
+                where.LessThanOrEqual(fields.Value);
             else
                 throw new NotImplementedException("Operation not implemented");
 
-
-            
-            //string field = Modl<T>.GetFieldName(((MemberExpression)node.Left).Member.Name);
-            //object value = ExpressionTreeHelpers.GetValueFromExpression(node.Right);
-
-            
-
             return base.VisitBinary(node);
-        }
-
-        protected KeyValuePair<string, object> GetFields(BinaryExpression node)
-        {
-            if (node.Left is ConstantExpression && node.Right is ConstantExpression)
-                throw new InvalidQueryException("Unable to compare 2 constants.");
-
-            if (node.Left is MemberExpression)
-                return GetValues(node.Left, node.Right);
-            else
-                return GetValues(node.Right, node.Left);
-        }
-
-        protected KeyValuePair<string, object> GetValues(Expression field, Expression value)
-        {
-            return new KeyValuePair<string, object>((string)GetValue(field), GetValue(value));
-        }
-
-        protected object GetValue(Expression expression)
-        {
-            if (expression is ConstantExpression)
-                return ((ConstantExpression)expression).Value;
-            else
-                return Modl<T>.GetFieldName(((MemberExpression)expression).Member.Name);
         }
     }
 }
