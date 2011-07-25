@@ -17,17 +17,17 @@ namespace Modl
             return (Int32.TryParse(teststring, out i));
         }
 
-        public static T GetSafeValue<T>(IDataReader reader, string column, T defaultValue)
+        public static T GetSafeValue<T>(IDataReader reader, string column)
         {
-            return (T)GetSafeValue(reader, column, defaultValue, typeof(T));
+            return (T)GetSafeValue(reader, column, typeof(T));
         }
 
-        public static dynamic GetSafeValue(IDataReader reader, string column, dynamic defaultValue, Type type)
+        public static object GetSafeValue(IDataReader reader, string column, Type type)
         {
             int c = reader.GetOrdinal(column);
 
             if (reader[c] == DBNull.Value)
-                return defaultValue;
+                return GetDefault(type);
             else
                 return ConvertTo(type, reader[c]);
         }
@@ -37,7 +37,7 @@ namespace Modl
             return (T)ConvertTo(typeof(T), value);
         }
 
-        public static dynamic ConvertTo(Type type, object value)
+        public static object ConvertTo(Type type, object value)
         {
             if (value == null)
                 return GetDefault(type);

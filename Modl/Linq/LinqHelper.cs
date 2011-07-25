@@ -31,8 +31,8 @@ namespace Modl.Linq
                 return ((ConstantExpression)expression).Value;
             else if (expression is MemberExpression)
                 return Modl<T>.GetFieldName(((MemberExpression)expression).Member.Name);
-            if (expression.NodeType == ExpressionType.Lambda)
-                return GetValue<T>(((LambdaExpression)expression).Body);
+            //else if (expression.NodeType == ExpressionType.Lambda)
+            //    return GetValue<T>(((LambdaExpression)expression).Body);
             else
                 throw new InvalidQueryException("Value is not a member or constant.");
         }

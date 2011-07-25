@@ -37,8 +37,8 @@ namespace Modl
         private bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
-        public bool IsDirty { get { return store.IsDirty; } }
-        public override int Id { get { return store.Id; } }
+        public bool IsDirty { get { return Store.IsDirty; } }
+        public override int Id { get { return Store.Id; } }
 
         internal static string IdName = "Id";
         public string Table { get { return TableName; } }
@@ -92,14 +92,15 @@ namespace Modl
         //internal static dynamic Constants;
         protected dynamic Fields;
         protected dynamic F;
-        protected dynamic Lazy;
-        private Store<C> store;
+        private Dictionary<string, object> Lazy = new Dictionary<string, object>();
+        internal Store<C> Store;
 
         static Modl()
         {
             typeof(C).TypeInitializer.Invoke(null, null);
 
-            Statics<C>.SetFieldName("Id", IdName);
+            Statics<C>.IdName = IdName;
+            Statics<C>.Initialize(new C());
         }
 
         //public static List<C> AllCached
@@ -115,13 +116,13 @@ namespace Modl
 
         public Modl()
         {
-            store = new Store<C>(IdName);
+            Store = new Store<C>();
 
-            Fields = store.DynamicFields;
-            F = store.DynamicFields;
+            Fields = Store.DynamicFields;
+            F = Store.DynamicFields;
             //Lazy = new DynamicFields(store);
 
-            store.SetDefaults(this);
+            Statics<C>.FillFields(this);
         }
 
         public static C New()
@@ -158,7 +159,7 @@ namespace Modl
 
         public static C Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
         {
-            return GetWhere(x => x.Id == id, database, throwExceptionOnNotFound);
+            return Get(new Select<C>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
         }
 
         private static C Get(Select<C> query, bool throwExceptionOnNotFound = true)
@@ -170,7 +171,7 @@ namespace Modl
         {
             var c = Modl<C>.New(database); //new C();
 
-            if (c.store.Load(reader, throwExceptionOnNotFound, singleRow))
+            if (c.Store.Load(reader, throwExceptionOnNotFound, singleRow))
             {
                 c.isNew = false;
                 return c;
@@ -274,15 +275,15 @@ namespace Modl
         protected delegate T FetchDelegate<T>();
         protected T GetLazy<T>(string name, FetchDelegate<T> fetchCode)
         {
-            if (!Lazy.Dictionary.ContainsKey(name) || Lazy.Dictionary[name] == null)
-                Lazy.Dictionary[name] = fetchCode();
+            if (!Lazy.ContainsKey(name) || Lazy[name] == null)
+                Lazy[name] = fetchCode();
 
-            return Lazy.Dictionary[name];
+            return (T)Lazy[name];
         }
 
         protected void SetLazy<T>(string name, T value)
         {
-            Lazy.Dictionary[name] = value;
+            Lazy[name] = value;
         }
 
         protected delegate T FetchIdDelegate<T>(int id);
@@ -312,14 +313,14 @@ namespace Modl
         {
             Change<C> statement = BaseGetSaveStatement();
 
-            store.BaseAddSaveFields(statement);
+            Store.BaseAddSaveFields(statement);
 
             if (dbTransaction != null)
                 BaseTransactionSave(statement, dbTransaction);
             else
                 BaseSave(statement);
 
-            store.ResetFields();
+            Store.ResetFields();
             //LogSave();
         }
 
@@ -348,7 +349,7 @@ namespace Modl
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
 
             if (statement is Insert<C>)
-                store.Id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
+                Store.Id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
             else
                 DbAccess.ExecuteNonQuery(statement);
 
@@ -447,13 +448,16 @@ namespace Modl
 
         internal static string GetFieldName(string propertyName)
         {
-            return Statics<C>.GetFieldName(propertyName);
+            if (propertyName == "Id")
+                return Statics<C>.IdName;
+            else
+                return Statics<C>.GetFieldName(propertyName);
         }
 
-        internal static string GetFieldName(Expression<Func<C, string>> field)
-        {
-            return Statics<C>.GetFieldName((string)LinqHelper.GetValue<C>(field));
-        }
+        //internal static string GetFieldName(Expression<Func<C, string>> field)
+        //{
+        //    return Statics<C>.GetFieldName((string)LinqHelper.GetValue<C>(field));
+        //}
         
     }
 }

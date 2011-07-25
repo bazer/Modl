@@ -11,19 +11,15 @@ namespace Modl.Fields
 {
     internal class Store<C> where C : Modl<C>, new()
     {
-        public string IdName;
         protected int id = 0;
         internal int Id { get { return id; } set { id = value; } }
 
         public DynamicFields<C> DynamicFields;
-        public Dictionary<string, Field> Fields = new Dictionary<string, Field>();
-        
-
+        protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
         string NameOfLastInsertedMember;
 
-        public Store(string idName)
+        public Store()
         {
-            IdName = idName;
             DynamicFields = new DynamicFields<C>(this);
         }
 
@@ -74,7 +70,7 @@ namespace Modl.Fields
         {
             if (reader.Read())
             {
-                id = Helper.GetSafeValue(reader, IdName, 0);
+                id = Helper.GetSafeValue<int>(reader, Statics<C>.IdName);
 
                 var keys = Fields.Keys.ToList();
 
@@ -83,9 +79,9 @@ namespace Modl.Fields
                     string key = keys[i];
 
                     if (Fields[key].Type.GetInterface("IModl") != null)
-                        SetField(key, Helper.GetSafeValue(reader, key, Fields[key].Value, typeof(int?)));
+                        SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
                     else
-                        SetField(key, Helper.GetSafeValue(reader, key, Fields[key].Value, Fields[key].Type));
+                        SetField(key, Helper.GetSafeValue(reader, key, Statics<C>.GetFieldType(key)));
                 }
 
                 if (singleRow)
@@ -101,19 +97,6 @@ namespace Modl.Fields
                     throw new RecordNotFoundException();
                 else
                     return false;
-            }
-        }
-
-        internal virtual void SetDefaults(Modl<C> instance)
-        {
-            foreach (PropertyInfo property in typeof(C).GetProperties())
-            {
-                if (property.CanWrite)
-                {
-                    property.SetValue(instance, Helper.GetDefault(property.PropertyType), null);
-                    Fields[LastInsertedMemberName].Type = property.PropertyType;
-                    Statics<C>.SetFieldName(property.Name, LastInsertedMemberName);
-                }
             }
         }
 
