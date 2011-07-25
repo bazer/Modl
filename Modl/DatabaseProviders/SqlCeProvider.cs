@@ -20,9 +20,11 @@ namespace Modl.DatabaseProviders
         internal override IDbConnection GetConnection()
         {
             //if (activeConnection.State != ConnectionState.Closed)
-                activeConnection = new SqlCeConnection(ConnectionString);
+            //    activeConnection = new SqlCeConnection(ConnectionString);
 
-            return activeConnection;
+            //return activeConnection;
+
+            return new SqlCeConnection(ConnectionString);
         }
 
         internal static SqlCeProvider GetNewOnMatch(ConnectionStringSettings connectionConfig)

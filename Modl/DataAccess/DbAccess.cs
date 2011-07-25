@@ -43,7 +43,7 @@ namespace Modl.DataAccess
 
         static public T ExecuteScalar<T>(List<IQuery> queries)
         {
-            return ExecuteScalar<T>( Database.GetDbCommands(queries));
+            return ExecuteScalar<T>(Database.GetDbCommands(queries));
         }
 
         static public T ExecuteScalar<T>(List<IDbCommand> commands)
