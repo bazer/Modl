@@ -1,6 +1,7 @@
 ﻿using ExampleModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
+using Modl.Mvc;
 using Modl.DatabaseProviders;
 using System.Linq;
 using System.Diagnostics;
@@ -147,6 +148,9 @@ namespace Tests
             AssertEqual(car, car2);
             
             car2.Delete();
+
+            Car c = new Car();
+            
         }
 
         public void GetFromLinqInstance(string databaseName)

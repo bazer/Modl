@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Web.Mvc;
-using Modl.DataAccess;
-using Modl.Exceptions;
-using Modl.Fields;
-using Modl.Query;
-using Modl.Linq;
 using System.Linq.Expressions;
+using Modl.DataAccess;
+using Modl.Fields;
+using Modl.Linq;
+using Modl.Query;
 
 
 namespace Modl
@@ -26,7 +23,7 @@ namespace Modl
         public static string TableName;
     }
 
-    [ModelBinder(typeof(ModlBinder))]
+    //[ModelBinder(typeof(ModlBinder))]
     [DebuggerDisplay("{typeof(C).Name, nq}: {Id}")]
     public abstract class Modl<C> : ModlBase, System.IEquatable<C>
         where C : Modl<C>, new()
@@ -262,15 +259,15 @@ namespace Modl
         //    return GetList(select);
         //}
 
-        //protected void SetValue<T>(string name, T value)
-        //{
-        //    Fields.SetValue(name, value);
-        //}
+        protected void SetValue<T>(string name, T value)
+        {
+            Store.SetValue(name, value);
+        }
 
-        //protected T GetValue<T>(string name)
-        //{
-        //    return Fields.GetValue<T>(name);
-        //}
+        protected T GetValue<T>(string name)
+        {
+            return Store.GetValue<T>(name);
+        }
 
         protected delegate T FetchDelegate<T>();
         protected T GetLazy<T>(string name, FetchDelegate<T> fetchCode)

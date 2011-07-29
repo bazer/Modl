@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modl.Mvc", "Modl.MVC\Modl.Mvc.csproj", "{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Modl.vsmdi
@@ -41,6 +43,10 @@ Global
 		{760E80C2-5BBD-4691-9522-D7D48C8C886E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{760E80C2-5BBD-4691-9522-D7D48C8C886E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{760E80C2-5BBD-4691-9522-D7D48C8C886E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

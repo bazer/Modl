@@ -5,7 +5,7 @@ using System.Text;
 using System.Web.Mvc;
 using System.Reflection;
 
-namespace Modl
+namespace Modl.Mvc
 {
     public class ModlBinder : DefaultModelBinder
     {
@@ -15,7 +15,7 @@ namespace Modl
 
             if (bindingContext.ModelType.GetInterface("IModl") != null && value != null)
             {
-                if (Helper.IsNumeric(value.AttemptedValue))
+                if (MvcHelper.IsNumeric(value.AttemptedValue))
                 {
                     var method = bindingContext.ModelType.GetMethods(BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.Public).Single(x => x.Name == "Get" && x.GetParameters()[0].ParameterType == typeof(int));
                     return method.Invoke(null, new object[] { Convert.ToInt32(value.AttemptedValue), true });

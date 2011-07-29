@@ -14,7 +14,7 @@ namespace ExampleModel
         }
 
         public string Name { get { return Fields.Name; } set { Fields.Name = value; } }
-        public string Manufacturer { get { return F.Manufacturer; } set { F.Manufacturer = value; } }
+        public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
 
         public static Car GetFromName(string name)
         {
