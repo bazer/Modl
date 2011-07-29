@@ -18,3 +18,5 @@
 *.suo
 *.psess
 *.vsp
+/Modl.Mvc/obj
+/Modl.Mvc/bin
