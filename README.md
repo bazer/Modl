@@ -4,6 +4,7 @@ The aim of the project is to be a no fuss, easy to setup, easy to use Object Rel
 Just define your connection strings and of you go.
 
 Modl will have utilities for auto generating all your classes directly from database meta data.
+
 All querying is done through Linq.
 
 ##Supported databases
@@ -11,10 +12,10 @@ All querying is done through Linq.
 * Microsoft Sql Server Compact Edition 4
 * MySQL 5
 
-More to come..
+With more to come..
 
 ## Requirements
 * Microsoft.NET 4
 
 ## License
-Released under the [GNU Lesser General Public License](http://www.gnu.org/licenses/lgpl.html).
+Released under the [GNU Lesser General Public License v3.0](http://www.gnu.org/licenses/lgpl.html).
