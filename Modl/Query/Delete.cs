@@ -12,7 +12,7 @@ namespace Modl.Query
 
         public override string ToString()
         {
-            return string.Format("DELETE FROM {0}\r\nWHERE\r\n{1}", Modl<C>.TableName, QueryPartsToString());
+            return string.Format("DELETE FROM {0} \r\nWHERE \r\n{1}", Modl<C>.TableName, QueryPartsToString());
         }
     }
 }

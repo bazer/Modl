@@ -12,6 +12,7 @@ namespace Modl.Query
 
         protected string ValuesToString()
         {
+            //return string.Join(",", ChangeValues.Select(x => DatabaseProvider.GetCommandString(x.Key, Relation.Equal,  + "='" + x.Value + "'"));
             return string.Join(",", ChangeValues.Select(x => x.Key + "='" + x.Value + "'"));
         }
 

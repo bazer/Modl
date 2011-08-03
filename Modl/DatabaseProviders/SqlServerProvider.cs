@@ -35,24 +35,33 @@ namespace Modl.DatabaseProviders
             return new Literal(Name, "SELECT SCOPE_IDENTITY()");
         }
 
+        internal override string GetCommandString(string field, Relation relation, string key)
+        {
+            return string.Format("{0} {1} @{2}", field, relation.ToSql(), key);
+        }
+
+        internal override IDbDataParameter GetCommandParameter(string key, object value)
+        {
+            return new SqlParameter("@" + key, value);
+        }
+
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            return new SqlCommand(query.ToString(), (SqlConnection)GetConnection());
+            var command = new SqlCommand(query.ToString(), (SqlConnection)GetConnection());
+            command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+
+            return command;
         }
 
         internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
-            //var connection = GetConnection();
             var commands = new List<IDbCommand>();
 
-            commands.Add(new SqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (SqlConnection)GetConnection()));
+            var command = new SqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (SqlConnection)GetConnection());
+            command.Parameters.AddRange(queries.SelectMany(x => x.QueryPartsParameters()).ToArray());
+            commands.Add(command);
 
             return commands;
         }
-
-        //internal override object Execute(Expression expression)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }

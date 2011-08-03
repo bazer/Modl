@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Data;
 
 namespace Modl.Query
 {
@@ -16,7 +17,9 @@ namespace Modl.Query
         SmallerThanOrEqual
     }
 
-    public class Where<C, T> : QueryPart<C> where C : Modl<C>, new()
+    public class Where<C, T> : QueryPart<C> 
+        where C : Modl<C>, new() 
+        where T : Query<C, T>
     {
         T Query;
         string Key;
@@ -78,29 +81,23 @@ namespace Modl.Query
             return Query;
         }
 
-        public override string ToString()
+        //public override string ToString()
+        //{
+        //    return string.Format("{0} {1} '{2}'", Key, RelationToString(Relation), Value.ToString());
+        //}
+
+        public override string GetCommandString(int number)
         {
-            return string.Format("{0} {1} '{2}'", Key, RelationToString(Relation), Value.ToString());
+            return Query.DatabaseProvider.GetCommandString(Key, Relation, number.ToString());
+
+            //return string.Format("{0} {1} @{2}", Key, RelationToString(Relation), number);
         }
 
-        private string RelationToString(Relation relation)
+        public override IDbDataParameter GetCommandParameter(int number)
         {
-            if (relation == Modl.Query.Relation.Equal)
-                return "=";
-            else if (relation == Modl.Query.Relation.NotEqual)
-                return "<>";
-            else if (relation == Modl.Query.Relation.Like)
-                return "LIKE";
-            else if (relation == Modl.Query.Relation.BiggerThan)
-                return ">";
-            else if (relation == Modl.Query.Relation.BiggerThanOrEqual)
-                return ">=";
-            else if (relation == Modl.Query.Relation.SmallerThan)
-                return "<";
-            else if (relation == Modl.Query.Relation.SmallerThanOrEqual)
-                return "<=";
+            return Query.DatabaseProvider.GetCommandParameter(number.ToString(), Value);
 
-            return null;
+            //return new Tuple<string, object>("@" + number, Value);
         }
     }
 }

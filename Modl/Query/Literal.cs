@@ -29,5 +29,10 @@ namespace Modl.Query
         {
             throw new NotImplementedException();
         }
+
+        public IEnumerable<IDbDataParameter> QueryPartsParameters()
+        {
+            return new List<IDbDataParameter>();
+        }
     }
 }

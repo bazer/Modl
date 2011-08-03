@@ -35,9 +35,26 @@ namespace Modl.DatabaseProviders
             return new Literal(Name, "SELECT last_insert_id()");
         }
 
+        internal override string GetCommandString(string field, Relation relation, string key)
+        {
+            return string.Format("{0} {1} ?{2}", field, relation.ToSql(), key);
+        }
+
+        internal override IDbDataParameter GetCommandParameter(string key, object value)
+        {
+            return new MySqlParameter("?" + key, value);
+        }
+
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            return new MySqlCommand(query.ToString(), (MySqlConnection)GetConnection());
+            var command = new MySqlCommand(query.ToString(), (MySqlConnection)GetConnection());
+            command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+            //foreach (var param in query.QueryPartsParameters())
+            //    command.Parameters.Add(new MySqlParameter(param.Item1, param.Item2));
+
+            return command;
+
+            //return new MySqlCommand(query.ToString(), (MySqlConnection)GetConnection());
         }
 
         internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
@@ -45,7 +62,14 @@ namespace Modl.DatabaseProviders
             //var connection = GetConnection();
             var commands = new List<IDbCommand>();
 
-            commands.Add(new MySqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (MySqlConnection)GetConnection()));
+            //commands.Add(new MySqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (MySqlConnection)GetConnection()));
+
+            var command = new MySqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (MySqlConnection)GetConnection());
+            command.Parameters.AddRange(queries.SelectMany(x => x.QueryPartsParameters()).ToArray());
+            //foreach (var param in queries.SelectMany(x => x.QueryPartsParameters()))
+            //    command.Parameters.Add(new MySqlParameter(param.Item1, param.Item2));
+
+            commands.Add(command);
 
             return commands;
         }

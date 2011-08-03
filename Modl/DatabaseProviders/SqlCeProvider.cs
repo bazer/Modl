@@ -40,16 +40,41 @@ namespace Modl.DatabaseProviders
             return new Literal(Name, "SELECT @@IDENTITY");
         }
 
+        internal override string GetCommandString(string field, Relation relation, string key)
+        {
+            return string.Format("{0} {1} @{2}", field, relation.ToSql(), key);
+        }
+
+        internal override IDbDataParameter GetCommandParameter(string key, object value)
+        {
+            return new SqlCeParameter("@" + key, value);
+        }
+
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            return new SqlCeCommand(query.ToString(), (SqlCeConnection)GetConnection());
+            var command = new SqlCeCommand(query.ToString(), (SqlCeConnection)GetConnection());
+            command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+
+            return command;
+
+            //return new SqlCeCommand(query.ToString(), (SqlCeConnection)GetConnection());
         }
 
         internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
             var connection = GetConnection();
+            var commands = new List<IDbCommand>();
 
-            return queries.Select(x => new SqlCeCommand(x.ToString(), (SqlCeConnection)connection)).ToList<IDbCommand>();
+            foreach (var query in queries)
+            {
+                var command = new SqlCeCommand(query.ToString(), (SqlCeConnection)connection);
+                command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+                commands.Add(command);
+            }
+
+            return commands;
+
+            //return queries.Select(x => new SqlCeCommand(x.ToString(), (SqlCeConnection)connection)).ToList<IDbCommand>();
 
             //List<IDbCommand> commands = new List<IDbCommand>();
 

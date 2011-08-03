@@ -52,6 +52,7 @@
     <Compile Include="DatabaseProviders\SqlServerProvider.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Fields\Field.cs" />
     <Compile Include="Fields\Statics.cs" />
     <Compile Include="Fields\Store.cs" />

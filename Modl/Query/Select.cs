@@ -10,7 +10,7 @@ using Modl.Linq.Parsers;
 
 namespace Modl.Query
 {
-    public class Select<C> : Query<C, Select<C>> //, IQueryable<C>
+    public class Select<C> : Query<C, Select<C>>
         where C : Modl<C>, new()
     {
         Expression expression;
@@ -36,34 +36,9 @@ namespace Modl.Query
             sb.AppendFormat("SELECT * FROM {0} \r\n", Modl<C>.TableName);
 
             if (queryParts.Count > 0)
-                sb.AppendFormat("WHERE\r\n {1}", Modl<C>.TableName, QueryPartsToString());
+                sb.AppendFormat("WHERE\r\n {0}", QueryPartsToString());
 
             return sb.ToString();
         }
-
-        //public IEnumerator<C> GetEnumerator()
-        //{
-        //    return ((IEnumerable<C>)provider.Execute(this.expression)).GetEnumerator();
-        //}
-
-        //System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        //{
-        //    return ((IEnumerable)this.provider.Execute(this.expression)).GetEnumerator();
-        //}
-
-        //public Type ElementType
-        //{
-        //    get { return typeof(C); }
-        //}
-
-        //public System.Linq.Expressions.Expression Expression
-        //{
-        //    get { return expression; }
-        //}
-
-        //public IQueryProvider Provider
-        //{
-        //    get { return provider; }
-        //}
     }
 }

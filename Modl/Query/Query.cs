@@ -12,6 +12,7 @@ namespace Modl.Query
     {
         Database DatabaseProvider { get; }
         IDbCommand ToDbCommand();
+        IEnumerable<IDbDataParameter> QueryPartsParameters();
     }
 
     public abstract class Query<C, T> : IQuery
@@ -45,29 +46,16 @@ namespace Modl.Query
             return where;
         }
 
-        //public T And()
-        //{
-        //    return (T)this;
-        //}
-
-        //public T And(T where)
-        //{
-        //    return (T)this;
-        //}
-
-        //public T Or()
-        //{
-        //    return (T)this;
-        //}
-
-        //public T Or(T where)
-        //{
-        //    return (T)this;
-        //}
-
         protected string QueryPartsToString()
         {
-            return string.Join("AND \r\n", queryParts.Select(x => x.ToString()));
+            int i = 0;
+            return string.Join(" AND \r\n", queryParts.Select(x => x.GetCommandString(i++)));
+        }
+
+        public IEnumerable<IDbDataParameter> QueryPartsParameters()
+        {
+            int i = 0;
+            return queryParts.Select(x => x.GetCommandParameter(i++));
         }
 
         public IDbCommand ToDbCommand()
