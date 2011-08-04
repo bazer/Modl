@@ -7,6 +7,7 @@ using Modl.Linq;
 using System.Linq.Expressions;
 using System.Collections;
 using Modl.Linq.Parsers;
+using System.Data;
 
 namespace Modl.Query
 {
@@ -29,16 +30,28 @@ namespace Modl.Query
             parser.ParseTree(expression);
         }
 
-        public override string ToString()
+        public override Tuple<string, IEnumerable<IDataParameter>> ToSql()
         {
-            StringBuilder sb = new StringBuilder();
+            var where = GetWhere();
 
-            sb.AppendFormat("SELECT * FROM {0} \r\n", Modl<C>.TableName);
-
-            if (queryParts.Count > 0)
-                sb.AppendFormat("WHERE\r\n {0}", QueryPartsToString());
-
-            return sb.ToString();
+            return new Tuple<string, IEnumerable<IDataParameter>>(
+                string.Format("SELECT * FROM {0} \r\n{1}", Modl<C>.TableName, where.Item1),
+                where.Item2);
         }
+
+
+        //public override string ToString()
+        //{
+        //    StringBuilder sb = new StringBuilder();
+
+        //    sb.AppendFormat("SELECT * FROM {0} \r\n", Modl<C>.TableName);
+
+            
+
+        //    if (whereList.Count > 0)
+        //        sb.AppendFormat("WHERE\r\n {0}", QueryPartsToString());
+
+        //    return sb.ToString();
+        //}
     }
 }

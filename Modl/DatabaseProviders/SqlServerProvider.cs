@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Configuration;
+using System.Linq;
 using Modl.Query;
-using System.Linq.Expressions;
 
 namespace Modl.DatabaseProviders
 {
@@ -32,33 +29,40 @@ namespace Modl.DatabaseProviders
 
         internal override IQuery GetLastIdQuery()
         {
-            return new Literal(Name, "SELECT SCOPE_IDENTITY()");
+            return new Literal(this, "SELECT SCOPE_IDENTITY()");
         }
 
-        internal override string GetCommandString(string field, Relation relation, string key)
+        internal override string GetParameterValue(string key)
+        {
+            return string.Format("@{0}", key);
+        }
+
+        internal override string GetParameterComparison(string field, Relation relation, string key)
         {
             return string.Format("{0} {1} @{2}", field, relation.ToSql(), key);
         }
 
-        internal override IDbDataParameter GetCommandParameter(string key, object value)
+        internal override IDataParameter GetParameter(string key, object value)
         {
             return new SqlParameter("@" + key, value);
         }
 
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            var command = new SqlCommand(query.ToString(), (SqlConnection)GetConnection());
-            command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+            var sql = query.ToSql();
+            var command = new SqlCommand(sql.Item1, (SqlConnection)GetConnection());
+            command.Parameters.AddRange(sql.Item2.ToArray());
 
             return command;
         }
 
         internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
+            var sql = queries.Select(x => x.ToSql()).ToList();
             var commands = new List<IDbCommand>();
 
-            var command = new SqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (SqlConnection)GetConnection());
-            command.Parameters.AddRange(queries.SelectMany(x => x.QueryPartsParameters()).ToArray());
+            var command = new SqlCommand(string.Join("; \r\n", sql.Select(x => x.Item1)), (SqlConnection)GetConnection());
+            command.Parameters.AddRange(sql.SelectMany(x => x.Item2).ToArray());
             commands.Add(command);
 
             return commands;

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlServerCe;
+using System.Linq;
 using Modl.Query;
-using System.Linq.Expressions;
 
 namespace Modl.DatabaseProviders
 {
@@ -37,23 +34,29 @@ namespace Modl.DatabaseProviders
 
         internal override IQuery GetLastIdQuery()
         {
-            return new Literal(Name, "SELECT @@IDENTITY");
+            return new Literal(this, "SELECT @@IDENTITY");
         }
 
-        internal override string GetCommandString(string field, Relation relation, string key)
+        internal override string GetParameterValue(string key)
+        {
+            return string.Format("@{0}", key);
+        }
+
+        internal override string GetParameterComparison(string field, Relation relation, string key)
         {
             return string.Format("{0} {1} @{2}", field, relation.ToSql(), key);
         }
 
-        internal override IDbDataParameter GetCommandParameter(string key, object value)
+        internal override IDataParameter GetParameter(string key, object value)
         {
             return new SqlCeParameter("@" + key, value);
         }
 
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            var command = new SqlCeCommand(query.ToString(), (SqlCeConnection)GetConnection());
-            command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+            var sql = query.ToSql();
+            var command = new SqlCeCommand(sql.Item1, (SqlCeConnection)GetConnection());
+            command.Parameters.AddRange(sql.Item2.ToArray());
 
             return command;
 
@@ -67,8 +70,9 @@ namespace Modl.DatabaseProviders
 
             foreach (var query in queries)
             {
-                var command = new SqlCeCommand(query.ToString(), (SqlCeConnection)connection);
-                command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
+                var sql = query.ToSql();
+                var command = new SqlCeCommand(sql.Item1, (SqlCeConnection)connection);
+                command.Parameters.AddRange(sql.Item2.ToArray());
                 commands.Add(command);
             }
 

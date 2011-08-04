@@ -11,28 +11,37 @@ namespace Modl.Query
     public class Literal : IQuery
     {
         private string sql;
+        IEnumerable<IDataParameter> parameters;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
-        
-        public Literal(string databaseName, string sql)
+
+        public Literal(Database database, string sql)
         {
+            this.provider = database;
             this.sql = sql;
-            provider = Config.GetDatabase(databaseName);
+            this.parameters = new List<IDataParameter>();
         }
 
-        public override string ToString()
+        public Literal(Database database, string sql, IEnumerable<IDataParameter> parameters)
         {
-            return sql;
+            this.provider = database;
+            this.sql = sql;
+            this.parameters = parameters;
+        }
+
+        public Tuple<string, IEnumerable<IDataParameter>> ToSql()
+        {
+            return new Tuple<string, IEnumerable<IDataParameter>>(sql, parameters);
         }
 
         public IDbCommand ToDbCommand()
         {
-            throw new NotImplementedException();
+            return DatabaseProvider.ToDbCommand(this);
         }
 
-        public IEnumerable<IDbDataParameter> QueryPartsParameters()
-        {
-            return new List<IDbDataParameter>();
-        }
+        //public IEnumerable<IDataParameter> QueryPartsParameters()
+        //{
+        //    return new List<IDataParameter>();
+        //}
     }
 }

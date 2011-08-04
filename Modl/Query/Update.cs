@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
+using System.Data;
 
 namespace Modl.Query
 {
@@ -10,15 +11,22 @@ namespace Modl.Query
     {
         public Update(Database database) : base(database) { }
 
-        protected string ValuesToString()
+        protected Tuple<string, IEnumerable<IDataParameter>> GetWith()
         {
-            //return string.Join(",", ChangeValues.Select(x => DatabaseProvider.GetCommandString(x.Key, Relation.Equal,  + "='" + x.Value + "'"));
-            return string.Join(",", ChangeValues.Select(x => x.Key + "='" + x.Value + "'"));
+            int i = 0, j = 0;
+            return new Tuple<string, IEnumerable<IDataParameter>>(
+                string.Join(",", withList.Select(x => DatabaseProvider.GetParameterComparison(x.Key, Relation.Equal, "v" + i++))),
+                withList.Select(x => DatabaseProvider.GetParameter("v" + j++, x.Value)));
         }
 
-        public override string ToString()
+        public override Tuple<string, IEnumerable<IDataParameter>> ToSql()
         {
-            return string.Format("UPDATE {0} SET {1}\r\nWHERE\r\n{2}", Modl<C>.TableName, ValuesToString(), QueryPartsToString());
+            var with = GetWith();
+            var where = GetWhere();
+
+            return new Tuple<string, IEnumerable<IDataParameter>>(
+                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<C>.TableName, with.Item1, where.Item1),
+                with.Item2.Concat(where.Item2));
         }
     }
 }

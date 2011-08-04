@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Configuration;
-using MySql.Data.MySqlClient;
+using System.Data;
+using System.Linq;
 using Modl.Query;
-using System.Linq.Expressions;
+using MySql.Data.MySqlClient;
 
 namespace Modl.DatabaseProviders
 {
@@ -32,51 +29,43 @@ namespace Modl.DatabaseProviders
 
         internal override IQuery GetLastIdQuery()
         {
-            return new Literal(Name, "SELECT last_insert_id()");
+            return new Literal(this, "SELECT last_insert_id()");
         }
 
-        internal override string GetCommandString(string field, Relation relation, string key)
+        internal override string GetParameterValue(string key)
+        {
+            return string.Format("?{0}", key);
+        }
+
+        internal override string GetParameterComparison(string field, Relation relation, string key)
         {
             return string.Format("{0} {1} ?{2}", field, relation.ToSql(), key);
         }
 
-        internal override IDbDataParameter GetCommandParameter(string key, object value)
+        internal override IDataParameter GetParameter(string key, object value)
         {
             return new MySqlParameter("?" + key, value);
         }
 
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            var command = new MySqlCommand(query.ToString(), (MySqlConnection)GetConnection());
-            command.Parameters.AddRange(query.QueryPartsParameters().ToArray());
-            //foreach (var param in query.QueryPartsParameters())
-            //    command.Parameters.Add(new MySqlParameter(param.Item1, param.Item2));
+            var sql = query.ToSql();
+            var command = new MySqlCommand(sql.Item1, (MySqlConnection)GetConnection());
+            command.Parameters.AddRange(sql.Item2.ToArray());
 
             return command;
-
-            //return new MySqlCommand(query.ToString(), (MySqlConnection)GetConnection());
         }
 
         internal override List<IDbCommand> ToDbCommands(List<IQuery> queries)
         {
-            //var connection = GetConnection();
+            var sql = queries.Select(x => x.ToSql()).ToList();
             var commands = new List<IDbCommand>();
 
-            //commands.Add(new MySqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (MySqlConnection)GetConnection()));
-
-            var command = new MySqlCommand(string.Join(";\r\n", queries.Select(x => x.ToString())), (MySqlConnection)GetConnection());
-            command.Parameters.AddRange(queries.SelectMany(x => x.QueryPartsParameters()).ToArray());
-            //foreach (var param in queries.SelectMany(x => x.QueryPartsParameters()))
-            //    command.Parameters.Add(new MySqlParameter(param.Item1, param.Item2));
-
+            var command = new MySqlCommand(string.Join("; \r\n", sql.Select(x => x.Item1)), (MySqlConnection)GetConnection());
+            command.Parameters.AddRange(sql.SelectMany(x => x.Item2).ToArray());
             commands.Add(command);
 
             return commands;
         }
-
-        //internal override object Execute(Expression expression)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }

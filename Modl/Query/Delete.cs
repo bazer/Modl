@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
+using System.Data;
 
 namespace Modl.Query
 {
@@ -10,9 +11,18 @@ namespace Modl.Query
     {
         public Delete(Database database) : base(database) { }
 
-        public override string ToString()
+        public override Tuple<string, IEnumerable<IDataParameter>> ToSql()
         {
-            return string.Format("DELETE FROM {0} \r\nWHERE \r\n{1}", Modl<C>.TableName, QueryPartsToString());
+            var where = GetWhere();
+
+            return new Tuple<string, IEnumerable<IDataParameter>>(
+                string.Format("DELETE FROM {0} \r\n{1}", Modl<C>.TableName, where.Item1),
+                where.Item2);
         }
+
+        //public override string ToString()
+        //{
+        //    return string.Format("DELETE FROM {0} \r\nWHERE \r\n{1}", Modl<C>.TableName, QueryPartsToString());
+        //}
     }
 }

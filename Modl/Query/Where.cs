@@ -86,16 +86,16 @@ namespace Modl.Query
         //    return string.Format("{0} {1} '{2}'", Key, RelationToString(Relation), Value.ToString());
         //}
 
-        public override string GetCommandString(int number)
+        public override string GetCommandString(int counter)
         {
-            return Query.DatabaseProvider.GetCommandString(Key, Relation, number.ToString());
+            return Query.DatabaseProvider.GetParameterComparison(Key, Relation, "w" + counter);
 
             //return string.Format("{0} {1} @{2}", Key, RelationToString(Relation), number);
         }
 
-        public override IDbDataParameter GetCommandParameter(int number)
+        public override IDataParameter GetCommandParameter(int counter)
         {
-            return Query.DatabaseProvider.GetCommandParameter(number.ToString(), Value);
+            return Query.DatabaseProvider.GetParameter("w" + counter, Value);
 
             //return new Tuple<string, object>("@" + number, Value);
         }

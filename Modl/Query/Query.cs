@@ -12,20 +12,22 @@ namespace Modl.Query
     {
         Database DatabaseProvider { get; }
         IDbCommand ToDbCommand();
-        IEnumerable<IDbDataParameter> QueryPartsParameters();
+        Tuple<string, IEnumerable<IDataParameter>> ToSql();
+        //IEnumerable<IDataParameter> QueryPartsParameters();
     }
 
     public abstract class Query<C, T> : IQuery
         where C : Modl<C>, new()
         where T : Query<C, T>
     {
-        protected List<QueryPart<C>> queryParts = new List<QueryPart<C>>();
+        protected List<Where<C, T>> whereList = new List<Where<C, T>>();
         protected ModlBase owner;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
+        public abstract Tuple<string, IEnumerable<IDataParameter>> ToSql();
 
         public Query()
-        { 
+        {
         }
 
         public Query(Database database)
@@ -41,22 +43,33 @@ namespace Modl.Query
         public Where<C, T> Where(string key)
         {
             var where = new Where<C, T>((T)this, key);
-            queryParts.Add(where);
+            whereList.Add(where);
 
             return where;
         }
 
-        protected string QueryPartsToString()
+        protected Tuple<string, IEnumerable<IDataParameter>> GetWhere()
         {
-            int i = 0;
-            return string.Join(" AND \r\n", queryParts.Select(x => x.GetCommandString(i++)));
+            if (whereList.Count == 0)
+                return new Tuple<string, IEnumerable<IDataParameter>>(string.Empty, new List<IDataParameter>());
+
+            int i = 0, j = 0;
+            return new Tuple<string, IEnumerable<IDataParameter>>("WHERE \r\n" +
+                string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(i++))),
+                whereList.Select(x => x.GetCommandParameter(j++)));
         }
 
-        public IEnumerable<IDbDataParameter> QueryPartsParameters()
-        {
-            int i = 0;
-            return queryParts.Select(x => x.GetCommandParameter(i++));
-        }
+        //protected string QueryPartsToString()
+        //{
+        //    int i = 0;
+        //    return string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(i++)));
+        //}
+
+        //public IEnumerable<IDataParameter> QueryPartsParameters()
+        //{
+        //    int i = 0;
+        //    return whereList.Select(x => x.GetCommandParameter(i++));
+        //}
 
         public IDbCommand ToDbCommand()
         {

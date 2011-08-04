@@ -10,7 +10,7 @@ namespace Modl.Query
     {
         public Change(Database database) : base(database) { }
 
-        protected Dictionary<string, object> ChangeValues = new Dictionary<string, object>();
+        protected Dictionary<string, object> withList = new Dictionary<string, object>();
 
         public Change<C> With(string key, string value)
         {
@@ -19,7 +19,7 @@ namespace Modl.Query
 
         public Change<C> With<V>(string key, V value)
         {
-            ChangeValues.Add(key, value);
+            withList.Add(key, value);
             return this;
         }
     }
