@@ -20,7 +20,6 @@ namespace Modl
     public abstract class ModlBase : IModl
     {
         public abstract int Id { get; }
-        public static string TableName;
     }
 
     //[ModelBinder(typeof(ModlBinder))]
@@ -37,13 +36,11 @@ namespace Modl
         public bool IsDirty { get { return Store.IsDirty; } }
         public override int Id { get { return Store.Id; } }
 
-        internal static string IdName = "Id";
-        public string Table { get { return TableName; } }
+        internal static string IdName { get { return Statics<C>.IdName; } }
+        internal static string Table { get { return Statics<C>.TableName; } }
 
         private Database instanceDbProvider = null;
         private static Database staticDbProvider = null;
-
-        //public string DatabaseName { get { return Database.Name; } }
 
         public Database Database
         {
@@ -76,16 +73,6 @@ namespace Modl
             }
         }
 
-        //public static void SetDefaultDatabase(string databaseName)
-        //{
-        //    DefaultDatabase = Config.GetDatabase(databaseName);
-        //}
-
-        //public static void ClearDefaultDatabase()
-        //{
-        //    staticDbProvider = null;
-        //}
-
         //internal static dynamic Constants;
         protected dynamic Fields;
         protected dynamic F;
@@ -94,9 +81,6 @@ namespace Modl
 
         static Modl()
         {
-            typeof(C).TypeInitializer.Invoke(null, null);
-
-            Statics<C>.IdName = IdName;
             Statics<C>.Initialize(new C());
         }
 
@@ -117,15 +101,13 @@ namespace Modl
 
             Fields = Store.DynamicFields;
             F = Store.DynamicFields;
-            //Lazy = new DynamicFields(store);
 
             Statics<C>.FillFields(this);
         }
 
         public static C New()
         {
-            var c = new C();
-            return c;
+            return new C();
         }
 
         public static C New(string databaseName)
@@ -187,47 +169,22 @@ namespace Modl
 
         internal static IEnumerable<C> GetList(Select<C> query)
         {
-            //var list = new List<C>();
-
             using (DbDataReader reader = DbAccess.ExecuteReader(query))
             {
                 while (!reader.IsClosed)
                 {
-                    C c = Get(reader, query.DatabaseProvider, singleRow: false);
+                    var c = Get(reader, query.DatabaseProvider, singleRow: false);
 
                     if (c != null)
                         yield return c;
-                        //list.Add(c);
                 }
             }
-
-            //return list;
         }
 
         public static C GetWhere(Expression<Func<C, bool>> query, Database database = null, bool throwExceptionOnNotFound = true)
         {
             return Get(new Select<C>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
-
-        //public static C GetWhere<T>(string field, T value, Database database = null, bool throwExceptionOnNotFound = true)
-        //{
-        //    return GetWhere(database, throwExceptionOnNotFound, Tuple.Create(field, value));
-        //}
-
-        //public static C GetWhere<T>(params Tuple<string, T>[] fields)
-        //{
-        //    return GetWhere(null, true, fields);
-        //}
-
-        //public static C GetWhere<T>(Database database = null, bool throwExceptionOnNotFound = true, params Tuple<string, T>[] fields)
-        //{
-        //    var select = new Select<C>(database ?? DefaultDatabase);
-
-        //    foreach (var field in fields)
-        //        select.Where(field.Item1).EqualTo(field.Item2.ToString());
-
-        //    return Get(select, throwExceptionOnNotFound);
-        //}
 
         public static IEnumerable<C> GetAll(Database database = null)
         {
@@ -238,26 +195,6 @@ namespace Modl
         {
             return GetList(new Select<C>(database ?? DefaultDatabase, query));
         }
-
-        //public static List<C> GetAllWhere<T>(string field, T value, Database database = null)
-        //{
-        //    return GetAllWhere(database, Tuple.Create(field, value));
-        //}
-
-        //public static List<C> GetAllWhere<T>(params Tuple<string, T>[] fields)
-        //{
-        //    return GetAllWhere(null, fields);
-        //}
-
-        //public static List<C> GetAllWhere<T>(Database database = null, params Tuple<string, T>[] fields)
-        //{
-        //    var select = new Select<C>(database ?? DefaultDatabase);
-
-        //    foreach (var field in fields)
-        //        select.Where(field.Item1).EqualTo(field.Item2.ToString());
-
-        //    return GetList(select);
-        //}
 
         protected void SetValue<T>(string name, T value)
         {
@@ -343,7 +280,7 @@ namespace Modl
         private void BaseSave(Change<C> statement)
         {
             if (isDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
+                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
 
             if (statement is Insert<C>)
                 Store.Id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
@@ -356,7 +293,7 @@ namespace Modl
         private void BaseTransactionSave(Change<C> statement, Modl.DataAccess.DbTransaction trans)
         {
             if (isDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", TableName, Id));
+                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
 
             //if (statement is Insert<C>)
             //    id = trans.ExecuteScalar<int>(statement, new Literal("select SCOPE_IDENTITY()"));
@@ -406,38 +343,6 @@ namespace Modl
         #endregion
 
 
-        //protected static Tuple<string, T> Q<T>(string field, T value)
-        //{
-        //    return Tuple.Create<string, T>(field, value);
-        //}
-
-        
-
-        //public Select<C> Select()
-        //{
-        //    return new Select<C>(Database);
-        //}
-
-        //public Where<C, K> Where<K>(string key) //where K : Query<C, K>
-        //{
-        //    return new Where<C, K>(key);
-        //}
-
-        //public Where<C, Select<C>> Where(string key)
-        //{
-        //    return new Where<C, Select<C>>(key);
-        //}
-
-        //public Where<C, Update<C>> Where(string key)
-        //{
-        //    return new Where<C, Update<C>>(key);
-        //}
-
-        //public Where<C, Select<C>> Where(string key) 
-        //{
-        //    return new Where<C, Select<C>>(key);
-        //}
-
         public static IQueryable<C> Query(Database database = null)
         {
             return new LinqQuery<C>(database ?? DefaultDatabase);
@@ -446,7 +351,7 @@ namespace Modl
         internal static string GetFieldName(string propertyName)
         {
             if (propertyName == "Id")
-                return Statics<C>.IdName;
+                return IdName;
             else
                 return Statics<C>.GetFieldName(propertyName);
         }
@@ -455,6 +360,5 @@ namespace Modl
         //{
         //    return Statics<C>.GetFieldName((string)LinqHelper.GetValue<C>(field));
         //}
-        
     }
 }

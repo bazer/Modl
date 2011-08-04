@@ -31,7 +31,7 @@ namespace Modl.Query
             var with = GetWith();
 
             return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("INSERT INTO {0} {1}", Modl<C>.TableName, with.Item1),
+                string.Format("INSERT INTO {0} {1}", Modl<C>.Table, with.Item1),
                 with.Item2);
         }
 

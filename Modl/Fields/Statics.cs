@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Modl.Attributes;
 
 namespace Modl.Fields
 {
     internal class Statics<C> where C : Modl<C>, new()
     {
+        internal static string TableName;
         internal static string IdName;
 
         private static Dictionary<string, string> Properties = new Dictionary<string, string>();
@@ -35,14 +37,28 @@ namespace Modl.Fields
 
         internal static void Initialize(Modl<C> instance)
         {
+            foreach (var attribute in typeof(C).GetCustomAttributes(true))
+            {
+                if (attribute is TableAttribute)
+                    TableName = ((TableAttribute)attribute).Name;
+                else if (attribute is IdAttribute)
+                    IdName = ((IdAttribute)attribute).Name;
+            }
+
+            if (string.IsNullOrEmpty(TableName))
+                TableName = typeof(C).Name;
+
+            if (string.IsNullOrEmpty(IdName))
+                IdName = "Id";
+
+
             foreach (PropertyInfo property in typeof(C).GetProperties())
             {
                 if (property.CanWrite)
                 {
                     property.SetValue(instance, Helper.GetDefault(property.PropertyType), null);
-                    //Fields[LastInsertedMemberName].Type = property.PropertyType;
-                    Statics<C>.SetFieldName(property.Name, instance.Store.LastInsertedMemberName);
-                    Statics<C>.SetFieldType(instance.Store.LastInsertedMemberName, property.PropertyType);
+                    SetFieldName(property.Name, instance.Store.LastInsertedMemberName);
+                    SetFieldType(instance.Store.LastInsertedMemberName, property.PropertyType);
                 }
             }
         }
@@ -50,9 +66,7 @@ namespace Modl.Fields
         internal static void FillFields(Modl<C> instance)
         {
             foreach (var field in Types)
-            {
                 instance.Store.SetValue(field.Key, Helper.GetDefault(field.Value));
-            }
         }
     }
 }

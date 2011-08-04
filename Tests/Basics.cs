@@ -78,6 +78,8 @@ namespace Tests
             car3.Delete();
             Assert.IsTrue(car3.IsDeleted);
             Assert.AreEqual(null, GetModl<Car>(car.Id, database, false));
+
+            
         }
 
         public T NewModl<T>(Database database) where T : Modl<T>, new()

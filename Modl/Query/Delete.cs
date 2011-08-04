@@ -16,7 +16,7 @@ namespace Modl.Query
             var where = GetWhere();
 
             return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("DELETE FROM {0} \r\n{1}", Modl<C>.TableName, where.Item1),
+                string.Format("DELETE FROM {0} \r\n{1}", Modl<C>.Table, where.Item1),
                 where.Item2);
         }
 

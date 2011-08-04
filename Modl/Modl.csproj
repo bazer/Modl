@@ -45,6 +45,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\IdAttribute.cs" />
+    <Compile Include="Attributes\TableAttribute.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DatabaseProviders\MySQLProvider.cs" />
     <Compile Include="DatabaseProviders\SqlCeProvider.cs" />

@@ -25,7 +25,7 @@ namespace Modl.Query
             var where = GetWhere();
 
             return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<C>.TableName, with.Item1, where.Item1),
+                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<C>.Table, with.Item1, where.Item1),
                 with.Item2.Concat(where.Item2));
         }
     }
