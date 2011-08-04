@@ -7,7 +7,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public class Insert<C> : Change<C> where C : Modl<C>, new()
+    public class Insert<M> : Change<M> 
+        where M : Modl<M>, new()
     {
         public Insert(Database database) : base(database) { }
 
@@ -31,7 +32,7 @@ namespace Modl.Query
             var with = GetWith();
 
             return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("INSERT INTO {0} {1}", Modl<C>.Table, with.Item1),
+                string.Format("INSERT INTO {0} {1}", Modl<M>.Table, with.Item1),
                 with.Item2);
         }
 

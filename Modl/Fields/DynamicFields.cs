@@ -7,11 +7,11 @@ using System.Data.Common;
 
 namespace Modl.Fields
 {
-    public class DynamicFields<C> : DynamicObject where C : Modl<C>, new()
+    public class DynamicFields<M> : DynamicObject where M : Modl<M>, new()
     {
-        Store<C> store;
+        Store<M> store;
 
-        internal DynamicFields(Store<C> store)
+        internal DynamicFields(Store<M> store)
         {
             this.store = store;
         }

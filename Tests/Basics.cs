@@ -6,6 +6,7 @@ using Modl.DatabaseProviders;
 using System.Linq;
 using System.Diagnostics;
 using System;
+using System.Collections.Generic;
 
 namespace Tests
 {
@@ -196,6 +197,51 @@ namespace Tests
             AssertEqual(car, car2);
             
             car2.Delete();
+        }
+
+        public void StaticDelete()
+        {
+            var cars = NewCars(5);
+            Assert.IsTrue(Car.GetAll().Count() >= cars.Count);
+
+            Car.DeleteAll();
+            Assert.AreEqual(0, Car.GetAll().Count());
+
+            cars = NewCars(5);
+            Assert.AreEqual(5, Car.GetAll().Count());
+
+            Car.Delete(cars[0].Id);
+            Assert.IsFalse(Car.Exists(cars[0].Id));
+            Assert.AreEqual(4, Car.GetAll().Count());
+
+            cars[1].Name = "10000";
+            cars[1].Save();
+            Car.DeleteAllWhere(x => x.Name == "9000");
+            Assert.IsTrue(Car.Exists(cars[1].Id));
+            Assert.AreEqual(1, Car.GetAll().Count());
+
+            cars[1].Delete();
+            Assert.AreEqual(0, Car.GetAll().Count());
+        }
+
+        public List<Car> NewCars(int count, bool save = true)
+        {
+            List<Car> list = new List<Car>(count);
+
+            while (count-- > 0)
+            {
+                var car = new Car();
+                car.Manufacturer = "Saab";
+                car.Name = "9000";
+                car.Save();
+
+                list.Add(car);
+            }
+
+            //Assert.AreEqual(count, list.Count);
+
+
+            return list;
         }
 
         public void AssertEqual(Car car1, Car car2)

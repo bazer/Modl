@@ -13,14 +13,15 @@ namespace Modl.Query
         Database DatabaseProvider { get; }
         IDbCommand ToDbCommand();
         Tuple<string, IEnumerable<IDataParameter>> ToSql();
+        //Where<C, T> Where(string key);
         //IEnumerable<IDataParameter> QueryPartsParameters();
     }
 
-    public abstract class Query<C, T> : IQuery
-        where C : Modl<C>, new()
-        where T : Query<C, T>
+    public abstract class Query<M, Q> : IQuery
+        where M : Modl<M>, new()
+        where Q : Query<M, Q>
     {
-        protected List<Where<C, T>> whereList = new List<Where<C, T>>();
+        protected List<Where<M, Q>> whereList = new List<Where<M, Q>>();
         protected ModlBase owner;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
@@ -35,14 +36,14 @@ namespace Modl.Query
             provider = database;
         }
 
-        public Query(C owner)
+        public Query(M owner)
         {
             this.owner = owner;
         }
 
-        public Where<C, T> Where(string key)
+        public Where<M, Q> Where(string key)
         {
-            var where = new Where<C, T>((T)this, key);
+            var where = new Where<M, Q>((Q)this, key);
             whereList.Add(where);
 
             return where;

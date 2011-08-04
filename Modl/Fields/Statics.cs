@@ -7,7 +7,7 @@ using Modl.Attributes;
 
 namespace Modl.Fields
 {
-    internal class Statics<C> where C : Modl<C>, new()
+    internal class Statics<M> where M : Modl<M>, new()
     {
         internal static string TableName;
         internal static string IdName;
@@ -35,9 +35,9 @@ namespace Modl.Fields
             return Types[fieldName];
         }
 
-        internal static void Initialize(Modl<C> instance)
+        internal static void Initialize(Modl<M> instance)
         {
-            foreach (var attribute in typeof(C).GetCustomAttributes(true))
+            foreach (var attribute in typeof(M).GetCustomAttributes(true))
             {
                 if (attribute is TableAttribute)
                     TableName = ((TableAttribute)attribute).Name;
@@ -46,13 +46,13 @@ namespace Modl.Fields
             }
 
             if (string.IsNullOrEmpty(TableName))
-                TableName = typeof(C).Name;
+                TableName = typeof(M).Name;
 
             if (string.IsNullOrEmpty(IdName))
                 IdName = "Id";
 
 
-            foreach (PropertyInfo property in typeof(C).GetProperties())
+            foreach (PropertyInfo property in typeof(M).GetProperties())
             {
                 if (property.CanWrite)
                 {
@@ -63,7 +63,7 @@ namespace Modl.Fields
             }
         }
 
-        internal static void FillFields(Modl<C> instance)
+        internal static void FillFields(Modl<M> instance)
         {
             foreach (var field in Types)
                 instance.Store.SetValue(field.Key, Helper.GetDefault(field.Value));

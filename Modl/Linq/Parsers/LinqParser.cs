@@ -7,15 +7,17 @@ using Modl.Query;
 
 namespace Modl.Linq.Parsers
 {
-    internal class LinqParser<T> : ExpressionVisitor where T : Modl<T>, new()
+    internal class LinqParser<M, Q> : ExpressionVisitor 
+        where M : Modl<M>, new()
+        where Q : Query<M, Q>
     {
-        protected Select<T> select;
-        protected WhereParser<T> whereParser;
+        protected Query<M, Q> select;
+        protected WhereParser<M, Q> whereParser;
 
-        internal LinqParser(Select<T> select)
+        internal LinqParser(Query<M, Q> select) 
         {
             this.select = select;
-            whereParser = new WhereParser<T>(select);
+            whereParser = new WhereParser<M, Q>(select);
         }
 
         internal void ParseTree(Expression expression)

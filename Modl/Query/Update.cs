@@ -7,7 +7,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public class Update<C> : Change<C> where C : Modl<C>, new()
+    public class Update<M> : Change<M> 
+        where M : Modl<M>, new()
     {
         public Update(Database database) : base(database) { }
 
@@ -25,7 +26,7 @@ namespace Modl.Query
             var where = GetWhere();
 
             return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<C>.Table, with.Item1, where.Item1),
+                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<M>.Table, with.Item1, where.Item1),
                 with.Item2.Concat(where.Item2));
         }
     }

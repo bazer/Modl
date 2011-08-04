@@ -24,8 +24,8 @@ namespace Modl
 
     //[ModelBinder(typeof(ModlBinder))]
     [DebuggerDisplay("{typeof(C).Name, nq}: {Id}")]
-    public abstract class Modl<C> : ModlBase, System.IEquatable<C>
-        where C : Modl<C>, new()
+    public abstract class Modl<M> : ModlBase, System.IEquatable<M>
+        where M : Modl<M>, new()
     {
         private bool isNew = true;
         public bool IsNew { get { return isNew; } }
@@ -36,8 +36,8 @@ namespace Modl
         public bool IsDirty { get { return Store.IsDirty; } }
         public override int Id { get { return Store.Id; } }
 
-        internal static string IdName { get { return Statics<C>.IdName; } }
-        internal static string Table { get { return Statics<C>.TableName; } }
+        internal static string IdName { get { return Statics<M>.IdName; } }
+        internal static string Table { get { return Statics<M>.TableName; } }
 
         private Database instanceDbProvider = null;
         private static Database staticDbProvider = null;
@@ -77,11 +77,11 @@ namespace Modl
         protected dynamic Fields;
         protected dynamic F;
         private Dictionary<string, object> Lazy = new Dictionary<string, object>();
-        internal Store<C> Store;
+        internal Store<M> Store;
 
         static Modl()
         {
-            Statics<C>.Initialize(new C());
+            Statics<M>.Initialize(new M());
         }
 
         //public static List<C> AllCached
@@ -97,30 +97,30 @@ namespace Modl
 
         public Modl()
         {
-            Store = new Store<C>();
+            Store = new Store<M>();
 
             Fields = Store.DynamicFields;
             F = Store.DynamicFields;
 
-            Statics<C>.FillFields(this);
+            Statics<M>.FillFields(this);
         }
 
-        public static C New()
+        public static M New()
         {
-            return new C();
+            return new M();
         }
 
-        public static C New(string databaseName)
+        public static M New(string databaseName)
         {
-            var c = new C();
+            var c = new M();
             c.instanceDbProvider = Config.GetDatabase(databaseName);
 
             return c;
         }
 
-        public static C New(Database database)
+        public static M New(Database database)
         {
-            var c = new C();
+            var c = new M();
             c.instanceDbProvider = database;
 
             return c;
@@ -131,29 +131,29 @@ namespace Modl
             return Get(id, database, false) != null;
         }
 
-        public static bool Exists(Expression<Func<C, bool>> query, Database database = null)
+        public static bool Exists(Expression<Func<M, bool>> query, Database database = null)
         {
             return GetWhere(query, database, false) != null;
         }
 
-        public static C Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
+        public static M Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
         {
-            return Get(new Select<C>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
+            return Get(new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
         }
 
-        private static C Get(Select<C> query, bool throwExceptionOnNotFound = true)
+        private static M Get(Select<M> query, bool throwExceptionOnNotFound = true)
         {
             return Get(DbAccess.ExecuteReader(query), query.DatabaseProvider, throwExceptionOnNotFound, true);
         }
 
-        protected static C Get(DbDataReader reader, Database database, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        protected static M Get(DbDataReader reader, Database database, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {
-            var c = Modl<C>.New(database); //new C();
+            var m = Modl<M>.New(database);
 
-            if (c.Store.Load(reader, throwExceptionOnNotFound, singleRow))
+            if (m.Store.Load(reader, throwExceptionOnNotFound, singleRow))
             {
-                c.isNew = false;
-                return c;
+                m.isNew = false;
+                return m;
             }
             else
                 return null;
@@ -167,7 +167,7 @@ namespace Modl
         //        return AllCached.SingleOrDefault(x => x.Id == id);
         //}
 
-        internal static IEnumerable<C> GetList(Select<C> query)
+        internal static IEnumerable<M> GetList(Select<M> query)
         {
             using (DbDataReader reader = DbAccess.ExecuteReader(query))
             {
@@ -181,19 +181,19 @@ namespace Modl
             }
         }
 
-        public static C GetWhere(Expression<Func<C, bool>> query, Database database = null, bool throwExceptionOnNotFound = true)
+        public static M GetWhere(Expression<Func<M, bool>> query, Database database = null, bool throwExceptionOnNotFound = true)
         {
-            return Get(new Select<C>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
+            return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
 
-        public static IEnumerable<C> GetAll(Database database = null)
+        public static IEnumerable<M> GetAll(Database database = null)
         {
-            return GetList(new Select<C>(database ?? DefaultDatabase));
+            return GetList(new Select<M>(database ?? DefaultDatabase));
         }
 
-        public static IEnumerable<C> GetAllWhere(Expression<Func<C, bool>> query, Database database = null)
+        public static IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return GetList(new Select<C>(database ?? DefaultDatabase, query));
+            return GetList(new Select<M>(database ?? DefaultDatabase, query));
         }
 
         protected void SetValue<T>(string name, T value)
@@ -245,7 +245,7 @@ namespace Modl
 
         public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
         {
-            Change<C> statement = BaseGetSaveStatement();
+            Change<M> statement = BaseGetSaveStatement();
 
             Store.BaseAddSaveFields(statement);
 
@@ -258,18 +258,18 @@ namespace Modl
             //LogSave();
         }
 
-        private Change<C> BaseGetSaveStatement()
+        private Change<M> BaseGetSaveStatement()
         {
-            Change<C> statement;
+            Change<M> statement;
 
             if (isNew)
             {
-                statement = new Insert<C>(Database);
+                statement = new Insert<M>(Database);
             }
             else
             {
-                statement = new Update<C>(Database);
-                ((Update<C>)statement).Where(IdName).EqualTo(Id);
+                statement = new Update<M>(Database);
+                ((Update<M>)statement).Where(IdName).EqualTo(Id);
             }
 
             return statement;
@@ -277,12 +277,12 @@ namespace Modl
 
 
 
-        private void BaseSave(Change<C> statement)
+        private void BaseSave(Change<M> statement)
         {
             if (isDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
 
-            if (statement is Insert<C>)
+            if (statement is Insert<M>)
                 Store.Id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
             else
                 DbAccess.ExecuteNonQuery(statement);
@@ -290,7 +290,7 @@ namespace Modl
             isNew = false;
         }
 
-        private void BaseTransactionSave(Change<C> statement, Modl.DataAccess.DbTransaction trans)
+        private void BaseTransactionSave(Change<M> statement, Modl.DataAccess.DbTransaction trans)
         {
             if (isDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
@@ -305,14 +305,38 @@ namespace Modl
 
         public virtual void Delete()
         {
+            Delete(Id, Database);
+
             //LogDelete();
 
-            Delete<C> statement = new Delete<C>(Database);
-            statement.Where(IdName).EqualTo(Id);
+            //Delete<C> statement = new Delete<C>(Database);
+            //statement.Where(IdName).EqualTo(Id);
 
-            DbAccess.ExecuteNonQuery(statement);
+            //DbAccess.ExecuteNonQuery(statement);
 
             isDeleted = true;
+        }
+
+        public static void Delete(int id, Database database = null)
+        {
+            Delete<M> statement = new Delete<M>(database ?? DefaultDatabase);
+            statement.Where(IdName).EqualTo(id);
+
+            DbAccess.ExecuteNonQuery(statement);
+        }
+
+        public static void DeleteAll(Database database = null)
+        {
+            Delete<M> statement = new Delete<M>(database ?? DefaultDatabase);
+            
+            DbAccess.ExecuteNonQuery(statement);
+        }
+
+        public static void DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
+        {
+            Delete<M> statement = new Delete<M>(database ?? DefaultDatabase, query);
+
+            DbAccess.ExecuteNonQuery(statement);
         }
 
         //protected void LogSave()
@@ -335,7 +359,7 @@ namespace Modl
 
         #region IEquatable<C> Members
 
-        public bool Equals(C other)
+        public bool Equals(M other)
         {
             return this.Id == other.Id;
         }
@@ -343,9 +367,9 @@ namespace Modl
         #endregion
 
 
-        public static IQueryable<C> Query(Database database = null)
+        public static IQueryable<M> Query(Database database = null)
         {
-            return new LinqQuery<C>(database ?? DefaultDatabase);
+            return new LinqQuery<M>(database ?? DefaultDatabase);
         }
 
         internal static string GetFieldName(string propertyName)
@@ -353,7 +377,7 @@ namespace Modl
             if (propertyName == "Id")
                 return IdName;
             else
-                return Statics<C>.GetFieldName(propertyName);
+                return Statics<M>.GetFieldName(propertyName);
         }
 
         //internal static string GetFieldName(Expression<Func<C, string>> field)

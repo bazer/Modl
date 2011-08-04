@@ -8,11 +8,13 @@ using Modl.Exceptions;
 
 namespace Modl.Linq.Parsers
 {
-    internal class WhereParser<T> : ExpressionVisitor where T : Modl<T>, new()
+    internal class WhereParser<M, Q> : ExpressionVisitor 
+        where M : Modl<M>, new()
+        where Q : Query<M, Q>
     {
-        protected Select<T> select;
+        protected Query<M, Q> select;
 
-        internal WhereParser(Select<T> select)
+        internal WhereParser(Query<M, Q> select)
         {
             this.select = select;
         }
@@ -24,7 +26,9 @@ namespace Modl.Linq.Parsers
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var fields = LinqHelper.GetFields<T>(node);
+            var fields = LinqHelper.GetFields<M>(node);
+
+            //IWhere<Select<M>> where = ((Select<M>)select).Where(fields.Key);
             var where = select.Where(fields.Key);
 
             if (node.NodeType == ExpressionType.Equal)

@@ -55,5 +55,12 @@ namespace Tests
             basics.SwitchDatabase("SqlServerDb");
             basics.GetFromLinqInstance(databaseName);
         }
+
+        [TestMethod]
+        public void StaticDelete()
+        {
+            basics.SwitchDatabase(databaseName);
+            basics.StaticDelete();
+        }
     }
 }

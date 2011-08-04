@@ -11,8 +11,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public class Select<C> : Query<C, Select<C>>
-        where C : Modl<C>, new()
+    public class Select<M> : Query<M, Select<M>>
+        where M : Modl<M>, new()
     {
         Expression expression;
 
@@ -26,7 +26,7 @@ namespace Modl.Query
             : base(database)
         {
             this.expression = expression;
-            var parser = new LinqParser<C>(this);
+            var parser = new LinqParser<M, Select<M>>(this);
             parser.ParseTree(expression);
         }
 
@@ -35,7 +35,7 @@ namespace Modl.Query
             var where = GetWhere();
 
             return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("SELECT * FROM {0} \r\n{1}", Modl<C>.Table, where.Item1),
+                string.Format("SELECT * FROM {0} \r\n{1}", Modl<M>.Table, where.Item1),
                 where.Item2);
         }
 

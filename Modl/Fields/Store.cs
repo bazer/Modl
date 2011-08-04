@@ -9,18 +9,18 @@ using Modl.Query;
 
 namespace Modl.Fields
 {
-    internal class Store<C> where C : Modl<C>, new()
+    internal class Store<M> where M : Modl<M>, new()
     {
         protected int id = 0;
         internal int Id { get { return id; } set { id = value; } }
 
-        public DynamicFields<C> DynamicFields;
+        public DynamicFields<M> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
         string NameOfLastInsertedMember;
 
         public Store()
         {
-            DynamicFields = new DynamicFields<C>(this);
+            DynamicFields = new DynamicFields<M>(this);
         }
 
         public bool IsDirty
@@ -70,7 +70,7 @@ namespace Modl.Fields
         {
             if (reader.Read())
             {
-                id = Helper.GetSafeValue<int>(reader, Statics<C>.IdName);
+                id = Helper.GetSafeValue<int>(reader, Statics<M>.IdName);
 
                 var keys = Fields.Keys.ToList();
 
@@ -81,7 +81,7 @@ namespace Modl.Fields
                     if (Fields[key].Type.GetInterface("IModl") != null)
                         SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
                     else
-                        SetField(key, Helper.GetSafeValue(reader, key, Statics<C>.GetFieldType(key)));
+                        SetField(key, Helper.GetSafeValue(reader, key, Statics<M>.GetFieldType(key)));
                 }
 
                 if (singleRow)
@@ -100,7 +100,7 @@ namespace Modl.Fields
             }
         }
 
-        internal void BaseAddSaveFields(Change<C> statement)
+        internal void BaseAddSaveFields(Change<M> statement)
         {
             foreach (var field in Fields)
             {

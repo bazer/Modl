@@ -17,17 +17,17 @@ namespace Modl.Query
         SmallerThanOrEqual
     }
 
-    public class Where<C, T> : QueryPart<C> 
-        where C : Modl<C>, new() 
-        where T : Query<C, T>
+    public class Where<M, Q> : QueryPart<M>
+        where M : Modl<M>, new() 
+        where Q : Query<M, Q>
     {
-        T Query;
+        Q Query;
         string Key;
         object Value;
         Relation Relation;
 
 
-        internal Where(T query, string key)
+        internal Where(Q query, string key)
         {
             this.Query = query;
             this.Key = key;
@@ -38,42 +38,42 @@ namespace Modl.Query
             this.Key = key;
         }
 
-        public T EqualTo<V>(V value)
+        public Q EqualTo<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.Equal);
         }
 
-        public T NotEqualTo<V>(V value)
+        public Q NotEqualTo<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.NotEqual);
         }
 
-        public T Like<V>(V value)
+        public Q Like<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.Like);
         }
 
-        public T GreaterThan<V>(V value)
+        public Q GreaterThan<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.BiggerThan);
         }
 
-        public T GreaterThanOrEqual<V>(V value)
+        public Q GreaterThanOrEqual<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.BiggerThanOrEqual);
         }
 
-        public T LessThan<V>(V value)
+        public Q LessThan<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.SmallerThan);
         }
 
-        public T LessThanOrEqual<V>(V value)
+        public Q LessThanOrEqual<V>(V value)
         {
             return SetAndReturn(value, Modl.Query.Relation.SmallerThanOrEqual);
         }
 
-        private T SetAndReturn<V>(V value, Relation relation)
+        private Q SetAndReturn<V>(V value, Relation relation)
         {
             this.Value = value;
             this.Relation = relation;
