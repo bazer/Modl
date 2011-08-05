@@ -59,7 +59,6 @@
     <Compile Include="Fields\Statics.cs" />
     <Compile Include="Fields\Store.cs" />
     <Compile Include="Linq\Evaluator.cs" />
-    <Compile Include="Linq\ExpressionTreeHelpers.cs" />
     <Compile Include="Linq\LinqHelper.cs" />
     <Compile Include="Linq\Parsers\WhereParser.cs" />
     <Compile Include="Linq\LinqQuery.cs" />
