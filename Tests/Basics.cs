@@ -171,12 +171,12 @@ namespace Tests
             var selectList = db.Query<Car>().Where(x => x.Name != "dsklhfsd").AsEnumerable().AsSelectList(x => x.Manufacturer + " " + x.Name);
             Assert.IsTrue(selectList.Count() > 0);
             
-            var car2 = cars.First();
+            //var car2 = cars.First();
+            var car2 = Car.Query(db).Where(x => x.Id == car.Id).First();
             AssertEqual(car, car2);
-
-            //var car2 = Car.Query(db).Where(x => x.Id == car.Id).First();
-            //var car3 = Car.GetWhere(x => x.Name == "9000", db);
-            //Assert.AreEqual("9000", car3.Name);
+            
+            var car3 = Car.GetWhere(x => x.Name == "9000", db);
+            Assert.AreEqual("9000", car3.Name);
 
             car2.Delete();
         }
@@ -237,9 +237,6 @@ namespace Tests
 
                 list.Add(car);
             }
-
-            //Assert.AreEqual(count, list.Count);
-
 
             return list;
         }

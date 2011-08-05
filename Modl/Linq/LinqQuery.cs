@@ -8,7 +8,8 @@ using Modl.Query;
 
 namespace Modl.Linq
 {
-    public class LinqQuery<T> : IQueryable<T> where T : Modl<T>, new()
+    public class LinqQuery<M> : IQueryable<M>
+        where M : Modl<M>, new()
     {
         Database database;
         Expression expression;
@@ -18,22 +19,22 @@ namespace Modl.Linq
         { 
             this.database = database;
             this.expression = Expression.Constant(this);
-            this.provider = new LinqQueryProvider(database);
+            this.provider = new LinqQueryProvider<M>(database);
         }
 
         public LinqQuery(Database database, Expression expression)
         {
             this.database = database;
             this.expression = expression;
-            this.provider = new LinqQueryProvider(database);
+            this.provider = new LinqQueryProvider<M>(database);
         }
 
-        protected IEnumerator<T> GetList()
+        protected IEnumerator<M> GetList()
         {
-            return Modl<T>.GetList(new Select<T>(database, expression)).GetEnumerator();
+            return Modl<M>.GetList(new Select<M>(database, expression)).GetEnumerator();
         }
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<M> GetEnumerator()
         {
             return GetList();
         }
@@ -45,7 +46,7 @@ namespace Modl.Linq
 
         public Type ElementType
         {
-            get { return typeof(T); }
+            get { return typeof(M); }
         }
 
         public System.Linq.Expressions.Expression Expression

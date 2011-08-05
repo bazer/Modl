@@ -141,7 +141,7 @@ namespace Modl
             return Get(new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
         }
 
-        private static M Get(Select<M> query, bool throwExceptionOnNotFound = true)
+        internal static M Get(Select<M> query, bool throwExceptionOnNotFound = true)
         {
             return Get(DbAccess.ExecuteReader(query), query.DatabaseProvider, throwExceptionOnNotFound, true);
         }
