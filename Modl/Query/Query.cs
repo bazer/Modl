@@ -40,7 +40,7 @@ namespace Modl.Query
         where Q : Query<M, Q>
     {
         protected List<Where<M, Q>> whereList = new List<Where<M, Q>>();
-        protected ModlBase owner;
+        protected M owner;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
         public abstract Tuple<string, IEnumerable<IDataParameter>> ToSql();

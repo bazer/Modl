@@ -47,6 +47,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LinqSuite.cs" />
     <Compile Include="MySQL.cs" />
     <Compile Include="SqlServerCe.cs" />
     <Compile Include="SqlServer.cs" />

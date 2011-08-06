@@ -58,6 +58,7 @@
     <Compile Include="Fields\Field.cs" />
     <Compile Include="Fields\Statics.cs" />
     <Compile Include="Fields\Store.cs" />
+    <Compile Include="Inherits.cs" />
     <Compile Include="Linq\Evaluator.cs" />
     <Compile Include="Linq\LinqHelper.cs" />
     <Compile Include="Linq\Parsers\WhereParser.cs" />

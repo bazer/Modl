@@ -35,14 +35,26 @@ namespace Modl
         int Id { get; }
     }
 
-    public abstract class ModlBase : IModl
+    //public interface IModl<M>
+    //    //where M : IModl<M>, new()
+    //{
+    //    int Id { get; }
+    //}
+
+    public abstract class Modl<M, IdType> : Modl<M>
+        where M : Modl<M>, new()
     {
-        public abstract int Id { get; }
+        public new IdType Id { get { return (IdType)Store.Id; } }
+
+        public Modl() 
+        {
+            Store.IdType = typeof(IdType);
+        }
     }
 
     //[ModelBinder(typeof(ModlBinder))]
     [DebuggerDisplay("{typeof(C).Name, nq}: {Id}")]
-    public abstract class Modl<M> : ModlBase, System.IEquatable<M>
+    public abstract class Modl<M> : System.IEquatable<M>, IModl //, IModl<M>
         where M : Modl<M>, new()
     {
         private bool isNew = true;
@@ -52,7 +64,7 @@ namespace Modl
         public bool IsDeleted { get { return isDeleted; } }
 
         public bool IsDirty { get { return Store.IsDirty; } }
-        public override int Id { get { return Store.Id; } }
+        public int Id { get { return (int)Store.Id; } }
 
         internal static string IdName { get { return Statics<M>.IdName; } }
         internal static string Table { get { return Statics<M>.TableName; } }
@@ -96,6 +108,7 @@ namespace Modl
         protected dynamic F;
         private Dictionary<string, object> Lazy = new Dictionary<string, object>();
         internal Store<M> Store;
+        //internal virtual Store<M, int> Store;
 
         static Modl()
         {
@@ -115,8 +128,7 @@ namespace Modl
 
         public Modl()
         {
-            Store = new Store<M>();
-
+            Store = new Store<M>(typeof(int));
             Fields = Store.DynamicFields;
             F = Store.DynamicFields;
 

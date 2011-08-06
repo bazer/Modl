@@ -27,17 +27,26 @@ using Modl.Query;
 
 namespace Modl.Fields
 {
-    internal class Store<M> where M : Modl<M>, new()
+    interface IStore
     {
-        protected int id = 0;
-        internal int Id { get { return id; } set { id = value; } }
+        T GetValue<T>(string name);
+        void SetValue<T>(string name, T value);
+    }
+
+    internal class Store<M> : IStore
+        where M : Modl<M>, new()
+    {
+        internal Type IdType { get; set; }
+        protected object id; // = default(IdType);
+        internal object Id { get { return id; } set { id = value; } }
 
         public DynamicFields<M> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
         string NameOfLastInsertedMember;
 
-        public Store()
+        public Store(Type IdType)
         {
+            this.IdType = IdType;
             DynamicFields = new DynamicFields<M>(this);
         }
 
@@ -88,7 +97,7 @@ namespace Modl.Fields
         {
             if (reader.Read())
             {
-                id = Helper.GetSafeValue<int>(reader, Statics<M>.IdName);
+                id = Helper.GetSafeValue(reader, Statics<M>.IdName, IdType);
 
                 var keys = Fields.Keys.ToList();
 

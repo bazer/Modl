@@ -27,9 +27,9 @@ namespace Modl.Fields
 {
     public class DynamicFields<M> : DynamicObject where M : Modl<M>, new()
     {
-        Store<M> store;
+        IStore store;
 
-        internal DynamicFields(Store<M> store)
+        internal DynamicFields(IStore store)
         {
             this.store = store;
         }
