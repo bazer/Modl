@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Modl.Attributes;
 
 namespace Modl.Fields
 {
@@ -32,6 +31,7 @@ namespace Modl.Fields
 
         private static Dictionary<string, string> Properties = new Dictionary<string, string>();
         private static Dictionary<string, Type> Types = new Dictionary<string, Type>();
+        private static List<PropertyInfo> EmptyProperties = new List<PropertyInfo>();
 
         internal static void SetFieldName(string propertyName, string fieldName)
         {
@@ -74,7 +74,17 @@ namespace Modl.Fields
             {
                 if (property.CanWrite)
                 {
-                    property.SetValue(instance, Helper.GetDefault(property.PropertyType), null);
+                    instance.Store.LastInsertedMemberName = null;
+
+                    object defaultValue = Helper.GetDefault(property.PropertyType);
+                    property.SetValue(instance, defaultValue, null);
+
+                    if (instance.Store.LastInsertedMemberName == null)
+                    { 
+                        instance.Store.SetValue(property.Name, defaultValue, true);
+                        EmptyProperties.Add(property);
+                    }
+                    
                     SetFieldName(property.Name, instance.Store.LastInsertedMemberName);
                     SetFieldType(instance.Store.LastInsertedMemberName, property.PropertyType);
                 }
@@ -85,6 +95,18 @@ namespace Modl.Fields
         {
             foreach (var field in Types)
                 instance.Store.SetValue(field.Key, Helper.GetDefault(field.Value));
+        }
+
+        internal static void ReadFromEmptyProperties(Modl<M> instance)
+        {
+            foreach (var property in EmptyProperties)
+                instance.Store.SetValue(property.Name, property.GetValue(instance, null), true);
+        }
+
+        internal static void WriteToEmptyProperties(Modl<M> instance)
+        {
+            foreach (var property in EmptyProperties)
+                property.SetValue(instance, instance.Store.GetValue<object>(property.Name), null);
         }
     }
 }

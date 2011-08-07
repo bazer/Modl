@@ -30,7 +30,7 @@ namespace Modl.Fields
     interface IStore
     {
         T GetValue<T>(string name);
-        void SetValue<T>(string name, T value);
+        void SetValue<T>(string name, T value, bool emptyProperty = false);
     }
 
     internal class Store<M> : IStore
@@ -42,7 +42,7 @@ namespace Modl.Fields
 
         public DynamicFields<M> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
-        string NameOfLastInsertedMember;
+        //string NameOfLastInsertedMember;
 
         public Store(Type IdType)
         {
@@ -63,10 +63,10 @@ namespace Modl.Fields
             return (T)GetField<T>(name).Value;
         }
 
-        public void SetValue<T>(string name, T value)
+        public void SetValue<T>(string name, T value, bool emptyProperty = false)
         {
-            SetField<T>(name, value);
-            NameOfLastInsertedMember = name;
+            SetField<T>(name, value, emptyProperty);
+            LastInsertedMemberName = name;
         }
 
         protected Field GetField<T>(string name)
@@ -77,21 +77,22 @@ namespace Modl.Fields
             return (Field)Fields[name];
         }
 
-        protected void SetField<T>(string name, T value)
+        protected void SetField<T>(string name, T value, bool emptyProperty = false)
         {
             if (!Fields.ContainsKey(name))
-                Fields[name] = new Field(value, typeof(T));
+                Fields[name] = new Field(value, typeof(T), emptyProperty);
             else
                 Fields[name].Value = value;
         }
 
-        public string LastInsertedMemberName
-        {
-            get
-            {
-                return NameOfLastInsertedMember;
-            }
-        }
+        internal string LastInsertedMemberName { get; set; }
+        //public string LastInsertedMemberName
+        //{
+        //    get
+        //    {
+        //        return NameOfLastInsertedMember;
+        //    }
+        //}
 
         internal bool Load(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {

@@ -30,13 +30,15 @@ namespace Modl.Fields
         protected bool isDirty = false;
         internal bool IsDirty { get { return isDirty; } }
         internal Type Type { get; set; }
+        protected bool emptyProperty;
 
-        internal Field(object value, Type type)
+        internal Field(object value, Type type, bool emptyProperty = false)
         {
             oldValue = value;
             newValue = value;
 
             Type = type;
+            this.emptyProperty = emptyProperty;
         }
 
         internal object Value

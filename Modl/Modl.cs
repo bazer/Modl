@@ -63,7 +63,7 @@ namespace Modl
         private bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
-        public bool IsDirty { get { return Store.IsDirty; } }
+        public bool IsDirty { get { Statics<M>.ReadFromEmptyProperties(this); return Store.IsDirty; } }
         public int Id { get { return (int)Store.Id; } }
 
         internal static string IdName { get { return Statics<M>.IdName; } }
@@ -182,7 +182,9 @@ namespace Modl
 
             if (m.Store.Load(reader, throwExceptionOnNotFound, singleRow))
             {
+                Statics<M>.WriteToEmptyProperties(m);
                 m.isNew = false;
+
                 return m;
             }
             else
@@ -276,7 +278,7 @@ namespace Modl
         public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
         {
             Change<M> statement = BaseGetSaveStatement();
-
+            Statics<M>.ReadFromEmptyProperties(this);
             Store.BaseAddSaveFields(statement);
 
             if (dbTransaction != null)
