@@ -143,7 +143,7 @@ namespace Modl.Fields
                     else
                         statement.With(field.Key, value.Id);
                 }
-                else
+                else if (field.Value.IsDirty)
                     statement.With(field.Key, field.Value.Value);
             }
         }
