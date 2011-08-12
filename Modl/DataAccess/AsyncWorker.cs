@@ -27,9 +27,13 @@ namespace Modl.DataAccess
     internal class AsyncWorker : IDisposable
     {
         private Database database;
-        private bool DoWork = true;
-        private Thread thread;
         private List<IQuery> workerQueue = new List<IQuery>();
+
+        private Thread thread;
+        private volatile bool doWork = true;
+        private volatile bool isWorking = true;
+        private readonly object workLock = new object();
+
 
         internal AsyncWorker(Database database)
         {
@@ -42,50 +46,59 @@ namespace Modl.DataAccess
 
         internal void Enqueue(params IQuery[] queries)
         {
-            lock (workerQueue)
+            lock (workLock)
             {
+                isWorking = true;
                 workerQueue.AddRange(queries);
+                Monitor.Pulse(workLock);
             }
         }
 
         internal void WaitToCompletion()
         {
-            while (workerQueue.Count != 0)
-                Thread.Sleep(20);
+            while (isWorking)
+                Thread.Yield();
         }
 
         private void WorkerLoop()
         {
-            while (DoWork || workerQueue.Count != 0)
+            while (doWork || workerQueue.Count != 0)
             {
-                IQuery[] list;
-
                 try
                 {
-                    if (workerQueue.Count != 0)
+                    IQuery[] list;
+
+                    lock (workLock)
                     {
-                        lock (workerQueue)
+                        if (workerQueue.Count == 0)
                         {
-                            int i = 0;
-                            list = workerQueue.TakeWhile(x => (i += x.ParameterCount) < 2000).ToArray();
-                            workerQueue.RemoveRange(0, list.Length);
+                            isWorking = false;
+                            Monitor.Wait(workLock);
                         }
 
-                        DbAccess.ExecuteNonQuery(list);
+                        int i = 0;
+                        list = workerQueue.TakeWhile(x => (i += x.ParameterCount) < 2000).ToArray();
+                        workerQueue.RemoveRange(0, list.Length);
                     }
+
+                    if (list.Length != 0)
+                        DbAccess.ExecuteNonQuery(list);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
                 }
-
-                Thread.Sleep(50);
             }
         }
 
         public void Dispose()
         {
-            DoWork = false;
+            lock (workLock)
+            {
+                doWork = false;
+                Monitor.Pulse(workLock);
+            }
+            
             thread.Join();
         }
     }
