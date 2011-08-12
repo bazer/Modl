@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ExampleModel;
+using Modl;
 
 namespace Tests
 {
@@ -34,7 +35,9 @@ namespace Tests
         //[TestMethod]
         public void PerformanceTest()
         {
-            basics.PerformanceCRUD(databaseName, 100);
+            GlobalCRUD();
+            basics.PerformanceCRUD(databaseName, 100, CacheLevel.Off);
+            basics.PerformanceCRUD(databaseName, 100, CacheLevel.On);
         }
 
         [TestMethod]

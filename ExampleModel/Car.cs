@@ -28,10 +28,10 @@ namespace ExampleModel
     [Id("Id")]
     public class Car : Modl<Car, int>
     {
-        //public string Name { get { return Fields.Name; } set { Fields.Name = value; } }
-        //public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
-
         public string Name { get; set; }
         public string Manufacturer { get; set; }
+
+        //public string Name { get { return Fields.Name; } set { Fields.Name = value; } }
+        //public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
     }
 }

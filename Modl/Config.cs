@@ -24,12 +24,38 @@ using System.Text;
 using System.Configuration;
 using Modl.DatabaseProviders;
 using System.Data;
+using Modl.DataAccess;
+using Modl.Cache;
 
 namespace Modl
 {
+    public enum CacheLevel
+    {
+        On,
+        Off
+    }
+
     public class Config
     {
-        //public static string ConnectionString { get; set; }
+        private static CacheLevel cacheLevel;
+        public static CacheLevel CacheLevel 
+        { 
+            get
+            {
+                return cacheLevel;
+            }
+            set 
+            {
+                cacheLevel = value;
+
+                if (cacheLevel == Modl.CacheLevel.Off)
+                {
+                    AsyncDbAccess.CloseAllWorkers();
+                    CacheManager.Clear();
+                }
+            }
+        }
+        
         protected static Dictionary<string, Database> DatabaseProviders = new Dictionary<string, Database>();
 
         static Config()
@@ -41,6 +67,8 @@ namespace Modl
             //if (ConfigurationManager.ConnectionStrings.Count > 1)
             //    AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
         }
+
+        
 
         private static Database defaultDbProvider = null;
         internal static Database DefaultDatabase

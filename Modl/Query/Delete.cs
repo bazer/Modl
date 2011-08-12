@@ -42,13 +42,18 @@ namespace Modl.Query
             parser.ParseTree(expression);
         }
 
-        public override Tuple<string, IEnumerable<IDataParameter>> ToSql()
+        public override Sql ToSql(string paramPrefix)
         {
-            var where = GetWhere();
+            var where = GetWhere(paramPrefix);
 
-            return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("DELETE FROM {0} \r\n{1}", Modl<M>.Table, where.Item1),
-                where.Item2);
+            return new Sql(
+                string.Format("DELETE FROM {0} \r\n{1}", Modl<M>.Table, where.Text),
+                where.Parameters);
+        }
+
+        public override int ParameterCount
+        {
+            get { return whereList.Count; }
         }
 
         //public override string ToString()

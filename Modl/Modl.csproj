@@ -47,6 +47,10 @@
   <ItemGroup>
     <Compile Include="Attributes\IdAttribute.cs" />
     <Compile Include="Attributes\TableAttribute.cs" />
+    <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="DataAccess\AsyncDbAccess.cs" />
+    <Compile Include="Cache\StaticCache.cs" />
+    <Compile Include="DataAccess\AsyncWorker.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DatabaseProviders\MySQLProvider.cs" />
     <Compile Include="DatabaseProviders\SqlCeProvider.cs" />
@@ -74,6 +78,7 @@
     <Compile Include="Query\Literal.cs" />
     <Compile Include="Query\Change.cs" />
     <Compile Include="Query\QueryPart.cs" />
+    <Compile Include="Query\Sql.cs" />
     <Compile Include="Query\Where.cs" />
     <Compile Include="Query\Delete.cs" />
     <Compile Include="Query\Insert.cs" />
@@ -87,6 +92,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

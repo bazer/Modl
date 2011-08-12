@@ -30,7 +30,8 @@ namespace Modl.Query
     {
         Database DatabaseProvider { get; }
         IDbCommand ToDbCommand();
-        Tuple<string, IEnumerable<IDataParameter>> ToSql();
+        Sql ToSql(string paramPrefix);
+        int ParameterCount { get; }
         //Where<C, T> Where(string key);
         //IEnumerable<IDataParameter> QueryPartsParameters();
     }
@@ -43,7 +44,8 @@ namespace Modl.Query
         protected M owner;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
-        public abstract Tuple<string, IEnumerable<IDataParameter>> ToSql();
+        public abstract Sql ToSql(string paramPrefix);
+        public abstract int ParameterCount { get; }
 
         public Query()
         {
@@ -67,15 +69,15 @@ namespace Modl.Query
             return where;
         }
 
-        protected Tuple<string, IEnumerable<IDataParameter>> GetWhere()
+        protected Sql GetWhere(string paramPrefix)
         {
             if (whereList.Count == 0)
-                return new Tuple<string, IEnumerable<IDataParameter>>(string.Empty, new List<IDataParameter>());
+                return new Sql(); // Tuple<string, IEnumerable<IDataParameter>>(string.Empty, new List<IDataParameter>());
 
             int i = 0, j = 0;
-            return new Tuple<string, IEnumerable<IDataParameter>>("WHERE \r\n" +
-                string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(i++))),
-                whereList.Select(x => x.GetCommandParameter(j++)));
+            return new Sql("WHERE \r\n" +
+                string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(paramPrefix, i++))),
+                whereList.Select(x => x.GetCommandParameter(paramPrefix, j++)).ToArray());
         }
 
         //protected string QueryPartsToString()
@@ -93,6 +95,21 @@ namespace Modl.Query
         public IDbCommand ToDbCommand()
         {
             return DatabaseProvider.ToDbCommand(this);
+        }
+
+        public override string ToString()
+        {
+            var sql = ToSql(string.Empty);
+            return sql.Text + "; " + string.Join(", ", sql.Parameters.Select(x => x.ParameterName + ": " + x.Value));
+
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendLine(sql.Item1 + "; ");
+
+
+            //foreach (var param in sql.Item2)
+            //    sb.AppendLine(param.ParameterName + ": " + param.Value);
+
+            //return sb.ToString();
         }
     }
 }

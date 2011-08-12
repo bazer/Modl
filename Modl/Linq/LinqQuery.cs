@@ -49,7 +49,9 @@ namespace Modl.Linq
 
         protected IEnumerator<M> GetList()
         {
-            return Modl<M>.GetList(new Select<M>(database, expression)).GetEnumerator();
+            return new Select<M>(database, expression).GetList<int>().GetEnumerator();
+
+            //return Modl<M>.GetList(new Select<M>(database, expression)).GetEnumerator();
         }
 
         public IEnumerator<M> GetEnumerator()

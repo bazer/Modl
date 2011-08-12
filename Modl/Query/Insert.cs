@@ -30,14 +30,14 @@ namespace Modl.Query
     {
         public Insert(Database database) : base(database) { }
 
-        protected Tuple<string, IEnumerable<IDataParameter>> GetWith()
+        protected Sql GetWith(string paramPrefix)
         {
             int i = 0, j = 0;
-            return new Tuple<string, IEnumerable<IDataParameter>>(
+            return new Sql(
                 string.Format("({0}) VALUES ({1})",
                     string.Join(",", withList.Keys),
-                    string.Join(",", withList.Values.Select(x => DatabaseProvider.GetParameterValue("v" + i++)))),
-                withList.Select(x => DatabaseProvider.GetParameter("v" + j++, x.Value)));
+                    string.Join(",", withList.Values.Select(x => DatabaseProvider.GetParameterValue(paramPrefix + "v" + i++)))),
+                withList.Select(x => DatabaseProvider.GetParameter(paramPrefix + "v" + j++, x.Value)).ToArray());
 
             //return string.Format("({0}) VALUES ({1})",
             //    string.Join(",", withList.Keys),
@@ -45,13 +45,18 @@ namespace Modl.Query
             //);
         }
 
-        public override Tuple<string, IEnumerable<IDataParameter>> ToSql()
+        public override Sql ToSql(string paramPrefix)
         {
-            var with = GetWith();
+            var with = GetWith(paramPrefix);
 
-            return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("INSERT INTO {0} {1}", Modl<M>.Table, with.Item1),
-                with.Item2);
+            return new Sql(
+                string.Format("INSERT INTO {0} {1}", Modl<M>.Table, with.Text),
+                with.Parameters);
+        }
+
+        public override int ParameterCount
+        {
+            get { return withList.Count; }
         }
 
         //public override string ToString()

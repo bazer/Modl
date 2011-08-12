@@ -26,6 +26,7 @@ using Modl.DataAccess;
 using Modl.Fields;
 using Modl.Linq;
 using Modl.Query;
+using Modl.Cache;
 
 
 namespace Modl
@@ -41,26 +42,78 @@ namespace Modl
     //    int Id { get; }
     //}
 
+    //public abstract class Modl<M, IdType> : Modl<M>
+    //    where M : Modl<M>, new()
+    //{
+    //    public new IdType Id { get { return (IdType)Store.Id; } }
+
+    //    public Modl() 
+    //    {
+    //        Store.IdType = typeof(IdType);
+    //    }
+    //}
+
     public abstract class Modl<M, IdType> : Modl<M>
         where M : Modl<M>, new()
     {
         public new IdType Id { get { return (IdType)Store.Id; } }
 
-        public Modl() 
+        public Modl()
         {
             Store.IdType = typeof(IdType);
+        }
+
+        public static bool Exists(IdType id, Database database = null)
+        {
+            return Get(id, database, false) != null;
+        }
+
+        public static M Get(IdType id, Database database = null, bool throwExceptionOnNotFound = true)
+        {
+            return Modl<M>.Get<IdType>(id, database, throwExceptionOnNotFound);
+        }
+
+        public static new IEnumerable<M> GetAll(Database database = null)
+        {
+            return new Select<M>(database ?? DefaultDatabase).GetList<IdType>();
+        }
+
+        public static new IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
+        {
+            return new Select<M>(database ?? DefaultDatabase, query).GetList<IdType>();
+        }
+
+        public override void Save()
+        {
+            Save<IdType>();
+        }
+
+        public override void Delete()
+        {
+            Delete<IdType>(Id, Database);
+            isDeleted = true;
+        }
+
+        public static void Delete(IdType id, Database database = null)
+        {
+            Delete<IdType>(id, database);
+        }
+
+        public static new void DeleteAll(Database database = null)
+        {
+            DeleteAll<IdType>(database);
         }
     }
 
     //[ModelBinder(typeof(ModlBinder))]
-    [DebuggerDisplay("{typeof(C).Name, nq}: {Id}")]
+    [DebuggerDisplay("{typeof(M).Name, nq}: {Id}")]
     public abstract class Modl<M> : System.IEquatable<M>, IModl //, IModl<M>
         where M : Modl<M>, new()
     {
-        private bool isNew = true;
+        internal bool isNew = true;
         public bool IsNew { get { return isNew; } }
 
-        private bool isDeleted = false;
+        internal bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
         public bool IsDirty { get { Statics<M>.ReadFromEmptyProperties(this); return Store.IsDirty; } }
@@ -168,15 +221,27 @@ namespace Modl
 
         public static M Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
         {
-            return Get(new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
+            return Get<int>(id, database, throwExceptionOnNotFound);
+            //return new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id).Get(throwExceptionOnNotFound);
+            //return Get(new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
         }
 
-        internal static M Get(Select<M> query, bool throwExceptionOnNotFound = true)
+        internal static M Get<IdType>(IdType id, Database database, bool throwExceptionOnNotFound)
         {
-            return Get(DbAccess.ExecuteReader(query), query.DatabaseProvider, throwExceptionOnNotFound, true);
+            return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase, throwExceptionOnNotFound);
+
+            //Database db = database ?? DefaultDatabase;
+
+            //if (StaticCache<M, IdType>.Contains(id, db))
+            //    return StaticCache<M, IdType>.Get(id, db);
+            //else
+            //{
+            //    M instance = new Select<M>(db).Where(IdName).EqualTo(id).Get(throwExceptionOnNotFound);
+
+            //}
         }
 
-        protected static M Get(DbDataReader reader, Database database, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        internal static M Get(DbDataReader reader, Database database, bool throwExceptionOnNotFound = true, bool singleRow = true)
         {
             var m = Modl<M>.New(database);
 
@@ -191,41 +256,22 @@ namespace Modl
                 return null;
         }
 
-        //public static C GetCached(int id, bool throwExceptionOnNotFound = true)
-        //{
-        //    if (throwExceptionOnNotFound)
-        //        return AllCached.Single(x => x.Id == id);
-        //    else
-        //        return AllCached.SingleOrDefault(x => x.Id == id);
-        //}
-
-        internal static IEnumerable<M> GetList(Select<M> query)
-        {
-            using (DbDataReader reader = DbAccess.ExecuteReader(query))
-            {
-                while (!reader.IsClosed)
-                {
-                    var c = Get(reader, query.DatabaseProvider, singleRow: false);
-
-                    if (c != null)
-                        yield return c;
-                }
-            }
-        }
-
         public static M GetWhere(Expression<Func<M, bool>> query, Database database = null, bool throwExceptionOnNotFound = true)
         {
-            return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
+            return new Select<M>(database ?? DefaultDatabase, query).Get(throwExceptionOnNotFound);
+            //return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
 
         public static IEnumerable<M> GetAll(Database database = null)
         {
-            return GetList(new Select<M>(database ?? DefaultDatabase));
+            return new Select<M>(database ?? DefaultDatabase).GetList<int>();
+            //return GetList(new Select<M>(database ?? DefaultDatabase));
         }
 
         public static IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return GetList(new Select<M>(database ?? DefaultDatabase, query));
+            return new Select<M>(database ?? DefaultDatabase, query).GetList<int>();
+            //return GetList(new Select<M>(database ?? DefaultDatabase, query));
         }
 
         protected void SetValue<T>(string name, T value)
@@ -275,65 +321,83 @@ namespace Modl
 
 
 
-        public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
+        //public virtual void Save(Modl.DataAccess.DbTransaction dbTransaction = null)
+        //{
+        //    Change<M> statement = BaseGetSaveStatement();
+        //    Statics<M>.ReadFromEmptyProperties(this);
+        //    Store.BaseAddSaveFields(statement);
+
+        //    if (dbTransaction != null)
+        //        BaseTransactionSave(statement, dbTransaction);
+        //    else
+        //        BaseSave(statement);
+
+        //    Store.ResetFields();
+        //    //LogSave();
+        //}
+
+        //private Change<M> BaseGetSaveStatement()
+        //{
+        //    Change<M> statement;
+
+        //    if (IsNew)
+        //    {
+        //        statement = new Insert<M>(Database);
+        //    }
+        //    else
+        //    {
+        //        statement = new Update<M>(Database);
+        //        ((Update<M>)statement).Where(IdName).EqualTo(Id);
+        //    }
+
+        //    return statement;
+        //}
+
+
+        public virtual void Save()
         {
-            Change<M> statement = BaseGetSaveStatement();
+            Save<int>();
+        }
+
+        internal void Save<IdType>()
+        {
+            if (isDeleted)
+                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
+
+            Change<M> query;
+
+            if (IsNew)
+                query = new Insert<M>(Database);
+            else
+                query = new Update<M>(Database).Where(IdName).EqualTo(Id);
+
             Statics<M>.ReadFromEmptyProperties(this);
-            Store.BaseAddSaveFields(statement);
+            Store.BaseAddSaveFields(query);
 
-            if (dbTransaction != null)
-                BaseTransactionSave(statement, dbTransaction);
+            if (query is Insert<M>)
+            {
+                Store.Id = DbAccess.ExecuteScalar<IdType>(query, Database.GetLastIdQuery());
+                StaticCache<M, IdType>.Add((IdType)Store.Id, (M)this, Database);
+            }
             else
-                BaseSave(statement);
+                AsyncDbAccess.ExecuteNonQuery(query);
 
+            isNew = false;
             Store.ResetFields();
-            //LogSave();
         }
 
-        private Change<M> BaseGetSaveStatement()
-        {
-            Change<M> statement;
+        //private void BaseTransactionSave(Change<M> statement, Modl.DataAccess.DbTransaction trans)
+        //{
+        //    if (isDeleted)
+        //        throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
 
-            if (isNew)
-            {
-                statement = new Insert<M>(Database);
-            }
-            else
-            {
-                statement = new Update<M>(Database);
-                ((Update<M>)statement).Where(IdName).EqualTo(Id);
-            }
+        //    //if (statement is Insert<C>)
+        //    //    id = trans.ExecuteScalar<int>(statement, new Literal("select SCOPE_IDENTITY()"));
+        //    //else
+        //    //    trans.ExecuteNonQuery(statement);
 
-            return statement;
-        }
-
-
-
-        private void BaseSave(Change<M> statement)
-        {
-            if (isDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
-
-            if (statement is Insert<M>)
-                Store.Id = DbAccess.ExecuteScalar<int>(statement, Database.GetLastIdQuery());
-            else
-                DbAccess.ExecuteNonQuery(statement);
-
-            isNew = false;
-        }
-
-        private void BaseTransactionSave(Change<M> statement, Modl.DataAccess.DbTransaction trans)
-        {
-            if (isDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
-
-            //if (statement is Insert<C>)
-            //    id = trans.ExecuteScalar<int>(statement, new Literal("select SCOPE_IDENTITY()"));
-            //else
-            //    trans.ExecuteNonQuery(statement);
-
-            isNew = false;
-        }
+        //    isNew = false;
+        //}
 
         public virtual void Delete()
         {
@@ -351,24 +415,46 @@ namespace Modl
 
         public static void Delete(int id, Database database = null)
         {
+            Delete<int>(id, database);
+        }
+
+        internal static void Delete<IdType>(IdType id, Database database = null)
+        {
             Delete<M> statement = new Delete<M>(database ?? DefaultDatabase);
             statement.Where(IdName).EqualTo(id);
 
-            DbAccess.ExecuteNonQuery(statement);
+            AsyncDbAccess.ExecuteNonQuery(statement);
+
+            StaticCache<M, IdType>.Delete(id, database ?? DefaultDatabase);
         }
 
         public static void DeleteAll(Database database = null)
         {
+            DeleteAll<int>(database);
+        }
+
+        public static void DeleteAll<IdType>(Database database = null)
+        {
             Delete<M> statement = new Delete<M>(database ?? DefaultDatabase);
-            
-            DbAccess.ExecuteNonQuery(statement);
+
+            AsyncDbAccess.ExecuteNonQuery(statement);
+
+            StaticCache<M, IdType>.DeleteAll(database ?? DefaultDatabase);
         }
 
         public static void DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
+            DeleteAllWhere<int>(query, database);
+        }
+
+        public static void DeleteAllWhere<IdType>(Expression<Func<M, bool>> query, Database database = null)
+        {
+            foreach (var modl in GetAllWhere(query, database).ToList().Cast<Modl<M, IdType>>())
+                StaticCache<M, IdType>.Delete(modl.Id, database ?? DefaultDatabase);
+
             Delete<M> statement = new Delete<M>(database ?? DefaultDatabase, query);
 
-            DbAccess.ExecuteNonQuery(statement);
+            AsyncDbAccess.ExecuteNonQuery(statement);
         }
 
         //protected void LogSave()

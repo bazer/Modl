@@ -21,6 +21,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 using Modl.Linq.Parsers;
+using System.Data.Common;
+using Modl.DataAccess;
+using Modl.Fields;
 
 namespace Modl.Query
 {
@@ -43,15 +46,55 @@ namespace Modl.Query
             parser.ParseTree(expression);
         }
 
-        public override Tuple<string, IEnumerable<IDataParameter>> ToSql()
+        public override Sql ToSql(string paramPrefix)
         {
-            var where = GetWhere();
+            var where = GetWhere(paramPrefix);
 
-            return new Tuple<string, IEnumerable<IDataParameter>>(
-                string.Format("SELECT * FROM {0} \r\n{1}", Modl<M>.Table, where.Item1),
-                where.Item2);
+            return new Sql(
+                string.Format("SELECT * FROM {0} \r\n{1}", Modl<M>.Table, where.Text),
+                where.Parameters);
         }
 
+        public override int ParameterCount
+        {
+            get { return whereList.Count; }
+        }
+
+        public DbDataReader Execute()
+        {
+            return AsyncDbAccess.ExecuteReader(this);
+        }
+
+        internal M Get(bool throwExceptionOnNotFound = true)
+        {
+            //if (StaticCache<M, )
+            return Modl<M>.Get(Execute(), DatabaseProvider, throwExceptionOnNotFound, true);
+        }
+
+        
+        
+
+        //public static C GetCached(int id, bool throwExceptionOnNotFound = true)
+        //{
+        //    if (throwExceptionOnNotFound)
+        //        return AllCached.Single(x => x.Id == id);
+        //    else
+        //        return AllCached.SingleOrDefault(x => x.Id == id);
+        //}
+
+        internal IEnumerable<M> GetList<IdType>()
+        {
+            using (DbDataReader reader = Execute())
+            {
+                while (!reader.IsClosed)
+                {
+                    var c = Modl<M, IdType>.Get(reader, DatabaseProvider, singleRow: false);
+
+                    if (c != null)
+                        yield return c;
+                }
+            }
+        }
 
         //public override string ToString()
         //{

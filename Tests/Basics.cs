@@ -49,8 +49,9 @@ namespace Tests
             Assert.AreEqual(databases.Count, Database.GetAll().Count);
         }
 
-        public TimeSpan PerformanceCRUD(string databaseName, int iterations)
+        public TimeSpan PerformanceCRUD(string databaseName, int iterations, CacheLevel cache)
         {
+            Config.CacheLevel = cache;
             SwitchDatabase(databaseName);
 
             var watch = Stopwatch.StartNew();
@@ -59,7 +60,7 @@ namespace Tests
                 CRUD();
 
             watch.Stop();
-            Console.WriteLine(string.Format("{0} iterations for {1}: {2} ms.", iterations, databaseName, watch.Elapsed.TotalMilliseconds));
+            Console.WriteLine(string.Format("{0} iterations for {1}: {2} ms. (cache {3})", iterations, databaseName, watch.Elapsed.TotalMilliseconds, cache));
 
             return watch.Elapsed;
         }

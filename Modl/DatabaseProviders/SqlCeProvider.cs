@@ -72,9 +72,9 @@ namespace Modl.DatabaseProviders
 
         internal override IDbCommand ToDbCommand(IQuery query)
         {
-            var sql = query.ToSql();
-            var command = new SqlCeCommand(sql.Item1, (SqlCeConnection)GetConnection());
-            command.Parameters.AddRange(sql.Item2.ToArray());
+            var sql = query.ToSql("");
+            var command = new SqlCeCommand(sql.Text, (SqlCeConnection)GetConnection());
+            command.Parameters.AddRange(sql.Parameters);
 
             return command;
 
@@ -86,11 +86,12 @@ namespace Modl.DatabaseProviders
             var connection = GetConnection();
             var commands = new List<IDbCommand>();
 
+            int i = 0;
             foreach (var query in queries)
             {
-                var sql = query.ToSql();
-                var command = new SqlCeCommand(sql.Item1, (SqlCeConnection)connection);
-                command.Parameters.AddRange(sql.Item2.ToArray());
+                var sql = query.ToSql("q" + i++);
+                var command = new SqlCeCommand(sql.Text, (SqlCeConnection)connection);
+                command.Parameters.AddRange(sql.Parameters);
                 commands.Add(command);
             }
 

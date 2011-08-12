@@ -24,7 +24,7 @@ using Modl.Query;
 
 namespace Modl
 {
-    public static class Extensions
+    internal static class Extensions
     {
         internal static string ToSql(this Relation relation)
         {

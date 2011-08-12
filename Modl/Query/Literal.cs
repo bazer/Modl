@@ -47,14 +47,19 @@ namespace Modl.Query
             this.parameters = parameters;
         }
 
-        public Tuple<string, IEnumerable<IDataParameter>> ToSql()
+        public Sql ToSql(string paramPrefix)
         {
-            return new Tuple<string, IEnumerable<IDataParameter>>(sql, parameters);
+            return new Sql(sql, parameters.ToArray());
         }
 
         public IDbCommand ToDbCommand()
         {
             return DatabaseProvider.ToDbCommand(this);
+        }
+
+        public int ParameterCount
+        {
+            get { return parameters.Count(); }
         }
 
         //public IEnumerable<IDataParameter> QueryPartsParameters()
