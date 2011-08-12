@@ -32,7 +32,13 @@ namespace Tests
         string databaseName = "MySQLDb";
         Basics basics = new Basics();
 
-        //[TestMethod]
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Database.DisposeAll();
+        }
+
+        [TestMethod]
         public void PerformanceTest()
         {
             GlobalCRUD();

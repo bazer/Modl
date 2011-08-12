@@ -50,7 +50,7 @@ namespace Modl
 
                 if (cacheLevel == Modl.CacheLevel.Off)
                 {
-                    AsyncDbAccess.CloseAllWorkers();
+                    AsyncDbAccess.DisposeAllWorkers();
                     CacheManager.Clear();
                 }
             }

@@ -36,7 +36,16 @@ namespace Modl.DataAccess
             return workers[database];
         }
 
-        public static void CloseAllWorkers()
+        public static void DisposeWorker(Database database)
+        {
+            if (workers.ContainsKey(database))
+            {
+                workers[database].Dispose();
+                workers.Remove(database);
+            }
+        }
+
+        public static void DisposeAllWorkers()
         {
             foreach (var worker in workers.Values)
                 worker.Dispose();

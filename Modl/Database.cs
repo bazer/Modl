@@ -27,6 +27,7 @@ using Modl.Query;
 using Modl.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Modl.DataAccess;
 
 namespace Modl
 {
@@ -37,7 +38,7 @@ namespace Modl
         MySQL
     }
 
-    public abstract class Database
+    public abstract class Database : IDisposable
     {
         public readonly DatabaseType Type;
         public readonly string Name;
@@ -205,6 +206,14 @@ namespace Modl
         //    //return Activator.CreateInstance(typeof(Modl<>).MakeGenericType(expression.Type), BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { reader }, null);
         //}
 
-        
+        public static void DisposeAll()
+        {
+            AsyncDbAccess.DisposeAllWorkers();
+        }
+
+        public void Dispose()
+        {
+            AsyncDbAccess.DisposeWorker(this);
+        }
     }
 }

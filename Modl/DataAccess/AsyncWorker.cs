@@ -33,7 +33,7 @@ namespace Modl.DataAccess
         private volatile bool doWork = true;
         private volatile bool isWorking = true;
         private readonly object workLock = new object();
-
+        private bool isDisposed = false;
 
         internal AsyncWorker(Database database)
         {
@@ -42,6 +42,8 @@ namespace Modl.DataAccess
             thread = new Thread(WorkerLoop);
             thread.IsBackground = false;
             thread.Start();
+
+            
         }
 
         internal void Enqueue(params IQuery[] queries)
@@ -72,8 +74,10 @@ namespace Modl.DataAccess
                     {
                         if (workerQueue.Count == 0)
                         {
+                            thread.IsBackground = true;
                             isWorking = false;
                             Monitor.Wait(workLock);
+                            thread.IsBackground = false;
                         }
 
                         int i = 0;
@@ -91,15 +95,37 @@ namespace Modl.DataAccess
             }
         }
 
+        
         public void Dispose()
         {
-            lock (workLock)
+            try
             {
-                doWork = false;
-                Monitor.Pulse(workLock);
+                if (!isDisposed)
+                {
+                    Console.WriteLine("Dispose: {0}, Worker queue: {1}, state: {2}", DateTime.Now.ToLongTimeString(), workerQueue.Count, thread.ThreadState);
+
+                    isDisposed = true;
+
+                    lock (workLock)
+                    {
+                        doWork = false;
+                        Monitor.Pulse(workLock);
+                    }
+                   
+                    thread.Join();
+                }
+
+                Console.WriteLine("End dispose: {0}, Worker queue: {1}, state: {2}", DateTime.Now.ToLongTimeString(), workerQueue.Count, thread.ThreadState);
             }
-            
-            thread.Join();
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
+            }
+        }
+
+        ~AsyncWorker()
+        {
+            Dispose();
         }
     }
 }

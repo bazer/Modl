@@ -33,13 +33,18 @@ namespace Tests
         string databaseName = "SqlServerDb";
         Basics basics = new Basics();
 
-        //[TestMethod]
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Database.DisposeAll();
+        }
+
+        [TestMethod]
         public void PerformanceTest()
         {
             GlobalCRUD();
-            basics.PerformanceCRUD(databaseName, 1000, CacheLevel.Off);
-            basics.PerformanceCRUD(databaseName, 1000, CacheLevel.On);
-            //Config.CacheLevel = CacheLevel.Off;
+            basics.PerformanceCRUD(databaseName, 100, CacheLevel.Off);
+            basics.PerformanceCRUD(databaseName, 100, CacheLevel.On);
         }
 
         [TestMethod]
