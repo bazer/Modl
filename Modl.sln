@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modl", "Modl\Modl.csproj", "{23EFD310-2981-4589-A8AC-BDBA33712479}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcApplication", "Examples\MvcApplication\MvcApplication.csproj", "{A5661862-6FB9-472B-A0E3-0B2C06B04DB5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleModel", "ExampleModel\ExampleModel.csproj", "{33323481-00D5-4BF2-AE51-CAA91193695A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{760E80C2-5BBD-4691-9522-D7D48C8C886E}"
@@ -31,10 +29,6 @@ Global
 		{23EFD310-2981-4589-A8AC-BDBA33712479}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23EFD310-2981-4589-A8AC-BDBA33712479}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23EFD310-2981-4589-A8AC-BDBA33712479}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5661862-6FB9-472B-A0E3-0B2C06B04DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5661862-6FB9-472B-A0E3-0B2C06B04DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5661862-6FB9-472B-A0E3-0B2C06B04DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5661862-6FB9-472B-A0E3-0B2C06B04DB5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33323481-00D5-4BF2-AE51-CAA91193695A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33323481-00D5-4BF2-AE51-CAA91193695A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33323481-00D5-4BF2-AE51-CAA91193695A}.Release|Any CPU.ActiveCfg = Release|Any CPU
