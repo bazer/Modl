@@ -24,14 +24,10 @@ using Modl;
 
 namespace ExampleModel
 {
-    [Table("Cars")]
-    [Id("Id")]
-    public class Car : Modl<Car>
+    [Table("Manufacturers")]
+    [Id("ManufacturerID")]
+    public class Manufacturer : Modl<Manufacturer, Guid>
     {
         public string Name { get; set; }
-        public string Manufacturer { get; set; }
-
-        //public string Name { get { return Fields.Name; } set { Fields.Name = value; } }
-        //public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
     }
 }

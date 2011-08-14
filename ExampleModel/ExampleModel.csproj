@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Car.cs" />
+    <Compile Include="Manufacturer.cs" />
     <Compile Include="Northwind\Northwind.cs" />
     <Compile Include="Northwind\NorthwindContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

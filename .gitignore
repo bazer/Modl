@@ -20,3 +20,4 @@
 *.vsp
 /Modl.Mvc/obj
 /Modl.Mvc/bin
+*.ctl

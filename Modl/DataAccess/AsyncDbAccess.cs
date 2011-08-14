@@ -25,6 +25,7 @@ namespace Modl.DataAccess
 {
     public static class AsyncDbAccess
     {
+        private static readonly object workLock = new object();
         private static Dictionary<Database, AsyncWorker> workers = new Dictionary<Database, AsyncWorker>();
 
         private static AsyncWorker GetWorker(Database database)
@@ -32,25 +33,35 @@ namespace Modl.DataAccess
             if (workers.ContainsKey(database))
                 return workers[database];
 
-            workers[database] = new AsyncWorker(database);
+            lock (workLock)
+            {
+                workers[database] = new AsyncWorker(database);
+            }
+
             return workers[database];
         }
 
         public static void DisposeWorker(Database database)
         {
-            if (workers.ContainsKey(database))
+            lock (workLock)
             {
-                workers[database].Dispose();
-                workers.Remove(database);
+                if (workers.ContainsKey(database))
+                {
+                    workers[database].Dispose();
+                    workers.Remove(database);
+                }
             }
         }
 
         public static void DisposeAllWorkers()
         {
-            foreach (var worker in workers.Values)
-                worker.Dispose();
+            lock (workLock)
+            {
+                foreach (var worker in workers.Values)
+                    worker.Dispose();
 
-            workers.Clear();
+                workers.Clear();
+            }
         }
 
         public static void ExecuteNonQuery(params IQuery[] queries)
@@ -71,7 +82,7 @@ namespace Modl.DataAccess
             if (Config.CacheLevel == CacheLevel.On)
                 GetWorker(query.DatabaseProvider).WaitToCompletion();
 
-            return DbAccess.ExecuteReader(query.ToDbCommand());
+            return DbAccess.ExecuteReader(query).First();
         }
     }
 }

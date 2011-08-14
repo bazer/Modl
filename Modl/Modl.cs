@@ -36,6 +36,11 @@ namespace Modl
         int Id { get; }
     }
 
+    public interface IModl<IdType>
+    {
+        IdType Id { get; }
+    }
+
     //public interface IModl<M>
     //    //where M : IModl<M>, new()
     //{
@@ -53,7 +58,7 @@ namespace Modl
     //    }
     //}
 
-    public abstract class Modl<M, IdType> : Modl<M>
+    public abstract class Modl<M, IdType> : Modl<M>, IModl<IdType>
         where M : Modl<M>, new()
     {
         public new IdType Id { get { return (IdType)Store.Id; } }
@@ -62,6 +67,42 @@ namespace Modl
         {
             Store.IdType = typeof(IdType);
         }
+
+        public Modl(IdType id)
+        {
+            Store.IdType = typeof(IdType);
+            SetId(id);
+            //Store.Id = id;
+            //AutomaticId = false;
+        }
+
+        public static M New(IdType id)
+        {
+            var m = new M();
+            m.SetId(id);
+
+            return m;
+        }
+
+        public static M New(IdType id, Database database)
+        {
+            var m = New(database);
+            m.SetId(id);
+
+            return m;
+        }
+
+        public static M New(IdType id, string databaseName)
+        {
+            var m = New(databaseName);
+            m.SetId(id);
+
+            return m;
+        }
+
+        //internal static new M New(int id) { throw new NotImplementedException(); }
+        //internal static new M New(int id, Database database) { throw new NotImplementedException(); }
+        //internal static new M New(int id, string databaseName) { throw new NotImplementedException(); }
 
         public static bool Exists(IdType id, Database database = null)
         {
@@ -107,7 +148,7 @@ namespace Modl
 
     //[ModelBinder(typeof(ModlBinder))]
     [DebuggerDisplay("{typeof(M).Name, nq}: {Id}")]
-    public abstract class Modl<M> : System.IEquatable<M>, IModl //, IModl<M>
+    public abstract class Modl<M> : System.IEquatable<M>, IModl , IModl<int>
         where M : Modl<M>, new()
     {
         internal bool isNew = true;
@@ -118,6 +159,7 @@ namespace Modl
 
         public bool IsDirty { get { Statics<M>.ReadFromEmptyProperties(this); return Store.IsDirty; } }
         public int Id { get { return (int)Store.Id; } }
+        internal bool AutomaticId = true;
 
         internal static string IdName { get { return Statics<M>.IdName; } }
         internal static string Table { get { return Statics<M>.TableName; } }
@@ -181,6 +223,23 @@ namespace Modl
 
         public Modl()
         {
+            Initialize(typeof(int));
+        }
+
+        public Modl(int id)
+        {
+            Initialize(typeof(int));
+            SetId(id);
+        }
+
+        internal void SetId(object id)
+        {
+            Store.Id = id;
+            AutomaticId = false;
+        }
+
+        private void Initialize(Type type)
+        {
             Store = new Store<M>(typeof(int));
             Fields = Store.DynamicFields;
             F = Store.DynamicFields;
@@ -193,12 +252,28 @@ namespace Modl
             return new M();
         }
 
-        public static M New(string databaseName)
+        public static M New(int id)
         {
-            var c = new M();
-            c.instanceDbProvider = Config.GetDatabase(databaseName);
+            var m = new M();
+            m.SetId(id);
 
-            return c;
+            return m;
+        }
+
+        public static M New(int id, Database database)
+        {
+            var m = New(database);
+            m.SetId(id);
+
+            return m;
+        }
+
+        public static M New(int id, string databaseName)
+        {
+            var m = New(databaseName);
+            m.SetId(id);
+
+            return m;
         }
 
         public static M New(Database database)
@@ -208,6 +283,16 @@ namespace Modl
 
             return c;
         }
+
+        public static M New(string databaseName)
+        {
+            var c = new M();
+            c.instanceDbProvider = Config.GetDatabase(databaseName);
+
+            return c;
+        }
+
+
 
         public static bool Exists(int id, Database database = null)
         {
@@ -369,14 +454,21 @@ namespace Modl
             if (IsNew)
                 query = new Insert<M>(Database);
             else
-                query = new Update<M>(Database).Where(IdName).EqualTo(Id);
+                query = new Update<M>(Database).Where(IdName).EqualTo(Store.Id);
 
             Statics<M>.ReadFromEmptyProperties(this);
             Store.BaseAddSaveFields(query);
 
             if (query is Insert<M>)
             {
-                Store.Id = DbAccess.ExecuteScalar<IdType>(query, Database.GetLastIdQuery());
+                if (!AutomaticId)
+                {
+                    query.With(IdName, Store.Id);
+                    AsyncDbAccess.ExecuteNonQuery(query);
+                }
+                else
+                    Store.Id = DbAccess.ExecuteScalar<IdType>(query, Database.GetLastIdQuery());
+
                 StaticCache<M, IdType>.Add((IdType)Store.Id, (M)this, Database);
             }
             else
@@ -449,7 +541,7 @@ namespace Modl
 
         public static void DeleteAllWhere<IdType>(Expression<Func<M, bool>> query, Database database = null)
         {
-            foreach (var modl in GetAllWhere(query, database).ToList().Cast<Modl<M, IdType>>())
+            foreach (var modl in GetAllWhere(query, database).ToList().Cast<IModl<IdType>>())
                 StaticCache<M, IdType>.Delete(modl.Id, database ?? DefaultDatabase);
 
             Delete<M> statement = new Delete<M>(database ?? DefaultDatabase, query);

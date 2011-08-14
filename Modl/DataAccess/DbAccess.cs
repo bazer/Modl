@@ -45,8 +45,8 @@ namespace Modl.DataAccess
 
 				commands[i].ExecuteNonQuery();
 
-				if (i + 1 == commands.Count || commands[i].Connection != commands[i + 1].Connection)
-					commands[i].Connection.Close();
+                if (i + 1 == commands.Count || commands[i].Connection != commands[i + 1].Connection)
+                    commands[i].Connection.Close();
 			}
 		}
 
@@ -71,8 +71,8 @@ namespace Modl.DataAccess
 
 				object o = commands[i].ExecuteScalar();
 
-				if (i+1 == commands.Count || commands[i].Connection != commands[i+1].Connection)
-					commands[i].Connection.Close();
+                if (i + 1 == commands.Count || commands[i].Connection != commands[i + 1].Connection)
+                    commands[i].Connection.Close();
 
 				if (o != null)
 					result = (T)Convert.ChangeType(o, typeof(T));
@@ -81,16 +81,36 @@ namespace Modl.DataAccess
 			return result;
 		}
 
-		static public DbDataReader ExecuteReader(IQuery query)
-		{
-			return ExecuteReader(query.ToDbCommand());
-		}
+        static public IEnumerable<DbDataReader> ExecuteReader(params IQuery[] queries)
+        {
+            return ExecuteReader(new List<IQuery>(queries));
+        }
 
-		static public DbDataReader ExecuteReader(IDbCommand command)
-		{
-			command.Connection.Open();
-			
-			return (DbDataReader)command.ExecuteReader(CommandBehavior.CloseConnection);
-		}
+        static public IEnumerable<DbDataReader> ExecuteReader(List<IQuery> queries)
+        {
+            return ExecuteReader(Database.GetDbCommands(queries));
+        }
+
+        static public IEnumerable<DbDataReader> ExecuteReader(List<IDbCommand> commands)
+        {
+            for (int i = 0; i < commands.Count; i++)
+            {
+                if (commands[i].Connection.State != ConnectionState.Open)
+                    commands[i].Connection.Open();
+
+                yield return (DbDataReader)commands[i].ExecuteReader(CommandBehavior.CloseConnection);
+            }
+        }
+
+        
+
+        //static public DbDataReader ExecuteReader(IDbCommand command)
+        //{
+        //    if (command.Connection.State != ConnectionState.Open)
+        //        command.Connection.Open();
+
+        //    //return (DbDataReader)command.ExecuteReader();
+        //    return (DbDataReader)command.ExecuteReader(CommandBehavior.CloseConnection);
+        //}
 	}
 }

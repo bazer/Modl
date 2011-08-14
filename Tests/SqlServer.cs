@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ExampleModel;
 using System.Collections;
 using Modl;
+using System.Diagnostics;
 
 namespace Tests
 {
@@ -45,6 +46,20 @@ namespace Tests
             GlobalCRUD();
             basics.PerformanceCRUD(databaseName, 100, CacheLevel.Off);
             basics.PerformanceCRUD(databaseName, 100, CacheLevel.On);
+        }
+
+        //[TestMethod]
+        public void AsyncPerformanceTest()
+        {
+            //GlobalCRUD();
+            var watch = Stopwatch.StartNew();
+            //basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.Off, 100);
+            //Console.WriteLine(string.Format("Total time: {0}", watch.Elapsed.TotalMilliseconds));
+            //watch.Restart();
+            basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.On, 100);
+            //Database.Get(databaseName).Dispose();
+            watch.Stop();
+            Console.WriteLine(string.Format("[{0}]Total time: {1}", databaseName, watch.Elapsed.TotalMilliseconds));
         }
 
         [TestMethod]
@@ -89,6 +104,13 @@ namespace Tests
         {
             basics.SwitchDatabase(databaseName);
             basics.StaticDelete();
+        }
+
+        [TestMethod]
+        public void SetIdExplicit()
+        {
+            basics.SwitchDatabase(databaseName);
+            basics.SetIdExplicit();
         }
     }
 }

@@ -20,44 +20,76 @@ using System.Collections.Generic;
 using System.Linq;
 using Modl.Exceptions;
 using Modl.Query;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Modl.Cache
 {
     internal static class StaticCache<M, IdType>
         where M : Modl<M>, new()
     {
-        private static Dictionary<Database, Dictionary<IdType, M>> cache = new Dictionary<Database, Dictionary<IdType, M>>();
+        private static readonly object workLock = new object();
+        //private static Dictionary<Database, Dictionary<IdType, M>> cache = new Dictionary<Database, Dictionary<IdType, M>>();
+        private static Dictionary<Database, AsyncCache<IdType, M>> cache = new Dictionary<Database, AsyncCache<IdType, M>>();
         private static Dictionary<Database, HashSet<IdType>> deleted = new Dictionary<Database, HashSet<IdType>>();
+
+        //AsyncCache<IdType, M> cache;
 
         static StaticCache()
         {
+            Initialize();
             CacheManager.RegisterClearMethod(Clear);
         }
 
-        internal static bool CacheContains(IdType id, Database database)
+        internal static void Initialize()
         {
-            return cache.ContainsKey(database) && cache[database].ContainsKey(id);
+            foreach (var database in Database.GetAll())
+            {
+                cache.Add(database, new AsyncCache<IdType, M>(x => new Task<M>(() => new Select<M>(database).Where(Modl<M>.IdName).EqualTo(x).Get(false))));
+                deleted.Add(database, new HashSet<IdType>());
+            }
         }
+
+        internal static void Clear()
+        {
+            lock (workLock)
+            {
+                cache.Clear();
+                deleted.Clear();
+
+                Initialize();
+            }
+        }
+
+        //internal static bool CacheContains(IdType id, Database database)
+        //{
+        //    return cache.ContainsKey(database) && cache[database].ContainsKey(id);
+        //}
 
         internal static bool DeletedContains(IdType id, Database database)
         {
-            return deleted.ContainsKey(database) && deleted[database].Contains(id);
+            //lock (workLock)
+            //{
+                return deleted[database].Contains(id);
+            //}
         }
 
         internal static M Get(IdType id, Database database, bool throwExceptionOnNotFound)
         {
             if (Config.CacheLevel == CacheLevel.On)
             {
-                if (CacheContains(id, database))
-                    return cache[database][id];
-                else if (DeletedContains(id, database))
+                //if (CacheContains(id, database))
+                //    return cache[database][id];
+                if (DeletedContains(id, database))
                     return ReturnNullOrThrow(throwExceptionOnNotFound);
+                else
+                    return cache[database].GetValue(id).Result;
             }
 
             M instance = new Select<M>(database).Where(Modl<M>.IdName).EqualTo(id).Get(throwExceptionOnNotFound);
 
-            if (Config.CacheLevel == CacheLevel.On)
-                Add(id, instance, database);
+            //if (Config.CacheLevel == CacheLevel.On)
+            //    Add(id, instance, database, throwExceptionOnNotFound);
 
             return instance;
         }
@@ -66,10 +98,18 @@ namespace Modl.Cache
         {
             if (Config.CacheLevel == CacheLevel.On)
             {
-                if (!cache.ContainsKey(database))
-                    cache.Add(database, new Dictionary<IdType, M>());
+                //lock (workLock)
+                //{
+                //    if (!cache.ContainsKey(database))
+                //        cache.Add(database, new AsyncCache<IdType,M>(x => new Task<M>(() => new Select<M>(database).Where(Modl<M>.IdName).EqualTo(x).Get(throwExceptionOnNotFound))));
+                //        //cache.Add(database, new Dictionary<IdType, M>());
+                //}
 
-                cache[database][id] = instance;
+                //cache[database][id] = instance;
+                cache[database].SetValue(id, instance);
+
+                if (DeletedContains(id, database))
+                    deleted[database].Remove(id);
             }
         }
 
@@ -77,13 +117,17 @@ namespace Modl.Cache
         {
             if (Config.CacheLevel == CacheLevel.On)
             {
-                if (CacheContains(id, database))
-                    cache[database].Remove(id);
+                //if (CacheContains(id, database))
+                //    cache[database].Remove(id);
 
-                if (!deleted.ContainsKey(database))
-                    deleted.Add(database, new HashSet<IdType>());
+                lock (workLock)
+                {
+                    //if (!deleted.ContainsKey(database))
+                    //    deleted.Add(database, new HashSet<IdType>());
 
-                deleted[database].Add(id);
+                    deleted[database].Add(id);
+                }
+                
             }
         }
 
@@ -91,20 +135,19 @@ namespace Modl.Cache
         {
             if (Config.CacheLevel == CacheLevel.On)
             {
-                cache.Clear();
+                cache[database].Clear();
 
-                if (!deleted.ContainsKey(database))
-                    deleted.Add(database, new HashSet<IdType>());
+                lock (workLock)
+                {
+                    //if (!deleted.ContainsKey(database))
+                    //    deleted.Add(database, new HashSet<IdType>());
 
-                deleted[database] = new HashSet<IdType>(Modl<M, IdType>.GetAll(database).Select(x => x.Id).Cast<IdType>());
+                    deleted[database] = new HashSet<IdType>(Modl<M, IdType>.GetAll(database).Select(x => x.Id).Cast<IdType>());
+                }
             }
         }
 
-        internal static void Clear()
-        {
-            cache.Clear();
-            deleted.Clear();
-        }
+        
 
         private static M ReturnNullOrThrow(bool throwExceptionOnNotFound)
         {

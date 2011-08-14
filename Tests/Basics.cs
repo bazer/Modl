@@ -25,6 +25,7 @@ using System.Linq;
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Tests
 {
@@ -52,12 +53,13 @@ namespace Tests
         public TimeSpan PerformanceCRUD(string databaseName, int iterations, CacheLevel cache)
         {
             Config.CacheLevel = cache;
-            SwitchDatabase(databaseName);
+            //SwitchDatabase(databaseName);
 
+            var db = Database.Get(databaseName);
             var watch = Stopwatch.StartNew();
 
             for (int i = 0; i < iterations; i++)
-                CRUD();
+                CRUD(db);
 
             watch.Stop();
             Console.WriteLine(string.Format("{0} iterations for {1}: {2} ms. (cache {3})", iterations, databaseName, watch.Elapsed.TotalMilliseconds, cache));
@@ -65,6 +67,18 @@ namespace Tests
             return watch.Elapsed;
         }
 
+        public void AsyncPerformanceCRUD(string databaseName, int iterations, CacheLevel cache, int threads)
+        {
+            var watch = Stopwatch.StartNew();
+            
+            Parallel.For(0, threads, i =>
+                {
+                    PerformanceCRUD(databaseName, iterations, cache);
+                });
+            
+            watch.Stop();
+            Console.WriteLine(string.Format("Async total, {0} threads for {1}: {2} ms. Average: {3} ms. (cache {4})", threads, databaseName, watch.Elapsed.TotalMilliseconds, watch.Elapsed.TotalMilliseconds / threads, cache));
+        }
 
         public void SwitchDatabase(string databaseName)
         {
@@ -101,6 +115,8 @@ namespace Tests
 
             
         }
+
+        
 
         public T NewModl<T>(Database database) where T : Modl<T>, new()
         {
@@ -267,6 +283,32 @@ namespace Tests
             Assert.AreEqual(car1.Id, car2.Id);
             Assert.AreEqual(car1.Manufacturer, car2.Manufacturer);
             Assert.AreEqual(car1.Name, car2.Name);
+        }
+
+        public void AssertEqual(Manufacturer m1, Manufacturer m2)
+        {
+            Assert.AreEqual(m1.Database, m2.Database);
+            Assert.AreEqual(m1.Database.Name, m2.Database.Name);
+            Assert.AreEqual(m1.Id, m2.Id);
+            Assert.AreEqual(m1.Name, m2.Name);
+        }
+
+        public void SetIdExplicit()
+        {
+            var id = Guid.NewGuid();
+            Manufacturer m1 = Manufacturer.New(id);
+            m1.Name = "Audi";
+            Assert.AreEqual(id, m1.Id);
+            m1.Save();
+            Assert.AreEqual(id, m1.Id);
+
+            var m2 = Manufacturer.Get(m1.Id);
+            AssertEqual(m1, m2);
+
+            m2.Save();
+            Assert.AreEqual(id, m2.Id);
+
+            m2.Delete();
         }
     }
 }

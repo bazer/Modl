@@ -31,9 +31,15 @@ namespace Modl.DatabaseProviders
         internal static new string[] ProviderNames = new string[1] { "System.Data.SqlClient" };
 
         protected SqlServerProvider(string name, string connectionString, string provider) : base(name, connectionString, provider) { }
+        protected IDbConnection CurrentConnection;
 
         internal override IDbConnection GetConnection()
         {
+            //if (CurrentConnection == null)
+            //    CurrentConnection = new SqlConnection(ConnectionString);
+
+            //return CurrentConnection;
+
             return new SqlConnection(ConnectionString);
         }
 
