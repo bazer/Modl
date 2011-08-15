@@ -82,19 +82,19 @@ namespace Modl.Query
         //        return AllCached.SingleOrDefault(x => x.Id == id);
         //}
 
-        internal IEnumerable<M> GetList<IdType>()
-        {
-            using (DbDataReader reader = Execute())
-            {
-                while (!reader.IsClosed)
-                {
-                    var c = Modl<M, IdType>.Get(reader, DatabaseProvider, singleRow: false);
+        //internal IEnumerable<M> GetList<IdType>()
+        //{
+        //    using (DbDataReader reader = Execute())
+        //    {
+        //        while (!reader.IsClosed)
+        //        {
+        //            var c = Modl<M, IdType>.Get(reader, DatabaseProvider, singleRow: false);
 
-                    if (c != null)
-                        yield return c;
-                }
-            }
-        }
+        //            if (c != null)
+        //                yield return c;
+        //        }
+        //    }
+        //}
 
         //public override string ToString()
         //{

@@ -22,6 +22,7 @@ using Modl.Exceptions;
 using Modl.Query;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
 
 namespace Modl.Cache
 {
@@ -142,7 +143,7 @@ namespace Modl.Cache
                     //if (!deleted.ContainsKey(database))
                     //    deleted.Add(database, new HashSet<IdType>());
 
-                    deleted[database] = new HashSet<IdType>(Modl<M, IdType>.GetAll(database).Select(x => x.Id).Cast<IdType>());
+                    deleted[database] = new HashSet<IdType>(Modl<M>.GetAll(database).Select(x => (IdType)Convert.ChangeType(x.Id, typeof(IdType))));
                 }
             }
         }

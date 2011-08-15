@@ -53,10 +53,10 @@ namespace Tests
         {
             //GlobalCRUD();
             var watch = Stopwatch.StartNew();
-            //basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.Off, 100);
-            //Console.WriteLine(string.Format("Total time: {0}", watch.Elapsed.TotalMilliseconds));
-            //watch.Restart();
-            basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.On, 100);
+            basics.AsyncPerformanceCRUD(databaseName, 1000, CacheLevel.Off, 10);
+            Console.WriteLine(string.Format("Total time: {0}", watch.Elapsed.TotalMilliseconds));
+            watch.Restart();
+            basics.AsyncPerformanceCRUD(databaseName, 1000, CacheLevel.On, 10);
             //Database.Get(databaseName).Dispose();
             watch.Stop();
             Console.WriteLine(string.Format("[{0}]Total time: {1}", databaseName, watch.Elapsed.TotalMilliseconds));

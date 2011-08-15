@@ -18,12 +18,15 @@ along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Modl.Cache
 {
     internal static class CacheManager
     {
         private static HashSet<Action> cacheList = new HashSet<Action>();
+
+        
 
         internal static void RegisterClearMethod(Action clearMethod)
         {
@@ -35,5 +38,7 @@ namespace Modl.Cache
             foreach (var cache in cacheList)
                 cache.Invoke();
         }
+
+        
     }
 }

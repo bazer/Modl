@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using Modl.Query;
+using System.Threading;
+using System;
 
 namespace Modl.DataAccess
 {
@@ -27,6 +29,38 @@ namespace Modl.DataAccess
     {
         private static readonly object workLock = new object();
         private static Dictionary<Database, AsyncWorker> workers = new Dictionary<Database, AsyncWorker>();
+
+        static AsyncDbAccess()
+        {
+            StartWorkManager();
+        }
+
+        private static void StartWorkManager()
+        {
+            Thread thread = new Thread(WorkManagerLoop);
+
+            thread.IsBackground = true;
+            thread.Start(thread);
+        }
+
+        private static void WorkManagerLoop(object thread)
+        {
+            while (true)
+            {
+                lock (workLock)
+                {
+                    foreach (var worker in workers.Values)
+                    {
+                        int workersToStart = (int)Math.Ceiling((worker.QueueDepth - (worker.RunningWorkers * 2000)) / 2000.0);
+
+                        if (workersToStart > 0)
+                            worker.StartWorker(workersToStart);
+                    }
+                }
+                
+                Thread.Sleep(1000);
+            }
+        }
 
         private static AsyncWorker GetWorker(Database database)
         {

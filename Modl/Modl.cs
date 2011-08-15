@@ -59,7 +59,7 @@ namespace Modl
     //}
 
     public abstract class Modl<M, IdType> : Modl<M>, IModl<IdType>
-        where M : Modl<M>, new()
+        where M : Modl<M, IdType>, new()
     {
         public new IdType Id { get { return (IdType)Store.Id; } }
 
@@ -116,12 +116,14 @@ namespace Modl
 
         public static new IEnumerable<M> GetAll(Database database = null)
         {
-            return new Select<M>(database ?? DefaultDatabase).GetList<IdType>();
+            //return new Select<M>(database ?? DefaultDatabase).GetList<IdType>();
+            return GetList<IdType>(new Select<M>(database ?? DefaultDatabase));
         }
 
         public static new IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return new Select<M>(database ?? DefaultDatabase, query).GetList<IdType>();
+            //return new Select<M>(database ?? DefaultDatabase, query).GetList<IdType>();
+            return GetList<IdType>(new Select<M>(database ?? DefaultDatabase, query));
         }
 
         public override void Save()
@@ -349,14 +351,28 @@ namespace Modl
 
         public static IEnumerable<M> GetAll(Database database = null)
         {
-            return new Select<M>(database ?? DefaultDatabase).GetList<int>();
+            return GetList<int>(new Select<M>(database ?? DefaultDatabase));
             //return GetList(new Select<M>(database ?? DefaultDatabase));
         }
 
         public static IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return new Select<M>(database ?? DefaultDatabase, query).GetList<int>();
+            return GetList<int>(new Select<M>(database ?? DefaultDatabase, query));
             //return GetList(new Select<M>(database ?? DefaultDatabase, query));
+        }
+
+        internal static IEnumerable<M> GetList<IdType>(Select<M> query)
+        {
+            using (DbDataReader reader = query.Execute())
+            {
+                while (!reader.IsClosed)
+                {
+                    var c = Get(reader, query.DatabaseProvider, singleRow: false);
+
+                    if (c != null)
+                        yield return c;
+                }
+            }
         }
 
         protected void SetValue<T>(string name, T value)
@@ -447,7 +463,7 @@ namespace Modl
         internal void Save<IdType>()
         {
             if (isDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
+                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Store.Id));
 
             Change<M> query;
 
