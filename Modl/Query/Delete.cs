@@ -27,8 +27,8 @@ using Modl.Linq.Parsers;
 
 namespace Modl.Query
 {
-    public class Delete<M> : Query<M, Delete<M>> 
-        where M : Modl<M>, new()
+    public class Delete<M, IdType> : Query<M, IdType, Delete<M, IdType>>
+        where M : Modl<M, IdType>, new()
     {
         Expression expression;
 
@@ -38,7 +38,7 @@ namespace Modl.Query
             : base(database)
         {
             this.expression = expression;
-            var parser = new LinqParser<M, Delete<M>>(this);
+            var parser = new LinqParser<M, IdType, Delete<M, IdType>>(this);
             parser.ParseTree(expression);
         }
 
@@ -47,7 +47,7 @@ namespace Modl.Query
             var where = GetWhere(paramPrefix);
 
             return new Sql(
-                string.Format("DELETE FROM {0} \r\n{1}", Modl<M>.Table, where.Text),
+                string.Format("DELETE FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
                 where.Parameters);
         }
 

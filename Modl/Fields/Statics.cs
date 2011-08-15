@@ -24,7 +24,7 @@ using System.Reflection;
 
 namespace Modl.Fields
 {
-    internal class Statics<M> where M : Modl<M>, new()
+    internal class Statics<M, IdType> where M : Modl<M, IdType>, new()
     {
         internal static string TableName;
         internal static string IdName;
@@ -53,7 +53,7 @@ namespace Modl.Fields
             return Types[fieldName];
         }
 
-        internal static void Initialize(Modl<M> instance)
+        internal static void Initialize(Modl<M, IdType> instance)
         {
             foreach (var attribute in typeof(M).GetCustomAttributes(true))
             {
@@ -91,19 +91,19 @@ namespace Modl.Fields
             }
         }
 
-        internal static void FillFields(Modl<M> instance)
+        internal static void FillFields(Modl<M, IdType> instance)
         {
             foreach (var field in Types)
                 instance.Store.SetValue(field.Key, Helper.GetDefault(field.Value));
         }
 
-        internal static void ReadFromEmptyProperties(Modl<M> instance)
+        internal static void ReadFromEmptyProperties(Modl<M, IdType> instance)
         {
             foreach (var property in EmptyProperties)
                 instance.Store.SetValue(property.Name, property.GetValue(instance, null), true);
         }
 
-        internal static void WriteToEmptyProperties(Modl<M> instance)
+        internal static void WriteToEmptyProperties(Modl<M, IdType> instance)
         {
             foreach (var property in EmptyProperties)
                 property.SetValue(instance, instance.Store.GetValue<object>(property.Name), null);

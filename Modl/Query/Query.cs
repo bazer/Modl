@@ -36,11 +36,11 @@ namespace Modl.Query
         //IEnumerable<IDataParameter> QueryPartsParameters();
     }
 
-    public abstract class Query<M, Q> : IQuery
-        where M : Modl<M>, new()
-        where Q : Query<M, Q>
+    public abstract class Query<M, IdType, Q> : IQuery
+        where M : Modl<M, IdType>, new()
+        where Q : Query<M, IdType, Q>
     {
-        protected List<Where<M, Q>> whereList = new List<Where<M, Q>>();
+        protected List<Where<M, IdType, Q>> whereList = new List<Where<M, IdType, Q>>();
         protected M owner;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
@@ -61,9 +61,9 @@ namespace Modl.Query
             this.owner = owner;
         }
 
-        public Where<M, Q> Where(string key)
+        public Where<M, IdType, Q> Where(string key)
         {
-            var where = new Where<M, Q>((Q)this, key);
+            var where = new Where<M, IdType, Q>((Q)this, key);
             whereList.Add(where);
 
             return where;

@@ -25,8 +25,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public class Update<M> : Change<M> 
-        where M : Modl<M>, new()
+    public class Update<M, IdType> : Change<M, IdType>
+        where M : Modl<M, IdType>, new()
     {
         public Update(Database database) : base(database) { }
 
@@ -44,7 +44,7 @@ namespace Modl.Query
             var where = GetWhere(paramPrefix);
 
             return new Sql(
-                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<M>.Table, with.Text, where.Text),
+                string.Format("UPDATE {0} SET {1} \r\n{2}", Modl<M, IdType>.Table, with.Text, where.Text),
                 with.Parameters.Concat(where.Parameters).ToArray());
         }
 

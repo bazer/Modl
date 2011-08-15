@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Attributes\IdAttribute.cs" />
     <Compile Include="Attributes\TableAttribute.cs" />
+    <Compile Include="M.cs" />
     <Compile Include="ParallelExtensionsExtras\AsyncCache.cs" />
     <Compile Include="Cache\CacheManager.cs" />
     <Compile Include="DataAccess\AsyncDbAccess.cs" />

@@ -26,8 +26,8 @@ using Modl.Query;
 
 namespace Modl.Linq
 {
-    public class LinqQuery<M> : IQueryable<M>
-        where M : Modl<M>, new()
+    public class LinqQuery<M, IdType> : IQueryable<M>
+        where M : Modl<M, IdType>, new()
     {
         Database database;
         Expression expression;
@@ -37,21 +37,21 @@ namespace Modl.Linq
         { 
             this.database = database;
             this.expression = Expression.Constant(this);
-            this.provider = new LinqQueryProvider<M>(database);
+            this.provider = new LinqQueryProvider<M, IdType>(database);
         }
 
         public LinqQuery(Database database, Expression expression)
         {
             this.database = database;
             this.expression = expression;
-            this.provider = new LinqQueryProvider<M>(database);
+            this.provider = new LinqQueryProvider<M, IdType>(database);
         }
 
         protected IEnumerator<M> GetList()
         {
             //return new Select<M>(database, expression).GetList<int>().GetEnumerator();
 
-            return Modl<M>.GetList<int>(new Select<M>(database, expression)).GetEnumerator();
+            return Modl<M, IdType>.GetList(new Select<M, IdType>(database, expression)).GetEnumerator();
         }
 
         public IEnumerator<M> GetEnumerator()

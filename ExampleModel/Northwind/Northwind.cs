@@ -8,7 +8,7 @@ namespace ExampleModel.Northwind
 {
     [Table("Categories")]
     [Id("CategoryId")]
-    public class Category : Modl<Category>
+    public class Category : Modl<Category, int>
     {
         
         
@@ -76,7 +76,7 @@ namespace ExampleModel.Northwind
     }
 
     ////[HierarchyRoot]
-    public class Region : Modl<Region>
+    public class Region : Modl<Region, int>
     {
         ////[Field, FieldMapping("RegionId"), Key]
         //public int Id { get; private set; }
@@ -89,7 +89,7 @@ namespace ExampleModel.Northwind
     ////[HierarchyRoot]
     [Table("Suppliers")]
     [Id("SupplierId")]
-    public class Supplier : Modl<Supplier>
+    public class Supplier : Modl<Supplier, int>
     {
         //[Field, FieldMapping("SupplierId"), Key]
         //public int Id { get; private set; }
@@ -132,7 +132,7 @@ namespace ExampleModel.Northwind
     //[HierarchyRoot]
     [Table("Shippers")]
     [Id("ShipperId")]
-    public class Shipper : Modl<Shipper>
+    public class Shipper : Modl<Shipper, int>
     {
         //[Field, FieldMapping("ShipperId"), Key]
         //public int Id { get; private set; }
@@ -144,7 +144,7 @@ namespace ExampleModel.Northwind
         public string Phone { get; set; }
     }
 
-    public class ActiveProduct : Inherits<Product, ActiveProduct> //Product, IModl<ActiveProduct> // Inherits<Product, ActiveProduct> // Modl<ActiveProduct> //Product
+    public class ActiveProduct : Inherits<Product, ActiveProduct, int> //Product, IModl<ActiveProduct> // Inherits<Product, ActiveProduct> // Modl<ActiveProduct> //Product
     {
         public ActiveProduct()
         { 
@@ -152,7 +152,7 @@ namespace ExampleModel.Northwind
         }
     }
 
-    public class DiscontinuedProduct : Inherits<Product, DiscontinuedProduct> // Modl<DiscontinuedProduct>
+    public class DiscontinuedProduct : Inherits<Product, DiscontinuedProduct, int> // Modl<DiscontinuedProduct>
     {
         public DiscontinuedProduct()
         { 
@@ -164,7 +164,7 @@ namespace ExampleModel.Northwind
     //[HierarchyRoot(InheritanceSchema.SingleTable)]
     [Table("Products")]
     [Id("ProductId")]
-    public class Product : Modl<Product>
+    public class Product : Modl<Product, int>
     {
         //[Field, FieldMapping("ProductId"), Key]
         //public int Id { get; private set; }
@@ -201,7 +201,7 @@ namespace ExampleModel.Northwind
     //[HierarchyRoot]
     [Table("Employees")]
     [Id("Id")]
-    public class Employee : Modl<Employee>
+    public class Employee : Modl<Employee, int>
     {
         //[Field, Key]
         //public int Id { get; private set; }
@@ -298,7 +298,7 @@ namespace ExampleModel.Northwind
     //[HierarchyRoot]
     [Table("Orders")]
     [Id("OrderId")]
-    public class Order : Modl<Order>
+    public class Order : Modl<Order, int>
     {
         //[Field, FieldMapping("OrderId"), Key]
         //public int Id { get; private set; }

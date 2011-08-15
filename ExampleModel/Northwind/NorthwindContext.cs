@@ -17,62 +17,62 @@ namespace ExampleModel.Northwind
 
         public IQueryable<Category> Categories
         {
-            get { return db.Query<Category>(); }
+            get { return Category.Query(db); }
         }
 
         public IQueryable<Customer> Customers
         {
-            get { return db.Query<Customer>(); }
+            get { return Customer.Query(db); ; }
         }
 
         public IQueryable<Employee> Employees
         {
-            get { return db.Query<Employee>(); }
+            get { return Employee.Query(db); }
         }
 
         public IQueryable<Order> Orders
         {
-            get { return db.Query<Order>(); }
+            get { return Order.Query(db); }
         }
 
         public IQueryable<OrderDetail> OrderDetails
         {
-            get { return db.Query<OrderDetail>(); }
+            get { return OrderDetail.Query(db); }
         }
 
         public IQueryable<Product> Products
         {
-            get { return db.Query<Product>(); }
+            get { return Product.Query(db); }
         }
 
         public IQueryable<ActiveProduct> ActiveProducts
         {
-            get { return db.Query<ActiveProduct>(); }
+            get { return ActiveProduct.Query(db); }
         }
 
         public IQueryable<DiscontinuedProduct> DiscontinuedProducts
         {
-            get { return db.Query<DiscontinuedProduct>(); }
+            get { return DiscontinuedProduct.Query(db); }
         }
 
         public IQueryable<Region> Regions
         {
-            get { return db.Query<Region>(); }
+            get { return Region.Query(db); }
         }
 
         public IQueryable<Shipper> Shippers
         {
-            get { return db.Query<Shipper>(); }
+            get { return Shipper.Query(db); }
         }
 
         public IQueryable<Supplier> Suppliers
         {
-            get { return db.Query<Supplier>(); }
+            get { return Supplier.Query(db); }
         }
 
         public IQueryable<Territory> Territories
         {
-            get { return db.Query<Territory>(); }
+            get { return Territory.Query(db); }
         }
     }
 }

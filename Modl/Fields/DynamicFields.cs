@@ -25,7 +25,7 @@ using System.Data.Common;
 
 namespace Modl.Fields
 {
-    public class DynamicFields<M> : DynamicObject where M : Modl<M>, new()
+    public class DynamicFields<M, IdType> : DynamicObject where M : Modl<M, IdType>, new()
     {
         IStore store;
 

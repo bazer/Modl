@@ -33,21 +33,21 @@ namespace Modl.Fields
         void SetValue<T>(string name, T value, bool emptyProperty = false);
     }
 
-    internal class Store<M> : IStore
-        where M : Modl<M>, new()
+    internal class Store<M, IdType> : IStore
+        where M : Modl<M, IdType>, new()
     {
-        internal Type IdType { get; set; }
-        protected object id; // = default(IdType);
-        internal object Id { get { return id; } set { id = value; } }
+        //internal Type IdType { get; set; }
+        protected IdType id; // = default(IdType);
+        internal IdType Id { get { return id; } set { id = value; } }
 
-        public DynamicFields<M> DynamicFields;
+        public DynamicFields<M, IdType> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
         //string NameOfLastInsertedMember;
 
-        public Store(Type IdType)
+        public Store()
         {
-            this.IdType = IdType;
-            DynamicFields = new DynamicFields<M>(this);
+            //this.IdType = IdType;
+            DynamicFields = new DynamicFields<M, IdType>(this);
         }
 
         public bool IsDirty
@@ -94,11 +94,11 @@ namespace Modl.Fields
         //    }
         //}
 
-        internal bool Load(DbDataReader reader, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        internal bool Load(DbDataReader reader, bool singleRow = true)
         {
             if (reader.Read())
             {
-                id = Helper.GetSafeValue(reader, Statics<M>.IdName, IdType);
+                id = Helper.GetSafeValue<IdType>(reader, Statics<M, IdType>.IdName);
 
                 var keys = Fields.Keys.ToList();
 
@@ -106,10 +106,10 @@ namespace Modl.Fields
                 {
                     string key = keys[i];
 
-                    if (Fields[key].Type.GetInterface("IModl") != null)
-                        SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
-                    else
-                        SetField(key, Helper.GetSafeValue(reader, key, Statics<M>.GetFieldType(key)));
+                    //if (Fields[key].Type.GetInterface("IModl") != null)
+                    //    SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
+                    //else
+                        SetField(key, Helper.GetSafeValue(reader, key, Statics<M, IdType>.GetFieldType(key)));
                 }
 
                 if (singleRow)
@@ -121,29 +121,30 @@ namespace Modl.Fields
             {
                 reader.Close();
 
-                if (singleRow && throwExceptionOnNotFound)
-                    throw new RecordNotFoundException();
-                else
+                //if (singleRow && throwExceptionOnNotFound)
+                //    throw new RecordNotFoundException();
+                //else
                     return false;
             }
         }
 
-        internal void BaseAddSaveFields(Change<M> statement)
+        internal void BaseAddSaveFields(Change<M, IdType> statement)
         {
             foreach (var field in Fields)
             {
-                if (field.Value.Type.GetInterface("IModl") != null && !(field.Value.Value is int))
-                {
-                    var value = field.Value as IModl;
+                //if (field.Value.Type.GetInterface("IModl") != null && !(field.Value.Value is int))
+                //{
+                //    var value = field.Value as IModl;
 
-                    if (value == null)
-                        statement.With(field.Key, null);
-                    else if (value.Id == 0)
-                        throw new Exception("Can't save foreign key of unsaved object: " + value);
-                    else
-                        statement.With(field.Key, value.Id);
-                }
-                else if (field.Value.IsDirty)
+                //    if (value == null)
+                //        statement.With(field.Key, null);
+                //    else if (value.Id == 0)
+                //        throw new Exception("Can't save foreign key of unsaved object: " + value);
+                //    else
+                //        statement.With(field.Key, value.Id);
+                //}
+                //else 
+                if (field.Value.IsDirty)
                     statement.With(field.Key, field.Value.Value);
             }
         }

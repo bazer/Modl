@@ -26,7 +26,7 @@ namespace Modl.Mvc
 {
     public static class Extensions
     {
-        public static IEnumerable<SelectListItem> AsSelectList<T>(this IEnumerable<T> list, Func<T, string> text, Func<T, string> value = null) where T : Modl<T>, new()
+        public static IEnumerable<SelectListItem> AsSelectList<M, IdType>(this IEnumerable<M> list, Func<M, string> text, Func<M, string> value = null) where M : Modl<M, IdType>, new()
         {
             if (value == null)
                 value = x => x.Id.ToString();

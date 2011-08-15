@@ -151,26 +151,33 @@ namespace Modl
         {
             return queries.GroupBy(x => x.DatabaseProvider).SelectMany(x => x.Key.ToDbCommands(x.ToList())).ToList();
         }
-        
-        public T New<T>() where T : Modl<T>, new()
-        {
-            return Modl<T>.New(this);
-        }
 
-        public T Get<T>(int id, bool throwExceptionOnNotFound = true) where T : Modl<T>, new()
-        {
-            return Modl<T>.Get(id, this, throwExceptionOnNotFound);
-        }
+        //public M New<M, IdType>() where M : Modl<M, IdType>, new()
+        //{
+        //    return Modl<M, IdType>.New(this);
+        //}
 
-        public bool Exists<T>(int id) where T : Modl<T>, new()
-        {
-            return Modl<T>.Exists(id, this);
-        }
+        //public M Get<M, IdType>(IdType id, bool throwExceptionOnNotFound = true) where M : Modl<M, IdType>, new()
+        //{
+        //    return Modl<M, IdType>.Get(id, this, throwExceptionOnNotFound);
+        //}
 
-        public IQueryable<T> Query<T>() where T : Modl<T>, new()
-        {
-            return new LinqQuery<T>(this);
-        }
+        //public bool Exists<M, IdType>(IdType id) where M : Modl<M, IdType>, new()
+        //{
+        //    return Modl<M, IdType>.Exists(id, this);
+        //}
+
+        //public IQueryable<M> Query<M, IdType>() where M : Modl<M, IdType>, new()
+        //{
+        //    return Modl<M, IdType>.Query(this);
+        //    //return new LinqQuery<M, IdType>(this);
+        //}
+
+        //public IQueryable<M> Query<M>() where M : Modl<M>, new()
+        //{
+        //    return Modl<M>.Query(this);
+        //    //return new LinqQuery<M, IdType>(this);
+        //}
 
         //IQueryable<T> IQueryProvider.CreateQuery<T>(System.Linq.Expressions.Expression expression)
         //{

@@ -25,8 +25,8 @@ using System.Reflection;
 
 namespace Modl.Linq
 {
-    internal class LinqQueryProvider<M> : IQueryProvider
-         where M : Modl<M>, new()
+    internal class LinqQueryProvider<M, IdType> : IQueryProvider
+         where M : Modl<M, IdType>, new()
     {
         Database database;
 
@@ -37,25 +37,25 @@ namespace Modl.Linq
 
         public IQueryable<T> CreateQuery<T>(System.Linq.Expressions.Expression expression)
         {
-            return (IQueryable<T>)new LinqQuery<M>(database, expression);
+            return (IQueryable<T>)new LinqQuery<M, IdType>(database, expression);
 
            // return CreateNewQuery<T>(expression);    
         }
 
         public IQueryable CreateQuery(System.Linq.Expressions.Expression expression)
         {
-            return new LinqQuery<M>(database, expression);
+            return new LinqQuery<M, IdType>(database, expression);
         }
 
         public T Execute<T>(System.Linq.Expressions.Expression expression)
         {
-            return Helper.ConvertTo<T>(new Query.Select<M>(database, expression).Get());
+            return Helper.ConvertTo<T>(new Query.Select<M, IdType>(database, expression).Get());
             //return Helper.ConvertTo<T>(Modl<M>.Get(new Query.Select<M>(database, expression)));
         }
 
         public object Execute(System.Linq.Expressions.Expression expression)
         {
-            return new Query.Select<M>(database, expression).Get();
+            return new Query.Select<M, IdType>(database, expression).Get();
         }
 
         //return new LinqQuery<T>(database, expression);

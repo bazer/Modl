@@ -27,28 +27,28 @@ namespace Modl.Linq
 {
     internal class LinqHelper
     {
-        internal static KeyValuePair<string, object> GetFields<T>(BinaryExpression node) where T : Modl<T>, new()
+        internal static KeyValuePair<string, object> GetFields<T, IdType>(BinaryExpression node) where T : Modl<T, IdType>, new()
         {
             if (node.Left is ConstantExpression && node.Right is ConstantExpression)
                 throw new InvalidQueryException("Unable to compare 2 constants.");
 
             if (node.Left is MemberExpression)
-                return GetValues<T>(node.Left, node.Right);
+                return GetValues<T, IdType>(node.Left, node.Right);
             else
-                return GetValues<T>(node.Right, node.Left);
+                return GetValues<T, IdType>(node.Right, node.Left);
         }
 
-        internal static KeyValuePair<string, object> GetValues<T>(Expression field, Expression value) where T : Modl<T>, new()
+        internal static KeyValuePair<string, object> GetValues<T, IdType>(Expression field, Expression value) where T : Modl<T, IdType>, new()
         {
-            return new KeyValuePair<string, object>((string)GetValue<T>(field), GetValue<T>(value));
+            return new KeyValuePair<string, object>((string)GetValue<T, IdType>(field), GetValue<T, IdType>(value));
         }
 
-        internal static object GetValue<T>(Expression expression) where T : Modl<T>, new()
+        internal static object GetValue<T, IdType>(Expression expression) where T : Modl<T, IdType>, new()
         {
             if (expression is ConstantExpression)
                 return ((ConstantExpression)expression).Value;
             else if (expression is MemberExpression)
-                return Modl<T>.GetFieldName(((MemberExpression)expression).Member.Name);
+                return Modl<T, IdType>.GetFieldName(((MemberExpression)expression).Member.Name);
             //else if (expression.NodeType == ExpressionType.Lambda)
             //    return GetValue<T>(((LambdaExpression)expression).Body);
             else

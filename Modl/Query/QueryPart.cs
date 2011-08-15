@@ -24,8 +24,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public abstract class QueryPart<M> 
-        where M : Modl<M>, new()
+    public abstract class QueryPart<M, IdType>
+        where M : Modl<M, IdType>, new()
     {
         public abstract string GetCommandString(string prefix, int number);
         public abstract IDataParameter GetCommandParameter(string prefix, int number);

@@ -27,8 +27,8 @@ using Modl.Fields;
 
 namespace Modl.Query
 {
-    public class Select<M> : Query<M, Select<M>>
-        where M : Modl<M>, new()
+    public class Select<M, IdType> : Query<M, IdType, Select<M, IdType>>
+        where M : Modl<M, IdType>, new()
     {
         Expression expression;
 
@@ -42,7 +42,7 @@ namespace Modl.Query
             : base(database)
         {
             this.expression = expression;
-            var parser = new LinqParser<M, Select<M>>(this);
+            var parser = new LinqParser<M, IdType, Select<M, IdType>>(this);
             parser.ParseTree(expression);
         }
 
@@ -51,7 +51,7 @@ namespace Modl.Query
             var where = GetWhere(paramPrefix);
 
             return new Sql(
-                string.Format("SELECT * FROM {0} \r\n{1}", Modl<M>.Table, where.Text),
+                string.Format("SELECT * FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
                 where.Parameters);
         }
 
@@ -65,10 +65,10 @@ namespace Modl.Query
             return AsyncDbAccess.ExecuteReader(this);
         }
 
-        internal M Get(bool throwExceptionOnNotFound = true)
+        internal M Get()
         {
             //if (StaticCache<M, )
-            return Modl<M>.Get(Execute(), DatabaseProvider, throwExceptionOnNotFound, true);
+            return Modl<M, IdType>.Get(Execute(), DatabaseProvider, true);
         }
 
         

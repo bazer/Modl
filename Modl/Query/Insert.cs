@@ -25,8 +25,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public class Insert<M> : Change<M> 
-        where M : Modl<M>, new()
+    public class Insert<M, IdType> : Change<M, IdType>
+        where M : Modl<M, IdType>, new()
     {
         public Insert(Database database) : base(database) { }
 
@@ -50,7 +50,7 @@ namespace Modl.Query
             var with = GetWith(paramPrefix);
 
             return new Sql(
-                string.Format("INSERT INTO {0} {1}", Modl<M>.Table, with.Text),
+                string.Format("INSERT INTO {0} {1}", Modl<M, IdType>.Table, with.Text),
                 with.Parameters);
         }
 

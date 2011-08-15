@@ -26,7 +26,7 @@ namespace ExampleModel
 {
     [Table("Cars")]
     [Id("Id")]
-    public class Car : Modl<Car>
+    public class Car : Modl<Car, int>
     {
         public string Name { get; set; }
         public string Manufacturer { get; set; }

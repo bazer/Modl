@@ -35,9 +35,9 @@ namespace Modl.Query
         SmallerThanOrEqual
     }
 
-    public class Where<M, Q> : QueryPart<M>
-        where M : Modl<M>, new() 
-        where Q : Query<M, Q>
+    public class Where<M, IdType, Q> : QueryPart<M, IdType>
+        where M : Modl<M, IdType>, new()
+        where Q : Query<M, IdType, Q>
     {
         Q Query;
         string Key;

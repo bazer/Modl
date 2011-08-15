@@ -33,7 +33,7 @@ namespace Modl
 {
     public interface IModl
     {
-        int Id { get; }
+        
     }
 
     public interface IModl<IdType>
@@ -58,100 +58,105 @@ namespace Modl
     //    }
     //}
 
-    public abstract class Modl<M, IdType> : Modl<M>, IModl<IdType>
-        where M : Modl<M, IdType>, new()
-    {
-        public new IdType Id { get { return (IdType)Store.Id; } }
+    //public abstract class Modl<M, IdType> : Modl<M>, IModl<IdType>
+    //    where M : Modl<M, IdType>, new()
+    //{
+    //    public new IdType Id { get { return (IdType)Store.Id; } }
 
-        public Modl()
-        {
-            Store.IdType = typeof(IdType);
-        }
+    //    public Modl()
+    //    {
+    //        Store.IdType = typeof(IdType);
+    //    }
 
-        public Modl(IdType id)
-        {
-            Store.IdType = typeof(IdType);
-            SetId(id);
-            //Store.Id = id;
-            //AutomaticId = false;
-        }
+    //    public Modl(IdType id)
+    //    {
+    //        Store.IdType = typeof(IdType);
+    //        SetId(id);
+    //        //Store.Id = id;
+    //        //AutomaticId = false;
+    //    }
 
-        public static M New(IdType id)
-        {
-            var m = new M();
-            m.SetId(id);
+    //    public static M New(IdType id)
+    //    {
+    //        var m = new M();
+    //        m.SetId(id);
 
-            return m;
-        }
+    //        return m;
+    //    }
 
-        public static M New(IdType id, Database database)
-        {
-            var m = New(database);
-            m.SetId(id);
+    //    public static M New(IdType id, Database database)
+    //    {
+    //        var m = New(database);
+    //        m.SetId(id);
 
-            return m;
-        }
+    //        return m;
+    //    }
 
-        public static M New(IdType id, string databaseName)
-        {
-            var m = New(databaseName);
-            m.SetId(id);
+    //    public static M New(IdType id, string databaseName)
+    //    {
+    //        var m = New(databaseName);
+    //        m.SetId(id);
 
-            return m;
-        }
+    //        return m;
+    //    }
 
-        //internal static new M New(int id) { throw new NotImplementedException(); }
-        //internal static new M New(int id, Database database) { throw new NotImplementedException(); }
-        //internal static new M New(int id, string databaseName) { throw new NotImplementedException(); }
+    //    //internal static new M New(int id) { throw new NotImplementedException(); }
+    //    //internal static new M New(int id, Database database) { throw new NotImplementedException(); }
+    //    //internal static new M New(int id, string databaseName) { throw new NotImplementedException(); }
 
-        public static bool Exists(IdType id, Database database = null)
-        {
-            return Get(id, database, false) != null;
-        }
+    //    public static bool Exists(IdType id, Database database = null)
+    //    {
+    //        return Get(id, database, false) != null;
+    //    }
 
-        public static M Get(IdType id, Database database = null, bool throwExceptionOnNotFound = true)
-        {
-            return Modl<M>.Get<IdType>(id, database, throwExceptionOnNotFound);
-        }
+    //    public static M Get(IdType id, Database database = null, bool throwExceptionOnNotFound = true)
+    //    {
+    //        return Modl<M>.Get<IdType>(id, database, throwExceptionOnNotFound);
+    //    }
 
-        public static new IEnumerable<M> GetAll(Database database = null)
-        {
-            //return new Select<M>(database ?? DefaultDatabase).GetList<IdType>();
-            return GetList<IdType>(new Select<M>(database ?? DefaultDatabase));
-        }
+    //    public static new IEnumerable<M> GetAll(Database database = null)
+    //    {
+    //        //return new Select<M>(database ?? DefaultDatabase).GetList<IdType>();
+    //        return GetList<IdType>(new Select<M>(database ?? DefaultDatabase));
+    //    }
 
-        public static new IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
-        {
-            //return new Select<M>(database ?? DefaultDatabase, query).GetList<IdType>();
-            return GetList<IdType>(new Select<M>(database ?? DefaultDatabase, query));
-        }
+    //    public static new IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
+    //    {
+    //        //return new Select<M>(database ?? DefaultDatabase, query).GetList<IdType>();
+    //        return GetList<IdType>(new Select<M>(database ?? DefaultDatabase, query));
+    //    }
 
-        public override void Save()
-        {
-            Save<IdType>();
-        }
+    //    public override void Save()
+    //    {
+    //        Save<IdType>();
+    //    }
 
-        public override void Delete()
-        {
-            Delete<IdType>(Id, Database);
-            isDeleted = true;
-        }
+    //    public override void Delete()
+    //    {
+    //        Delete<IdType>(Id, Database);
+    //        isDeleted = true;
+    //    }
 
-        public static void Delete(IdType id, Database database = null)
-        {
-            Delete<IdType>(id, database);
-        }
+    //    public static void Delete(IdType id, Database database = null)
+    //    {
+    //        Delete<IdType>(id, database);
+    //    }
 
-        public static new void DeleteAll(Database database = null)
-        {
-            DeleteAll<IdType>(database);
-        }
-    }
+    //    public static new void DeleteAll(Database database = null)
+    //    {
+    //        DeleteAll<IdType>(database);
+    //    }
+    //}
+
+    //public abstract class Modl<M>
+    //{
+    //    //public static IQueryable<M> Query(Database database = null) { }
+    //}
 
     //[ModelBinder(typeof(ModlBinder))]
     [DebuggerDisplay("{typeof(M).Name, nq}: {Id}")]
-    public abstract class Modl<M> : System.IEquatable<M>, IModl , IModl<int>
-        where M : Modl<M>, new()
+    public abstract class Modl<M, IdType> : System.IEquatable<M>, IModl<IdType>, IModl
+        where M : Modl<M, IdType>, new()
     {
         internal bool isNew = true;
         public bool IsNew { get { return isNew; } }
@@ -159,12 +164,12 @@ namespace Modl
         internal bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
-        public bool IsDirty { get { Statics<M>.ReadFromEmptyProperties(this); return Store.IsDirty; } }
-        public int Id { get { return (int)Store.Id; } }
+        public bool IsDirty { get { Statics<M, IdType>.ReadFromEmptyProperties(this); return Store.IsDirty; } }
+        public IdType Id { get { return Store.Id; } }
         internal bool AutomaticId = true;
 
-        internal static string IdName { get { return Statics<M>.IdName; } }
-        internal static string Table { get { return Statics<M>.TableName; } }
+        internal static string IdName { get { return Statics<M, IdType>.IdName; } }
+        internal static string Table { get { return Statics<M, IdType>.TableName; } }
 
         private Database instanceDbProvider = null;
         private static Database staticDbProvider = null;
@@ -204,12 +209,12 @@ namespace Modl
         protected dynamic Fields;
         protected dynamic F;
         private Dictionary<string, object> Lazy = new Dictionary<string, object>();
-        internal Store<M> Store;
+        internal Store<M, IdType> Store;
         //internal virtual Store<M, int> Store;
 
         static Modl()
         {
-            Statics<M>.Initialize(new M());
+            Statics<M, IdType>.Initialize(new M());
         }
 
         //public static List<C> AllCached
@@ -225,28 +230,28 @@ namespace Modl
 
         public Modl()
         {
-            Initialize(typeof(int));
+            Initialize();
         }
 
-        public Modl(int id)
+        public Modl(IdType id)
         {
-            Initialize(typeof(int));
+            Initialize();
             SetId(id);
         }
 
-        internal void SetId(object id)
+        internal void SetId(IdType id)
         {
             Store.Id = id;
             AutomaticId = false;
         }
 
-        private void Initialize(Type type)
+        private void Initialize()
         {
-            Store = new Store<M>(typeof(int));
+            Store = new Store<M, IdType>();
             Fields = Store.DynamicFields;
             F = Store.DynamicFields;
 
-            Statics<M>.FillFields(this);
+            Statics<M, IdType>.FillFields(this);
         }
 
         public static M New()
@@ -254,7 +259,7 @@ namespace Modl
             return new M();
         }
 
-        public static M New(int id)
+        public static M New(IdType id)
         {
             var m = new M();
             m.SetId(id);
@@ -262,7 +267,7 @@ namespace Modl
             return m;
         }
 
-        public static M New(int id, Database database)
+        public static M New(IdType id, Database database)
         {
             var m = New(database);
             m.SetId(id);
@@ -270,7 +275,7 @@ namespace Modl
             return m;
         }
 
-        public static M New(int id, string databaseName)
+        public static M New(IdType id, string databaseName)
         {
             var m = New(databaseName);
             m.SetId(id);
@@ -296,26 +301,26 @@ namespace Modl
 
 
 
-        public static bool Exists(int id, Database database = null)
+        public static bool Exists(IdType id, Database database = null)
         {
-            return Get(id, database, false) != null;
+            return Get(id, database) != null;
         }
 
         public static bool Exists(Expression<Func<M, bool>> query, Database database = null)
         {
-            return GetWhere(query, database, false) != null;
+            return GetWhere(query, database) != null;
         }
 
-        public static M Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
-        {
-            return Get<int>(id, database, throwExceptionOnNotFound);
-            //return new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id).Get(throwExceptionOnNotFound);
-            //return Get(new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
-        }
+        //public static M Get(int id, Database database = null, bool throwExceptionOnNotFound = true)
+        //{
+        //    return Get<int>(id, database, throwExceptionOnNotFound);
+        //    //return new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id).Get(throwExceptionOnNotFound);
+        //    //return Get(new Select<M>(database ?? DefaultDatabase).Where(IdName).EqualTo(id), throwExceptionOnNotFound);
+        //}
 
-        internal static M Get<IdType>(IdType id, Database database, bool throwExceptionOnNotFound)
+        public static M Get(IdType id, Database database = null)
         {
-            return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase, throwExceptionOnNotFound);
+            return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase);
 
             //Database db = database ?? DefaultDatabase;
 
@@ -328,13 +333,13 @@ namespace Modl
             //}
         }
 
-        internal static M Get(DbDataReader reader, Database database, bool throwExceptionOnNotFound = true, bool singleRow = true)
+        internal static M Get(DbDataReader reader, Database database, bool singleRow = true)
         {
-            var m = Modl<M>.New(database);
+            var m = Modl<M, IdType>.New(database);
 
-            if (m.Store.Load(reader, throwExceptionOnNotFound, singleRow))
+            if (m.Store.Load(reader, singleRow))
             {
-                Statics<M>.WriteToEmptyProperties(m);
+                Statics<M, IdType>.WriteToEmptyProperties(m);
                 m.isNew = false;
 
                 return m;
@@ -343,25 +348,25 @@ namespace Modl
                 return null;
         }
 
-        public static M GetWhere(Expression<Func<M, bool>> query, Database database = null, bool throwExceptionOnNotFound = true)
+        public static M GetWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return new Select<M>(database ?? DefaultDatabase, query).Get(throwExceptionOnNotFound);
+            return new Select<M, IdType>(database ?? DefaultDatabase, query).Get();
             //return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
 
         public static IEnumerable<M> GetAll(Database database = null)
         {
-            return GetList<int>(new Select<M>(database ?? DefaultDatabase));
+            return GetList(new Select<M, IdType>(database ?? DefaultDatabase));
             //return GetList(new Select<M>(database ?? DefaultDatabase));
         }
 
         public static IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return GetList<int>(new Select<M>(database ?? DefaultDatabase, query));
+            return GetList(new Select<M, IdType>(database ?? DefaultDatabase, query));
             //return GetList(new Select<M>(database ?? DefaultDatabase, query));
         }
 
-        internal static IEnumerable<M> GetList<IdType>(Select<M> query)
+        internal static IEnumerable<M> GetList(Select<M, IdType> query)
         {
             using (DbDataReader reader = query.Execute())
             {
@@ -455,27 +460,27 @@ namespace Modl
         //}
 
 
-        public virtual void Save()
-        {
-            Save<int>();
-        }
+        //public virtual void Save()
+        //{
+        //    Save<int>();
+        //}
 
-        internal void Save<IdType>()
+        public void Save()
         {
             if (isDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Store.Id));
 
-            Change<M> query;
+            Change<M, IdType> query;
 
             if (IsNew)
-                query = new Insert<M>(Database);
+                query = new Insert<M, IdType>(Database);
             else
-                query = new Update<M>(Database).Where(IdName).EqualTo(Store.Id);
+                query = new Update<M, IdType>(Database).Where(IdName).EqualTo(Store.Id);
 
-            Statics<M>.ReadFromEmptyProperties(this);
+            Statics<M, IdType>.ReadFromEmptyProperties(this);
             Store.BaseAddSaveFields(query);
 
-            if (query is Insert<M>)
+            if (query is Insert<M, IdType>)
             {
                 if (!AutomaticId)
                 {
@@ -521,14 +526,14 @@ namespace Modl
             isDeleted = true;
         }
 
-        public static void Delete(int id, Database database = null)
-        {
-            Delete<int>(id, database);
-        }
+        //public static void Delete(int id, Database database = null)
+        //{
+        //    Delete<int>(id, database);
+        //}
 
-        internal static void Delete<IdType>(IdType id, Database database = null)
+        public static void Delete(IdType id, Database database = null)
         {
-            Delete<M> statement = new Delete<M>(database ?? DefaultDatabase);
+            Delete<M, IdType> statement = new Delete<M, IdType>(database ?? DefaultDatabase);
             statement.Where(IdName).EqualTo(id);
 
             AsyncDbAccess.ExecuteNonQuery(statement);
@@ -536,31 +541,31 @@ namespace Modl
             StaticCache<M, IdType>.Delete(id, database ?? DefaultDatabase);
         }
 
+        //public static void DeleteAll(Database database = null)
+        //{
+        //    DeleteAll<int>(database);
+        //}
+
         public static void DeleteAll(Database database = null)
         {
-            DeleteAll<int>(database);
-        }
-
-        public static void DeleteAll<IdType>(Database database = null)
-        {
-            Delete<M> statement = new Delete<M>(database ?? DefaultDatabase);
+            Delete<M, IdType> statement = new Delete<M, IdType>(database ?? DefaultDatabase);
 
             AsyncDbAccess.ExecuteNonQuery(statement);
 
             StaticCache<M, IdType>.DeleteAll(database ?? DefaultDatabase);
         }
 
-        public static void DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
-        {
-            DeleteAllWhere<int>(query, database);
-        }
+        //public static void DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
+        //{
+        //    DeleteAllWhere<int>(query, database);
+        //}
 
-        public static void DeleteAllWhere<IdType>(Expression<Func<M, bool>> query, Database database = null)
+        public static void DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
             foreach (var modl in GetAllWhere(query, database).ToList().Cast<IModl<IdType>>())
                 StaticCache<M, IdType>.Delete(modl.Id, database ?? DefaultDatabase);
 
-            Delete<M> statement = new Delete<M>(database ?? DefaultDatabase, query);
+            Delete<M, IdType> statement = new Delete<M, IdType>(database ?? DefaultDatabase, query);
 
             AsyncDbAccess.ExecuteNonQuery(statement);
         }
@@ -587,7 +592,7 @@ namespace Modl
 
         public bool Equals(M other)
         {
-            return this.Id == other.Id;
+            return this.Id.Equals(other.Id);
         }
 
         #endregion
@@ -595,7 +600,7 @@ namespace Modl
 
         public static IQueryable<M> Query(Database database = null)
         {
-            return new LinqQuery<M>(database ?? DefaultDatabase);
+            return new LinqQuery<M, IdType>(database ?? DefaultDatabase);
         }
 
         internal static string GetFieldName(string propertyName)
@@ -603,7 +608,7 @@ namespace Modl
             if (propertyName == "Id")
                 return IdName;
             else
-                return Statics<M>.GetFieldName(propertyName);
+                return Statics<M, IdType>.GetFieldName(propertyName);
         }
 
         //internal static string GetFieldName(Expression<Func<C, string>> field)

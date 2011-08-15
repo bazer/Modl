@@ -25,17 +25,17 @@ using Modl.Query;
 
 namespace Modl.Linq.Parsers
 {
-    internal class LinqParser<M, Q> : ExpressionVisitor 
-        where M : Modl<M>, new()
-        where Q : Query<M, Q>
+    internal class LinqParser<M, IdType, Q> : ExpressionVisitor
+        where M : Modl<M, IdType>, new()
+        where Q : Query<M, IdType, Q>
     {
-        protected Query<M, Q> select;
-        protected WhereParser<M, Q> whereParser;
+        protected Query<M, IdType, Q> select;
+        protected WhereParser<M, IdType, Q> whereParser;
 
-        internal LinqParser(Query<M, Q> select) 
+        internal LinqParser(Query<M, IdType, Q> select) 
         {
             this.select = select;
-            whereParser = new WhereParser<M, Q>(select);
+            whereParser = new WhereParser<M, IdType, Q>(select);
         }
 
         internal void ParseTree(Expression expression)

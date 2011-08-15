@@ -40,8 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Car.cs" />
-    <Compile Include="Manufacturer.cs" />
+    <Compile Include="Modl\Car.cs" />
+    <Compile Include="Modl\Manufacturer.cs" />
+    <Compile Include="Modl\ModlContext.cs" />
     <Compile Include="Northwind\Northwind.cs" />
     <Compile Include="Northwind\NorthwindContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

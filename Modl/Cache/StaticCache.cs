@@ -27,7 +27,7 @@ using System;
 namespace Modl.Cache
 {
     internal static class StaticCache<M, IdType>
-        where M : Modl<M>, new()
+        where M : Modl<M, IdType>, new()
     {
         private static readonly object workLock = new object();
         //private static Dictionary<Database, Dictionary<IdType, M>> cache = new Dictionary<Database, Dictionary<IdType, M>>();
@@ -46,7 +46,7 @@ namespace Modl.Cache
         {
             foreach (var database in Database.GetAll())
             {
-                cache.Add(database, new AsyncCache<IdType, M>(x => new Task<M>(() => new Select<M>(database).Where(Modl<M>.IdName).EqualTo(x).Get(false))));
+                cache.Add(database, new AsyncCache<IdType, M>(x => new Task<M>(() => new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(x).Get())));
                 deleted.Add(database, new HashSet<IdType>());
             }
         }
@@ -75,19 +75,19 @@ namespace Modl.Cache
             //}
         }
 
-        internal static M Get(IdType id, Database database, bool throwExceptionOnNotFound)
+        internal static M Get(IdType id, Database database)
         {
             if (Config.CacheLevel == CacheLevel.On)
             {
                 //if (CacheContains(id, database))
                 //    return cache[database][id];
                 if (DeletedContains(id, database))
-                    return ReturnNullOrThrow(throwExceptionOnNotFound);
+                    return null;
                 else
                     return cache[database].GetValue(id).Result;
             }
 
-            M instance = new Select<M>(database).Where(Modl<M>.IdName).EqualTo(id).Get(throwExceptionOnNotFound);
+            M instance = new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(id).Get();
 
             //if (Config.CacheLevel == CacheLevel.On)
             //    Add(id, instance, database, throwExceptionOnNotFound);
@@ -143,19 +143,19 @@ namespace Modl.Cache
                     //if (!deleted.ContainsKey(database))
                     //    deleted.Add(database, new HashSet<IdType>());
 
-                    deleted[database] = new HashSet<IdType>(Modl<M>.GetAll(database).Select(x => (IdType)Convert.ChangeType(x.Id, typeof(IdType))));
+                    deleted[database] = new HashSet<IdType>(Modl<M, IdType>.GetAll(database).Select(x => x.Id)); //(IdType)Convert.ChangeType(x.Id, typeof(IdType))));
                 }
             }
         }
 
         
 
-        private static M ReturnNullOrThrow(bool throwExceptionOnNotFound)
-        {
-            if (throwExceptionOnNotFound)
-                throw new RecordNotFoundException();
-            else
-                return null;
-        }
+        //private static M ReturnNullOrThrow(bool throwExceptionOnNotFound)
+        //{
+        //    if (throwExceptionOnNotFound)
+        //        throw new RecordNotFoundException();
+        //    else
+        //        return null;
+        //}
     }
 }
