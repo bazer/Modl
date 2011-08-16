@@ -168,14 +168,14 @@ namespace Modl.DataAccess
 
     internal class AsyncWorker : IDisposable
     {
-        private const bool writeDebugText = true;
+        private const bool writeDebugText = false;
 
         private Database database;
-        private ConcurrentQueue<IQuery> workerQueue = new ConcurrentQueue<IQuery>();
+        private ConcurrentQueue<IWorkPackage> workerQueue = new ConcurrentQueue<IWorkPackage>();
         //private List<IQuery> workerQueue = new List<IQuery>();
         private List<Thread> workers = new List<Thread>();
         private volatile int runningWorkers = 0;
-        private int maxWorkers = 100;
+        private int maxWorkers = 10;
 
         //private Thread thread;
         private volatile bool doWork = true;
@@ -190,19 +190,6 @@ namespace Modl.DataAccess
         internal AsyncWorker(Database database)
         {
             this.database = database;
-
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Thread thread = new Thread(WorkerLoop);
-            //    workers.Add(thread);
-
-            //    thread.IsBackground = false;
-            //    //thread.Start(i);
-            //}
-
-            //thread = new Thread(WorkerLoop);
-            //thread.IsBackground = false;
-            //thread.Start();
         }
 
         internal void StartWorker(int number = 1)
@@ -228,22 +215,17 @@ namespace Modl.DataAccess
             }
         }
 
-        internal void Enqueue(params IQuery[] queries)
+        internal void Enqueue(IWorkPackage work)
         {
-            foreach (var query in queries)
-                workerQueue.Enqueue(query);
+            //foreach (var query in queries)
+            //    workerQueue.Enqueue(query);
+
+            workerQueue.Enqueue(work);
 
             isWorking = true;
-            //hasWork = true;
 
             if (runningWorkers == 0)
                 StartWorker();
-
-            //lock (workLock)
-            //{
-            //    //workerQueue.AddRange(queries);
-            //    Monitor.Pulse(workLock);
-            //}
         }
 
         internal void WaitToCompletion()
@@ -255,71 +237,61 @@ namespace Modl.DataAccess
         private void WorkerLoop(object thread)
         {
             int sleepCycles = 0;
-            //int num = (int)threadNumber;
 
             while (sleepCycles < 5000 && (doWork || !workerQueue.IsEmpty))
             {
-                try
+                //try
+                //{
+                //    //List<IQuery> list = new List<IQuery>();
+                //    List<WorkPackage> list = new List<WorkPackage>();
+
+                //    int i = 0;
+                //    int sleep = 0;
+                //    while (i < 1 && sleep < 10)
+                //    {
+                //IQuery query;
+                IWorkPackage work;
+                if (workerQueue.TryDequeue(out work))
                 {
-                    //IQuery[] list;
-                    List<IQuery> list = new List<IQuery>();
-
-
-                    //if (workerQueue.IsEmpty)
-                    //{
-                    //    isWorking = false;
-                    //    //workers[num].IsBackground = true;
-                    //    sleepCycles += 100;
-                    //    Thread.Sleep(100);
-                    //    //lock (workLock)
-                    //    //{
-                    //    //    Monitor.Wait(workLock);
-                    //    //}
-                    //    //workers[num].IsBackground = false;
-                    //}
-                    //else if (workerQueue.Count / runningWorkers > 1000)
-                    //    StartWorker();
-
-
-                    int i = 0;
-                    int sleep = 0;
-                    while (i < 100 && sleep < 10)
+                    try
                     {
-                        IQuery query;
-                        if (workerQueue.TryDequeue(out query))
-                        {
-                            list.Add(query);
-                            i += query.ParameterCount;
-                        }
-                        else if (list.Count == 0)
-                        {
-                            isWorking = false;
-                            sleep++;
-                            sleepCycles += 10;
-                            Thread.Sleep(10);
-                        }
-                        else
-                            break;
-                    }
+                        work.DoWork();
 
-                    //int i = 0;
-                    //list = workerQueue.TakeWhile(x => (i += x.ParameterCount) < 200).ToArray();
-                    //workerQueue.RemoveRange(0, list.Length);
-
-
-                    if (list.Count != 0)
-                    {
-                        //DbAccess.ExecuteNonQuery(list);
-                        foreach (var reader in DbAccess.ExecuteReader(list))
-                            reader.Close();
+                        //if (work.Type == WorkType.Write)
+                        //    DbAccess.ExecuteNonQuery(work.GetWork());
+                        //else if (work.Type == WorkType.Scalar)
+                        //    work.SetResult(DbAccess.ExecuteScalar<object>(work.GetWork()));
+                        //else if (work.Type == WorkType.Read)
+                        //    foreach (var reader in DbAccess.ExecuteReader(work.GetWork()))
+                        //        reader.Close();
 
                         sleepCycles = 0;
                     }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
+                    isWorking = false;
+                    //sleep++;
+                    sleepCycles += 10;
+                    Thread.Sleep(10);
                 }
+
+
+
+
+                //if (list.Count != 0)
+                //{
+                //    //DbAccess.ExecuteNonQuery(list);
+                //    foreach (var reader in DbAccess.ExecuteReader(list.SelectMany(x => x.GetWork()).ToList()))
+                //        reader.Close();
+
+                //    sleepCycles = 0;
+                //}
+
             }
 
             lock (workLock)
@@ -331,6 +303,65 @@ namespace Modl.DataAccess
                     Console.WriteLine("[{0}]Worker exit: {1}, Queue: {2}", database.Name, runningWorkers, workerQueue.Count);
             }
         }
+
+        //private void WorkerLoop(object thread)
+        //{
+        //    int sleepCycles = 0;
+
+        //    while (sleepCycles < 5000 && (doWork || !workerQueue.IsEmpty))
+        //    {
+        //        try
+        //        {
+        //            //List<IQuery> list = new List<IQuery>();
+        //            List<WorkPackage> list = new List<WorkPackage>();
+
+        //            int i = 0;
+        //            int sleep = 0;
+        //            while (i < 1 && sleep < 10)
+        //            {
+        //                //IQuery query;
+        //                WorkPackage work;
+        //                if (workerQueue.TryDequeue(out work))
+        //                {
+        //                    list.Add(work);
+        //                    i += work.ParameterCount;
+        //                }
+        //                else if (list.Count == 0)
+        //                {
+        //                    isWorking = false;
+        //                    sleep++;
+        //                    sleepCycles += 10;
+        //                    Thread.Sleep(10);
+        //                }
+        //                else
+        //                    break;
+        //            }
+
+
+        //            if (list.Count != 0)
+        //            {
+        //                //DbAccess.ExecuteNonQuery(list);
+        //                foreach (var reader in DbAccess.ExecuteReader(list.SelectMany(x => x.GetWork()).ToList()))
+        //                    reader.Close();
+
+        //                sleepCycles = 0;
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
+        //        }
+        //    }
+
+        //    lock (workLock)
+        //    {
+        //        workers.Remove((Thread)thread);
+        //        runningWorkers--;
+
+        //        if (writeDebugText)
+        //            Console.WriteLine("[{0}]Worker exit: {1}, Queue: {2}", database.Name, runningWorkers, workerQueue.Count);
+        //    }
+        //}
 
 
         public void Dispose()

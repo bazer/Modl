@@ -24,6 +24,7 @@ using Modl.Linq.Parsers;
 using System.Data.Common;
 using Modl.DataAccess;
 using Modl.Fields;
+using System.Threading.Tasks;
 
 namespace Modl.Query
 {
@@ -60,15 +61,14 @@ namespace Modl.Query
             get { return whereList.Count; }
         }
 
-        public DbDataReader Execute()
+        public Task<DbDataReader> Execute(bool onQueue = true)
         {
-            return AsyncDbAccess.ExecuteReader(this);
+            return AsyncDbAccess.ExecuteReader(this, onQueue);
         }
 
-        internal M Get()
+        internal Task<M> Get(bool onQueue = true)
         {
-            //if (StaticCache<M, )
-            return Modl<M, IdType>.Get(Execute(), DatabaseProvider, true);
+            return Modl<M, IdType>.GetAsync(Execute(onQueue), DatabaseProvider, true);
         }
 
         

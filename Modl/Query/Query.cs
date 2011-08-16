@@ -47,6 +47,8 @@ namespace Modl.Query
         public abstract Sql ToSql(string paramPrefix);
         public abstract int ParameterCount { get; }
 
+        
+
         public Query()
         {
         }

@@ -43,9 +43,12 @@ namespace Tests
         [TestMethod]
         public void PerformanceTest()
         {
+            int iterations = 100;
             GlobalCRUD();
-            basics.PerformanceCRUD(databaseName, 100, CacheLevel.Off);
-            basics.PerformanceCRUD(databaseName, 100, CacheLevel.On);
+            basics.TestPerformance(databaseName, iterations, CacheLevel.Off, basics.CRUD);
+            basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUD);
+            basics.TestPerformance(databaseName, iterations, CacheLevel.Off, basics.CRUDExplicitId);
+            basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUDExplicitId);
         }
 
         //[TestMethod]
@@ -111,6 +114,19 @@ namespace Tests
         {
             basics.SwitchDatabase(databaseName);
             basics.SetIdExplicit();
+        }
+
+        [TestMethod]
+        public void CRUDIdExplicit()
+        {
+            basics.CRUDExplicitId(Database.Get(databaseName));
+        }
+
+        [TestMethod]
+        public void GetAllAsync()
+        {
+            basics.SwitchDatabase(databaseName);
+            basics.GetAllAsync();
         }
     }
 }

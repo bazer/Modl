@@ -46,7 +46,7 @@ namespace Modl.Cache
         {
             foreach (var database in Database.GetAll())
             {
-                cache.Add(database, new AsyncCache<IdType, M>(x => new Task<M>(() => new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(x).Get())));
+                cache.Add(database, new AsyncCache<IdType, M>(id => new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(id).Get(false)));
                 deleted.Add(database, new HashSet<IdType>());
             }
         }
@@ -75,24 +75,24 @@ namespace Modl.Cache
             //}
         }
 
-        internal static M Get(IdType id, Database database)
+        internal static Task<M> Get(IdType id, Database database)
         {
-            if (Config.CacheLevel == CacheLevel.On)
-            {
+            //if (Config.CacheLevel == CacheLevel.On)
+            //{
                 //if (CacheContains(id, database))
                 //    return cache[database][id];
                 if (DeletedContains(id, database))
                     return null;
                 else
-                    return cache[database].GetValue(id).Result;
-            }
+                    return cache[database].GetValue(id);
+            //}
 
-            M instance = new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(id).Get();
+            //M instance = new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(id).Get().Result;
 
-            //if (Config.CacheLevel == CacheLevel.On)
-            //    Add(id, instance, database, throwExceptionOnNotFound);
+            ////if (Config.CacheLevel == CacheLevel.On)
+            ////    Add(id, instance, database, throwExceptionOnNotFound);
 
-            return instance;
+            //return instance;
         }
 
         internal static void Add(IdType id, M instance, Database database)

@@ -26,6 +26,7 @@ using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Tests
 {
@@ -50,19 +51,35 @@ namespace Tests
             Assert.AreEqual(databases.Count, Database.GetAll().Count);
         }
 
-        public TimeSpan PerformanceCRUD(string databaseName, int iterations, CacheLevel cache)
+        //public TimeSpan PerformanceCRUD(string databaseName, int iterations, CacheLevel cache)
+        //{
+        //    Config.CacheLevel = cache;
+        //    //SwitchDatabase(databaseName);
+
+        //    var db = Database.Get(databaseName);
+        //    var watch = Stopwatch.StartNew();
+
+        //    for (int i = 0; i < iterations; i++)
+        //        CRUD(db);
+
+        //    watch.Stop();
+        //    Console.WriteLine(string.Format("{0} iterations for {1}: {2} ms. (cache {3})", iterations, databaseName, watch.Elapsed.TotalMilliseconds, cache));
+
+        //    return watch.Elapsed;
+        //}
+
+        public TimeSpan TestPerformance(string databaseName, int iterations, CacheLevel cache, Action<Database> testMethod)
         {
             Config.CacheLevel = cache;
-            //SwitchDatabase(databaseName);
 
             var db = Database.Get(databaseName);
             var watch = Stopwatch.StartNew();
 
             for (int i = 0; i < iterations; i++)
-                CRUD(db);
+                testMethod.Invoke(db);
 
             watch.Stop();
-            Console.WriteLine(string.Format("{0} iterations for {1}: {2} ms. (cache {3})", iterations, databaseName, watch.Elapsed.TotalMilliseconds, cache));
+            Console.WriteLine(string.Format("Method: {4}, {0} iterations for {1}: {2} ms. (cache {3})", iterations, databaseName, watch.Elapsed.TotalMilliseconds, cache, testMethod.Method.Name));
 
             return watch.Elapsed;
         }
@@ -73,7 +90,8 @@ namespace Tests
             
             Parallel.For(0, threads, i =>
                 {
-                    PerformanceCRUD(databaseName, iterations, cache);
+                    TestPerformance(databaseName, iterations, cache, CRUD);
+                    TestPerformance(databaseName, iterations, cache, CRUDExplicitId);
                 });
             
             watch.Stop();
@@ -114,6 +132,30 @@ namespace Tests
             Assert.AreEqual(null, GetModl<Car, int>(car.Id, database));
 
             
+        }
+
+        public void CRUDExplicitId(Database database)
+        {
+            Manufacturer m1 = Manufacturer.New(Guid.NewGuid(), database);
+            Assert.AreEqual(false, m1.IsDirty);
+            m1.Name = "BMW";
+            Assert.AreEqual(true, m1.IsDirty);
+            m1.Save();
+            Assert.IsTrue(!m1.IsNew);
+            Assert.AreEqual(false, m1.IsDirty);
+
+            Manufacturer m2 = Manufacturer.Get(m1.Id, database);
+            AssertEqual(m1, m2);
+
+            m2.Name = "Mercedes";
+            Assert.AreEqual("Mercedes", m2.Name);
+            m2.Save();
+
+            Manufacturer m3 = Manufacturer.Get(m1.Id, database);
+            Assert.AreEqual("Mercedes", m3.Name);
+            m3.Delete();
+            Assert.IsTrue(m3.IsDeleted);
+            Assert.AreEqual(null, Manufacturer.Get(m1.Id, database));
         }
 
 
@@ -268,7 +310,9 @@ namespace Tests
                 var car = new Car();
                 car.Manufacturer = "Saab";
                 car.Name = "9000";
-                car.Save();
+
+                if (save)
+                    car.Save();
 
                 list.Add(car);
             }
@@ -309,6 +353,27 @@ namespace Tests
             Assert.AreEqual(id, m2.Id);
 
             m2.Delete();
+        }
+
+        public void GetAllAsync()
+        {
+            Car.DeleteAll();
+
+            NewCars(10);
+            Thread.Sleep(100);
+
+            Assert.AreEqual(10, Car.GetAll().Count());
+
+            foreach (var car in Car.GetAll())
+            {
+                var aCar = Car.GetAsync(car.Id);
+
+                AssertEqual(car, aCar.Result);
+
+                aCar.Result.Delete();
+            }
+
+            Assert.AreEqual(0, Car.GetAll().Count());
         }
     }
 }

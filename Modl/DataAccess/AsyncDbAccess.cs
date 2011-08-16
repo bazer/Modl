@@ -22,6 +22,7 @@ using System.Linq;
 using Modl.Query;
 using System.Threading;
 using System;
+using System.Threading.Tasks;
 
 namespace Modl.DataAccess
 {
@@ -51,7 +52,7 @@ namespace Modl.DataAccess
                 {
                     foreach (var worker in workers.Values)
                     {
-                        int workersToStart = (int)Math.Ceiling((worker.QueueDepth - (worker.RunningWorkers * 2000)) / 2000.0);
+                        int workersToStart = (int)Math.Ceiling((worker.QueueDepth - (worker.RunningWorkers * 5000)) / 5000.0);
 
                         if (workersToStart > 0)
                             worker.StartWorker(workersToStart);
@@ -106,17 +107,38 @@ namespace Modl.DataAccess
             {
                 foreach (var list in queries.GroupBy(x => x.DatabaseProvider))
                 {
-                    GetWorker(list.Key).Enqueue(list.ToArray());
+                    //new WorkPackage<object>(WorkType.Write, list.ToArray()).DoWorkAsync();
+                    GetWorker(list.Key).Enqueue(new WorkPackage<object>(WorkType.Write, list.ToArray()));
                 }
             }
         }
 
-        static public DbDataReader ExecuteReader(IQuery query)
+        public static Task<T> ExecuteScalar<T>(Database database, bool onQueue, params IQuery[] queries)
         {
-            if (Config.CacheLevel == CacheLevel.On)
-                GetWorker(query.DatabaseProvider).WaitToCompletion();
+            var work = new WorkPackage<T>(WorkType.Scalar, queries);
 
-            return DbAccess.ExecuteReader(query).First();
+            if (Config.CacheLevel == CacheLevel.Off || !onQueue)
+                return work.DoWorkAsync();
+            else
+            {
+                GetWorker(database).Enqueue(work);
+                return work.GetResultAsync();
+            }
+
+            //return Task<T>.Factory.StartNew(() => DbAccess.ExecuteScalar<T>(queries));
+        }
+
+        static public Task<DbDataReader> ExecuteReader(IQuery query, bool onQueue = true)
+        {
+            var work = new WorkPackage<DbDataReader>(WorkType.Read, query);
+
+            if (Config.CacheLevel == CacheLevel.Off || !onQueue)
+                return work.DoWorkAsync();
+            else
+            {
+                GetWorker(query.DatabaseProvider).Enqueue(work);
+                return work.GetResultAsync();
+            }
         }
     }
 }
