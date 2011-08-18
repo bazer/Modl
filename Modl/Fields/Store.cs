@@ -86,45 +86,21 @@ namespace Modl.Fields
         }
 
         internal string LastInsertedMemberName { get; set; }
-        //public string LastInsertedMemberName
-        //{
-        //    get
-        //    {
-        //        return NameOfLastInsertedMember;
-        //    }
-        //}
 
-        internal bool Load(DbDataReader reader, bool singleRow = true)
+        internal void Load(DbDataReader reader)
         {
-            if (reader.Read())
+            id = Helper.GetSafeValue<IdType>(reader, Statics<M, IdType>.IdName);
+
+            var keys = Fields.Keys.ToList();
+
+            for (int i = 0; i < Fields.Count; i++)
             {
-                id = Helper.GetSafeValue<IdType>(reader, Statics<M, IdType>.IdName);
+                string key = keys[i];
 
-                var keys = Fields.Keys.ToList();
-
-                for (int i = 0; i < Fields.Count; i++)
-                {
-                    string key = keys[i];
-
-                    //if (Fields[key].Type.GetInterface("IModl") != null)
-                    //    SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
-                    //else
-                        SetField(key, Helper.GetSafeValue(reader, key, Statics<M, IdType>.GetFieldType(key)));
-                }
-
-                if (singleRow)
-                    reader.Close();
-
-                return true;
-            }
-            else
-            {
-                reader.Close();
-
-                //if (singleRow && throwExceptionOnNotFound)
-                //    throw new RecordNotFoundException();
+                //if (Fields[key].Type.GetInterface("IModl") != null)
+                //    SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
                 //else
-                    return false;
+                SetField(key, Helper.GetSafeValue(reader, key, Statics<M, IdType>.GetFieldType(key)));
             }
         }
 

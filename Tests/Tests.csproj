@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="LinqSuite.cs" />
     <Compile Include="MySQL.cs" />
+    <Compile Include="PerformanceTests.cs" />
     <Compile Include="SqlServerCe.cs" />
     <Compile Include="SqlServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

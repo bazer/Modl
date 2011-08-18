@@ -49,9 +49,12 @@ namespace Modl.Linq
 
         protected IEnumerator<M> GetList()
         {
-            //return new Select<M>(database, expression).GetList<int>().GetEnumerator();
+            //if (expression is ConstantExpression)
+            //    return Modl<M, IdType>.GetAll(database).GetEnumerator();
+            //else
+            //    return Modl<M, IdType>.GetAllWhere((Expression<Func<M, bool>>)expression, database).GetEnumerator();
 
-            return Modl<M, IdType>.GetList(new Select<M, IdType>(database, expression)).GetEnumerator();
+            return new Select<M, IdType>(database, expression).GetAllAsync().Result.GetEnumerator();
         }
 
         public IEnumerator<M> GetEnumerator()

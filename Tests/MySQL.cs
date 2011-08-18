@@ -39,30 +39,30 @@ namespace Tests
             Database.DisposeAll();
         }
 
-        [TestMethod]
-        public void PerformanceTest()
-        {
-            int iterations = 100;
-            GlobalCRUD();
-            basics.TestPerformance(databaseName, iterations, CacheLevel.Off, basics.CRUD);
-            basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUD);
-            basics.TestPerformance(databaseName, iterations, CacheLevel.Off, basics.CRUDExplicitId);
-            basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUDExplicitId);
-        }
-
         //[TestMethod]
-        public void AsyncPerformanceTest()
-        {
-            //GlobalCRUD();
-            var watch = Stopwatch.StartNew();
-            //basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.Off, 100);
-            //Console.WriteLine(string.Format("Total time: {0}", watch.Elapsed.TotalMilliseconds));
-            //watch.Restart();
-            basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.On, 100);
-            //Database.DisposeAll();
-            watch.Stop();
-            Console.WriteLine(string.Format("[{0}]Total time: {1}", databaseName, watch.Elapsed.TotalMilliseconds));
-        }
+        //public void PerformanceTest()
+        //{
+        //    int iterations = 100;
+        //    GlobalCRUD();
+        //    //basics.TestPerformance(databaseName, iterations, CacheLevel.Off, basics.CRUD);
+        //    basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUD);
+        //    //basics.TestPerformance(databaseName, iterations, CacheLevel.Off, basics.CRUDExplicitId);
+        //    basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUDExplicitId);
+        //}
+
+        ////[TestMethod]
+        //public void AsyncPerformanceTest()
+        //{
+        //    //GlobalCRUD();
+        //    var watch = Stopwatch.StartNew();
+        //    //basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.Off, 100);
+        //    //Console.WriteLine(string.Format("Total time: {0}", watch.Elapsed.TotalMilliseconds));
+        //    //watch.Restart();
+        //    basics.AsyncPerformanceCRUD(databaseName, 10, CacheLevel.On, 100);
+        //    //Database.DisposeAll();
+        //    watch.Stop();
+        //    Console.WriteLine(string.Format("[{0}]Total time: {1}", databaseName, watch.Elapsed.TotalMilliseconds));
+        //}
 
         [TestMethod]
         public void GlobalCRUD()

@@ -68,38 +68,12 @@ namespace Tests
         //    return watch.Elapsed;
         //}
 
-        public TimeSpan TestPerformance(string databaseName, int iterations, CacheLevel cache, Action<Database> testMethod)
-        {
-            Config.CacheLevel = cache;
-
-            var db = Database.Get(databaseName);
-            var watch = Stopwatch.StartNew();
-
-            for (int i = 0; i < iterations; i++)
-                testMethod.Invoke(db);
-
-            watch.Stop();
-            Console.WriteLine(string.Format("Method: {4}, {0} iterations for {1}: {2} ms. (cache {3})", iterations, databaseName, watch.Elapsed.TotalMilliseconds, cache, testMethod.Method.Name));
-
-            return watch.Elapsed;
-        }
-
-        public void AsyncPerformanceCRUD(string databaseName, int iterations, CacheLevel cache, int threads)
-        {
-            var watch = Stopwatch.StartNew();
-            
-            Parallel.For(0, threads, i =>
-                {
-                    TestPerformance(databaseName, iterations, cache, CRUD);
-                    TestPerformance(databaseName, iterations, cache, CRUDExplicitId);
-                });
-            
-            watch.Stop();
-            Console.WriteLine(string.Format("Async total, {0} threads for {1}: {2} ms. Average: {3} ms. (cache {4})", threads, databaseName, watch.Elapsed.TotalMilliseconds, watch.Elapsed.TotalMilliseconds / threads, cache));
-        }
+        
 
         public void SwitchDatabase(string databaseName)
         {
+            Car.DefaultDatabase = null;
+            Manufacturer.DefaultDatabase = null;
             Database.Default = Database.Get(databaseName);
 
             Assert.AreEqual(databaseName, Database.Default.Name);
@@ -360,7 +334,7 @@ namespace Tests
             Car.DeleteAll();
 
             NewCars(10);
-            Thread.Sleep(100);
+            //Thread.Sleep(100);
 
             Assert.AreEqual(10, Car.GetAll().Count());
 

@@ -156,7 +156,7 @@ namespace Modl
 
     //[ModelBinder(typeof(ModlBinder))]
     [DebuggerDisplay("{typeof(M).Name, nq}: {Id}")]
-    public abstract class Modl<M, IdType> : System.IEquatable<M>, IModl<IdType>, IModl
+    public abstract class Modl<M, IdType> : /*System.IEquatable<M>,*/ IModl<IdType>, IModl
         where M : Modl<M, IdType>, new()
     {
         internal bool isNew = true;
@@ -347,75 +347,98 @@ namespace Modl
             if (Config.CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase);
             else
-                return new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(id).Get();
+                return new Select<M, IdType>(database ?? DefaultDatabase).Where(Modl<M, IdType>.IdName).EqualTo(id).GetAsync();
         }
 
-        internal static Task<M> GetAsync(Task<DbDataReader> reader, Database database, bool singleRow = true)
-        {
-            return reader.ContinueWith<M>(r =>
-                {
-                    var m = Modl<M, IdType>.New(database);
+        //internal static Task<M> GetAsync(Task<DbDataReader> reader, Database database, bool singleRow = true)
+        //{
+        //    return reader.ContinueWith<M>(r =>
+        //        {
+        //            var mzer = new Materializer<M, IdType>(r.Result, database);
 
-                    if (m.Store.Load(r.Result, singleRow))
-                    {
-                        Statics<M, IdType>.WriteToEmptyProperties(m);
-                        m.isNew = false;
+        //            if (singleRow)
+        //                return mzer.ReadAndClose();
+        //            else
+        //                return mzer.Read();
+                    
 
-                        return m;
-                    }
-                    else
-                        return null;
-                });
-        }
+        //            //var m = Modl<M, IdType>.New(database);
 
-        internal static M Get(DbDataReader reader, Database database, bool singleRow = true)
-        {
-            var m = Modl<M, IdType>.New(database);
+        //            //if (m.Store.Load(r.Result, singleRow))
+        //            //{
+        //            //    Statics<M, IdType>.WriteToEmptyProperties(m);
+        //            //    m.isNew = false;
 
-            if (m.Store.Load(reader, singleRow))
-            {
-                Statics<M, IdType>.WriteToEmptyProperties(m);
-                m.isNew = false;
+        //            //    return m;
+        //            //}
+        //            //else
+        //            //    return null;
+        //        });
+        //}
 
-                return m;
-            }
-            else
-                return null;
-        }
+        //internal static M Get(DbDataReader reader, Database database, bool singleRow = true)
+        //{
+        //    var m = Modl<M, IdType>.New(database);
+
+        //    if (m.Store.Load(reader, singleRow))
+        //    {
+        //        Statics<M, IdType>.WriteToEmptyProperties(m);
+        //        m.isNew = false;
+
+        //        return m;
+        //    }
+        //    else
+        //        return null;
+        //}
 
         public static M GetWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return new Select<M, IdType>(database ?? DefaultDatabase, query).Get().Result;
+            if (Config.CacheLevel == CacheLevel.On)
+                return StaticCache<M, IdType>.GetWhere(query, database ?? DefaultDatabase);
+            else
+                return new Select<M, IdType>(database ?? DefaultDatabase, query).GetAsync().Result;
+            
             //return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
 
         public static IEnumerable<M> GetAll(Database database = null)
         {
-            return GetList(new Select<M, IdType>(database ?? DefaultDatabase));
+            if (Config.CacheLevel == CacheLevel.On)
+                return StaticCache<M, IdType>.GetAll(database ?? DefaultDatabase);
+            else
+                return new Select<M, IdType>(database ?? DefaultDatabase).GetAllAsync(true).Result;
+
+            //return StaticCache<M, IdType>.GetAll(new Select<M, IdType>(database ?? DefaultDatabase));
+            //return new Select<M, IdType>(database ?? DefaultDatabase).GetList(true);
             //return GetList(new Select<M>(database ?? DefaultDatabase));
         }
 
         public static IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return GetList(new Select<M, IdType>(database ?? DefaultDatabase, query));
+            if (Config.CacheLevel == CacheLevel.On)
+                return StaticCache<M, IdType>.GetAllWhere(query, database ?? DefaultDatabase);
+            else
+                return new Select<M, IdType>(database ?? DefaultDatabase, query).GetAllAsync(true).Result;
+
+            //return new Select<M, IdType>(database ?? DefaultDatabase, query).GetList(true);
             //return GetList(new Select<M>(database ?? DefaultDatabase, query));
         }
 
-        internal static IEnumerable<M> GetList(Select<M, IdType> query)
-        {
-            using (var reader = query.Execute().Result)
-            {
-                while (true)
-                {
-                    var m = Get(reader, query.DatabaseProvider, singleRow: false);
+        //internal static IEnumerable<M> GetList(Select<M, IdType> query)
+        //{
+        //    using (var reader = query.Execute().Result)
+        //    {
+        //        while (true)
+        //        {
+        //            var m = Get(reader, query.DatabaseProvider, singleRow: false);
 
-                    if (m != null)
-                        yield return m;
-                    else
-                        break;
-                }
-            }
-        }
+        //            if (m != null)
+        //                yield return m;
+        //            else
+        //                break;
+        //        }
+        //    }
+        //}
 
         protected void SetValue<T>(string name, T value)
         {
@@ -517,17 +540,16 @@ namespace Modl
             Statics<M, IdType>.ReadFromEmptyProperties(this);
             Store.BaseAddSaveFields(query);
 
-            if (query is Insert<M, IdType>)
+            if (IsNew)
             {
                 if (!AutomaticId)
                 {
                     query.With(IdName, Id);
-                    AsyncDbAccess.ExecuteNonQuery(query);
                     StaticCache<M, IdType>.Add((IdType)Store.Id, (M)this, Database);
+                    AsyncDbAccess.ExecuteNonQuery(query);
                 }
                 else
                 {
-                    IsIdLoaded = false;
                     IdTask = AsyncDbAccess.ExecuteScalar<IdType>(Database, false, query, Database.GetLastIdQuery()).ContinueWith<IdType>(x =>
                     {
                         var id = x.Result;
@@ -537,6 +559,9 @@ namespace Modl
 
                         return id;
                     });
+
+                    IsIdLoaded = false;
+                    StaticCache<M, IdType>.AddPreliminary((M)this, Database);
                 }
             }
             else
@@ -606,14 +631,14 @@ namespace Modl
             return Id.ToString();
         }
 
-        #region IEquatable<C> Members
+        //#region IEquatable<C> Members
 
-        public bool Equals(M other)
-        {
-            return this.Id.Equals(other.Id);
-        }
+        //public bool Equals(M other)
+        //{
+        //    return this.Id.Equals(other.Id);
+        //}
 
-        #endregion
+        //#endregion
 
 
         public static IQueryable<M> Query(Database database = null)

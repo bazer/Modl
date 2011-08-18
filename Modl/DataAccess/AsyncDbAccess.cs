@@ -122,7 +122,7 @@ namespace Modl.DataAccess
             else
             {
                 GetWorker(database).Enqueue(work);
-                return work.GetResultAsync();
+                return work.AwaitResult();
             }
 
             //return Task<T>.Factory.StartNew(() => DbAccess.ExecuteScalar<T>(queries));
@@ -137,7 +137,7 @@ namespace Modl.DataAccess
             else
             {
                 GetWorker(query.DatabaseProvider).Enqueue(work);
-                return work.GetResultAsync();
+                return work.AwaitResult();
             }
         }
     }

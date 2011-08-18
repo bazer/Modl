@@ -257,6 +257,9 @@ namespace Modl.DataAccess
                     {
                         work.DoWork();
 
+                        if (writeDebugText)
+                            Console.WriteLine(work.GetDebugSql());
+
                         //if (work.Type == WorkType.Write)
                         //    DbAccess.ExecuteNonQuery(work.GetWork());
                         //else if (work.Type == WorkType.Scalar)

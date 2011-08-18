@@ -28,6 +28,7 @@ using Modl.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Modl.DataAccess;
+using Modl.Cache;
 
 namespace Modl
 {
@@ -216,6 +217,7 @@ namespace Modl
         public static void DisposeAll()
         {
             AsyncDbAccess.DisposeAllWorkers();
+            CacheManager.Clear();
         }
 
         public void Dispose()

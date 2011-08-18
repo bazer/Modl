@@ -83,6 +83,22 @@ namespace System.Threading
             _map[key] = LazyExtensions.Create(value);
         }
 
+        public bool RemoveValue(TKey key)
+        {
+            Lazy<Task<TValue>> value;
+            return _map.TryRemove(key, out value);
+        }
+
+        public IEnumerable<TValue> GetValuesWhere(Func<TValue, bool> query)
+        {
+            return _map.Values.Select(x => x.Value.Result).Where(query);
+        }
+
+        public IEnumerable<TValue> GetAllValues()
+        {
+            return _map.Values.Select(x => x.Value.Result);
+        }
+
         /// <summary>Gets a Task to retrieve the value for the specified key.</summary>
         /// <param name="key">The key whose value should be retrieved.</param>
         /// <returns>A Task for the value of the specified key.</returns>

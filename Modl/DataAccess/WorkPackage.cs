@@ -21,7 +21,8 @@ namespace Modl.DataAccess
         int ParameterCount { get; }
         void SetResult(object result);
         IQuery[] GetWork();
-        void DoWork();
+        object DoWork();
+        string GetDebugSql();
     }
 
     internal class WorkPackage<T> : IWorkPackage
@@ -45,43 +46,6 @@ namespace Modl.DataAccess
             this.queries = queries;
         }
 
-        public void SetResult(object result)
-        {
-            try
-            {
-                this.result = (T)result;
-
-                if (task != null)
-                    task.SetResult(this.result);
-
-                HasResult = true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
-                task.SetException(e);
-            }
-        }
-
-        public Task<T> GetResultAsync()
-        {
-            if (task == null)
-            {
-                task = new TaskCompletionSource<T>();
-
-                if (HasResult)
-                    task.SetResult(result);
-            }
-
-            return task.Task;
-        }
-
-
-        public IQuery[] GetWork()
-        {
-            return queries;
-        }
-
         public Task<T> DoWorkAsync()
         {
             return Task<T>.Factory.StartNew(() =>
@@ -91,16 +55,55 @@ namespace Modl.DataAccess
             });
         }
 
-        public void DoWork()
+        public Task<T> AwaitResult()
+        {
+            if (task == null)
+            {
+                task = new TaskCompletionSource<T>();
+
+                if (HasResult)
+                    task.TrySetResult(result);
+            }
+
+            return task.Task;
+        }
+
+        public void SetResult(object result)
         {
             try
             {
+                this.result = (T)result;
+
+                if (task != null)
+                    task.TrySetResult(this.result);
+
+                HasResult = true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\r\n" + e.StackTrace);
+                
+                if (task != null)
+                    task.SetException(e);
+            }
+        }
+
+        public object DoWork()
+        {
+            try
+            {
+                object r = null;
+
                 if (Type == WorkType.Write)
                     DbAccess.ExecuteNonQuery(GetWork());
                 else if (Type == WorkType.Scalar)
-                    SetResult(DbAccess.ExecuteScalar<T>(GetWork()));
+                    r = DbAccess.ExecuteScalar<T>(GetWork());
                 else if (Type == WorkType.Read)
-                    SetResult(DbAccess.ExecuteReader(GetWork()).First());
+                    r = DbAccess.ExecuteReader(GetWork()).First();
+
+                SetResult(r);
+
+                return r;
             }
             catch (Exception e)
             {
@@ -111,6 +114,23 @@ namespace Modl.DataAccess
                 else
                     throw;
             }
+
+            return null;
+        }
+
+        public IQuery[] GetWork()
+        {
+            return queries;
+        }
+
+        public string GetDebugSql()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var query in GetWork())
+                sb.AppendLine(query.ToString());
+
+            return sb.ToString();
         }
     }
 }
