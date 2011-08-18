@@ -50,11 +50,16 @@ namespace Modl.Query
 
         public override Sql ToSql(string paramPrefix)
         {
-            var where = GetWhere(paramPrefix);
+            return GetWhere(
+                new Sql().AddFormat("SELECT * FROM {0} \r\n", Modl<M, IdType>.Table),
+                paramPrefix);
 
-            return new Sql(
-                string.Format("SELECT * FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
-                where.Parameters);
+
+            //var where = GetWhere(paramPrefix);
+
+            //return new Sql(
+            //    string.Format("SELECT * FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
+            //    where.Parameters);
         }
 
         public override int ParameterCount
@@ -62,24 +67,24 @@ namespace Modl.Query
             get { return whereList.Count; }
         }
 
-        public DbDataReader Execute(bool onQueue = true)
+        public DbDataReader Execute()
         {
             return DbAccess.ExecuteReader(this).First();
         }
 
-        public M Get(bool onQueue = true)
+        public M Get()
         {
-            return new Materializer<M, IdType>(Execute(onQueue), DatabaseProvider).ReadAndClose();
+            return new Materializer<M, IdType>(Execute(), DatabaseProvider).ReadAndClose();
         }
 
-        public IEnumerable<M> GetAll(bool onQueue = true)
+        public IEnumerable<M> GetAll()
         {
-            return new Materializer<M, IdType>(Execute(onQueue), DatabaseProvider).GetAll();
+            return new Materializer<M, IdType>(Execute(), DatabaseProvider).GetAll();
         }
 
-        public Materializer<M, IdType> GetMaterializer(bool onQueue = true)
+        public Materializer<M, IdType> GetMaterializer()
         {
-            return new Materializer<M, IdType>(Execute(onQueue), DatabaseProvider);
+            return new Materializer<M, IdType>(Execute(), DatabaseProvider);
         }
 
         public Task<DbDataReader> ExecuteAsync(bool onQueue = true)

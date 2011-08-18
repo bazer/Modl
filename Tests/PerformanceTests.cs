@@ -12,25 +12,28 @@ namespace Tests
     [TestClass]
     public class PerformanceTests
     {
-        Database[] databases;
+        List<Database> databases;
         Basics basics = new Basics();
         
         public PerformanceTests()
         {
-            databases = new Database[3]
+            //Config.CacheLevel = CacheLevel.Off;
+
+            databases = new List<Database>
             {
-                Database.Get("SqlServerCeDb"),
-                Database.Get("MySQLDb"),
+                //Database.Get("SqlServerCeDb"),
+                //Database.Get("MySQLDb"),
                 Database.Get("SqlServerDb")
             };
         }
         
+        [TestMethod]
         public void RunAllTest()
         {
             var watch = Stopwatch.StartNew();
 
-            //CRUDPerformanceTest();
-            AsyncCRUDPerformanceTest();
+            CRUDPerformanceTest(1000);
+            //AsyncCRUDPerformanceTest(1000, 10);
             
             Console.WriteLine(string.Format("All tests: {0} ms.", watch.Elapsed.TotalMilliseconds));
             Database.DisposeAll();

@@ -104,16 +104,16 @@ namespace Modl.Query
         //    return string.Format("{0} {1} '{2}'", Key, RelationToString(Relation), Value.ToString());
         //}
 
-        public override string GetCommandString(string prefix, int number)
+        public override Sql GetCommandString(Sql sql, string prefix, int number)
         {
-            return Query.DatabaseProvider.GetParameterComparison(Key, Relation, prefix + "w" + number);
+            return Query.DatabaseProvider.GetParameterComparison(sql, Key, Relation, prefix + "w" + number);
 
             //return string.Format("{0} {1} @{2}", Key, RelationToString(Relation), number);
         }
 
-        public override IDataParameter GetCommandParameter(string prefix, int number)
+        public override Sql GetCommandParameter(Sql sql, string prefix, int number)
         {
-            return Query.DatabaseProvider.GetParameter(prefix + "w" + number, Value);
+            return Query.DatabaseProvider.GetParameter(sql, prefix + "w" + number, Value);
 
             //return new Tuple<string, object>("@" + number, Value);
         }

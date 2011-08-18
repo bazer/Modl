@@ -71,15 +71,32 @@ namespace Modl.Query
             return where;
         }
 
-        protected Sql GetWhere(string paramPrefix)
+        protected Sql GetWhere(Sql sql, string paramPrefix)
         {
-            if (whereList.Count == 0)
-                return new Sql(); // Tuple<string, IEnumerable<IDataParameter>>(string.Empty, new List<IDataParameter>());
+            int length = whereList.Count;
+            if (length == 0)
+                return sql; 
 
-            int i = 0, j = 0;
-            return new Sql("WHERE \r\n" +
-                string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(paramPrefix, i++))),
-                whereList.Select(x => x.GetCommandParameter(paramPrefix, j++)).ToArray());
+            sql.AddText("WHERE \r\n");
+            
+            for (int i=0; i<length; i++)
+            {
+                whereList[i].GetCommandParameter(sql, paramPrefix, i);
+                whereList[i].GetCommandString(sql, paramPrefix, i);
+
+                if (i + 1 < length)
+                    sql.AddText(" AND \r\n");
+            }
+
+            return sql;
+
+                //.AddParameters(whereList.Select(x => x.GetCommandParameter(paramPrefix, j++)).ToArray())
+                
+                //.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(paramPrefix, i++)).ToArray());
+
+            //return new Sql("WHERE \r\n" +
+            //    string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(paramPrefix, i++))),
+            //    whereList.Select(x => x.GetCommandParameter(paramPrefix, j++)).ToArray());
         }
 
         //protected string QueryPartsToString()

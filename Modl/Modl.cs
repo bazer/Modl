@@ -334,18 +334,16 @@ namespace Modl
 
         public static M Get(IdType id, Database database = null)
         {
-            var m = GetAsync(id, database);
-
-            if (m != null)
-                return m.Result;
+            if (Config.CacheLevel == CacheLevel.On)
+                return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase);
             else
-                return null;
+                return new Select<M, IdType>(database ?? DefaultDatabase).Where(Modl<M, IdType>.IdName).EqualTo(id).Get();
         }
 
         public static Task<M> GetAsync(IdType id, Database database = null)
         {
             if (Config.CacheLevel == CacheLevel.On)
-                return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase);
+                return StaticCache<M, IdType>.GetAsync(id, database ?? DefaultDatabase);
             else
                 return new Select<M, IdType>(database ?? DefaultDatabase).Where(Modl<M, IdType>.IdName).EqualTo(id).GetAsync();
         }
@@ -396,7 +394,7 @@ namespace Modl
             if (Config.CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetWhere(query, database ?? DefaultDatabase);
             else
-                return new Select<M, IdType>(database ?? DefaultDatabase, query).GetAsync().Result;
+                return new Select<M, IdType>(database ?? DefaultDatabase, query).Get();
             
             //return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
@@ -406,7 +404,7 @@ namespace Modl
             if (Config.CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetAll(database ?? DefaultDatabase);
             else
-                return new Select<M, IdType>(database ?? DefaultDatabase).GetAllAsync(true).Result;
+                return new Select<M, IdType>(database ?? DefaultDatabase).GetAll();
 
             //return StaticCache<M, IdType>.GetAll(new Select<M, IdType>(database ?? DefaultDatabase));
             //return new Select<M, IdType>(database ?? DefaultDatabase).GetList(true);
@@ -418,7 +416,7 @@ namespace Modl
             if (Config.CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetAllWhere(query, database ?? DefaultDatabase);
             else
-                return new Select<M, IdType>(database ?? DefaultDatabase, query).GetAllAsync(true).Result;
+                return new Select<M, IdType>(database ?? DefaultDatabase, query).GetAll();
 
             //return new Select<M, IdType>(database ?? DefaultDatabase, query).GetList(true);
             //return GetList(new Select<M>(database ?? DefaultDatabase, query));

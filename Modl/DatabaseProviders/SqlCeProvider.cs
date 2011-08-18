@@ -55,26 +55,26 @@ namespace Modl.DatabaseProviders
             return new Literal(this, "SELECT @@IDENTITY");
         }
 
-        internal override string GetParameterValue(string key)
+        internal override Sql GetParameterValue(Sql sql, string key)
         {
-            return string.Format("@{0}", key);
+            return sql.AddFormat("@{0}", key);
         }
 
-        internal override string GetParameterComparison(string field, Relation relation, string key)
+        internal override Sql GetParameterComparison(Sql sql, string field, Relation relation, string key)
         {
-            return string.Format("{0} {1} @{2}", field, relation.ToSql(), key);
+            return sql.AddFormat("{0} {1} @{2}", field, relation.ToSql(), key);
         }
 
-        internal override IDataParameter GetParameter(string key, object value)
+        internal override Sql GetParameter(Sql sql, string key, object value)
         {
-            return new SqlCeParameter("@" + key, value);
+            return sql.AddParameters(new SqlCeParameter("@" + key, value));
         }
 
         internal override IDbCommand ToDbCommand(IQuery query)
         {
             var sql = query.ToSql("");
             var command = new SqlCeCommand(sql.Text, (SqlCeConnection)GetConnection());
-            command.Parameters.AddRange(sql.Parameters);
+            command.Parameters.AddRange(sql.Parameters.ToArray());
 
             return command;
 
@@ -91,7 +91,7 @@ namespace Modl.DatabaseProviders
             {
                 var sql = query.ToSql("q" + i++);
                 var command = new SqlCeCommand(sql.Text, (SqlCeConnection)connection);
-                command.Parameters.AddRange(sql.Parameters);
+                command.Parameters.AddRange(sql.Parameters.ToArray());
                 commands.Add(command);
             }
 

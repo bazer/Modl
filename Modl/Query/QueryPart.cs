@@ -27,8 +27,8 @@ namespace Modl.Query
     public abstract class QueryPart<M, IdType>
         where M : Modl<M, IdType>, new()
     {
-        public abstract string GetCommandString(string prefix, int number);
-        public abstract IDataParameter GetCommandParameter(string prefix, int number);
+        public abstract Sql GetCommandString(Sql sql, string prefix, int number);
+        public abstract Sql GetCommandParameter(Sql sql, string prefix, int number);
 
         public QueryPart()
         {

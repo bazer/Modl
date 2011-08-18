@@ -14,7 +14,8 @@ namespace Modl.DataAccess
         private DbDataReader reader;
         private Database database;
 
-        public bool IsDone { get; private set; }
+        public bool IsDone { get { return reader.IsClosed; } }
+        //public bool IsDone { get; private set; }
 
         private IdType id;
         private bool isIdSet = false;
@@ -76,18 +77,24 @@ namespace Modl.DataAccess
        
         public IEnumerable<IdType> GetIds()
         {
-            while (!IsDone)
+            using (var r = reader)
             {
-                yield return Peak();
-                StepReader();
+                while (!IsDone)
+                {
+                    yield return Peak();
+                    StepReader();
+                }
             }
         }
 
         public IEnumerable<M> GetAll()  
         {
-            while (!IsDone) 
+            using (var r = reader)
             {
-                yield return Read();
+                while (!IsDone)
+                {
+                    yield return Read();
+                }
             }
         }
 
@@ -95,7 +102,7 @@ namespace Modl.DataAccess
         {
             if (!IsDone)
             {
-                IsDone = true;
+                //IsDone = true;
                 //reader.Close();
                 reader.Dispose();
             }

@@ -60,9 +60,9 @@ namespace Modl
         internal abstract IDbCommand ToDbCommand(IQuery query);
         internal abstract List<IDbCommand> ToDbCommands(List<IQuery> queries);
         internal abstract IQuery GetLastIdQuery();
-        internal abstract IDataParameter GetParameter(string key, object value);
-        internal abstract string GetParameterValue(string key);
-        internal abstract string GetParameterComparison(string field, Relation relation, string key);
+        internal abstract Sql GetParameter(Sql sql, string key, object value);
+        internal abstract Sql GetParameterValue(Sql sql, string key);
+        internal abstract Sql GetParameterComparison(Sql sql, string field, Relation relation, string key);
         
 
         internal static Database GetNewDatabaseProvider(string databaseName, string connectionString, DatabaseType providerType)

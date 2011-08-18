@@ -279,8 +279,8 @@ namespace Modl.DataAccess
                 {
                     isWorking = false;
                     //sleep++;
-                    sleepCycles += 10;
-                    Thread.Sleep(10);
+                    sleepCycles += 5;
+                    Thread.Sleep(5);
                 }
 
 
@@ -389,7 +389,7 @@ namespace Modl.DataAccess
                     //    //    worker.Join();
 
                     while (runningWorkers != 0)
-                        Thread.Yield();
+                        Thread.Sleep(1);
 
                     //    //workers.ForEach(x => x.Join());
 

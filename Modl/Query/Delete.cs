@@ -44,11 +44,20 @@ namespace Modl.Query
 
         public override Sql ToSql(string paramPrefix)
         {
-            var where = GetWhere(paramPrefix);
+            //var sql = new Sql().AddFormat("DELETE FROM {0} \r\n", Modl<M, IdType>.Table);
 
-            return new Sql(
-                string.Format("DELETE FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
-                where.Parameters);
+            return GetWhere(
+                new Sql().AddFormat("DELETE FROM {0} \r\n", Modl<M, IdType>.Table), 
+                paramPrefix);
+
+
+            //var where = GetWhere(sql, paramPrefix);
+
+            //return where.
+
+            //return new Sql(
+            //    string.Format("DELETE FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
+            //    where.Parameters);
         }
 
         public override int ParameterCount
