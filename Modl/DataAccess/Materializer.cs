@@ -36,7 +36,7 @@ namespace Modl.DataAccess
             StepReader();
         }
 
-        
+
         public IdType Peak()
         {
             if (IsDone)
@@ -54,29 +54,46 @@ namespace Modl.DataAccess
         public M Read()
         {
             if (IsDone)
+                throw new Exception("Reader is closed");
+
+            //if (IsDone)
+            //    return null;
+            try
+            {
+                var m = Modl<M, IdType>.New(database);
+                m.Store.Load(reader);
+                Statics<M, IdType>.WriteToEmptyProperties(m);
+                m.isNew = false;
+                return m;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error on read: {0}\r\n{1}", e.Message, e.StackTrace);
                 return null;
-
-            var m = Modl<M, IdType>.New(database);
-            m.Store.Load(reader);
-            Statics<M, IdType>.WriteToEmptyProperties(m);
-            m.isNew = false;
-
-            StepReader();
-
-            return m;
+            }
+            finally
+            {
+                StepReader();
+            }
         }
 
         public M ReadAndClose()
         {
+            if (IsDone)
+                throw new Exception("Reader is closed");
+
             var m = Read();
             Close();
 
             return m;
         }
 
-       
+
         public IEnumerable<IdType> GetIds()
         {
+            //if (IsDone)
+            //    throw new Exception("Reader is closed");
+
             using (var r = reader)
             {
                 while (!IsDone)
@@ -87,13 +104,19 @@ namespace Modl.DataAccess
             }
         }
 
-        public IEnumerable<M> GetAll()  
+        public IEnumerable<M> GetAll()
         {
+            //if (IsDone)
+            //    throw new Exception("Reader is closed");
+
             using (var r = reader)
             {
                 while (!IsDone)
                 {
-                    yield return Read();
+                    var m = Read();
+
+                    if (m != null)
+                        yield return m;
                 }
             }
         }

@@ -548,7 +548,7 @@ namespace Modl
                 }
                 else
                 {
-                    IdTask = AsyncDbAccess.ExecuteScalar<IdType>(Database, false, query, Database.GetLastIdQuery()).ContinueWith<IdType>(x =>
+                    IdTask = AsyncDbAccess.ExecuteScalar<IdType>(Database, true, query, Database.GetLastIdQuery()).ContinueWith<IdType>(x =>
                     {
                         var id = x.Result;
                         Store.Id = id;

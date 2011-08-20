@@ -134,7 +134,7 @@ namespace Modl.Cache
 
             var listFromDb = new Select<M, IdType>(database).GetAllAsync(false);
 
-            HashSet<IdType> list = new HashSet<IdType>();
+            //HashSet<IdType> list = new HashSet<IdType>();
 
             foreach (var m in cache[database].Values)
             {
@@ -142,7 +142,7 @@ namespace Modl.Cache
                 {
                     //Add(m.Id, m, database);
 
-                    list.Add(m.Id);
+                    //list.Add(m.Id);
                     if (writeDebugText)
                         Console.WriteLine("[{0}] Cache Return: {1}", database.Name, m.Id);
                     yield return m;
@@ -157,13 +157,13 @@ namespace Modl.Cache
 
             foreach (var m in prel)
             {
-                list.Add(m.Id);
+                //list.Add(m.Id);
                 if (writeDebugText)
                     Console.WriteLine("[{0}] Prel Return: {1}", database.Name, m.Id);
                 yield return m;
             }
 
-
+            var list = AllInCache(database);
             foreach (var m in listFromDb.Result)
             {
                 if (!list.Contains(m.Id) && !DeletedContains(m.Id, database))
@@ -184,14 +184,14 @@ namespace Modl.Cache
                 Console.WriteLine("[{0}] Cache GetAllWhere: {1}", database.Name, query.ToString());
 
             var q = query.Compile();
-            HashSet<IdType> list = new HashSet<IdType>();
+            //HashSet<IdType> list = new HashSet<IdType>();
 
             foreach (var m in cache[database].Values.Where(q))
             {
                 if (!DeletedContains(m.Id, database))
                 {
                     //Add(m.Id, m, database);
-                    list.Add(m.Id);
+                    //list.Add(m.Id);
                     yield return m;
                 }
             }
@@ -204,10 +204,11 @@ namespace Modl.Cache
 
             foreach (var m in prel)
             {
-                list.Add(m.Id);
+                //list.Add(m.Id);
                 yield return m;
             }
 
+            var list = AllInCache(database);
             foreach (var m in new Select<M, IdType>(database, query).GetAll())
             {
                 if (!list.Contains(m.Id) && !DeletedContains(m.Id, database))
@@ -216,6 +217,20 @@ namespace Modl.Cache
                     yield return m;
                 }
             }
+        }
+
+        private static HashSet<IdType> AllInCache(Database database)
+        {
+            HashSet<IdType> list = new HashSet<IdType>();
+
+            foreach (var m in cache[database].Values)
+                //if (!DeletedContains(m.Id, database))
+                    list.Add(m.Id);
+
+            foreach (var m in preliminaryCache[database].ToList())
+                list.Add(m.Id);
+
+            return list;
         }
 
         internal static void Add(IdType id, M instance, Database database)
@@ -293,8 +308,15 @@ namespace Modl.Cache
                     //    deleted.Add(database, new HashSet<IdType>());
 
                     deleted[database] = new HashSet<IdType>(new Select<M, IdType>(database).GetMaterializer().GetIds()); //(IdType)Convert.ChangeType(x.Id, typeof(IdType))));
+
+                    foreach (var m in cache[database].Values)
+                        deleted[database].Add(m.Id);
+
+                    foreach (var m in preliminaryCache[database])
+                        deleted[database].Add(m.Id);
                 }
 
+                
                 cache[database].Clear();
 
                 lock (preliminaryLock)
