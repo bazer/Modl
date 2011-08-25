@@ -165,7 +165,7 @@ namespace Modl
         internal bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
-        public bool IsDirty { get { Statics<M, IdType>.ReadFromEmptyProperties(this); return Store.IsDirty; } }
+        public bool IsDirty { get { /*Statics<M, IdType>.ReadFromEmptyProperties(this);*/ return Store.IsDirty; } }
         
         public IdType Id 
         { 
@@ -261,7 +261,7 @@ namespace Modl
 
         private void Initialize()
         {
-            Store = new Store<M, IdType>();
+            Store = new Store<M, IdType>(this);
             Fields = Store.DynamicFields;
             F = Store.DynamicFields;
 
@@ -535,7 +535,7 @@ namespace Modl
             else
                 query = new Update<M, IdType>(Database).Where(IdName).EqualTo(Id);
 
-            Statics<M, IdType>.ReadFromEmptyProperties(this);
+            //Statics<M, IdType>.ReadFromEmptyProperties(this);
             Store.BaseAddSaveFields(query);
 
             if (IsNew)

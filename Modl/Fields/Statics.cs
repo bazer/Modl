@@ -31,7 +31,8 @@ namespace Modl.Fields
 
         private static Dictionary<string, string> Properties = new Dictionary<string, string>();
         private static Dictionary<string, Type> Types = new Dictionary<string, Type>();
-        private static List<PropertyInfo> EmptyProperties = new List<PropertyInfo>();
+        //private static List<PropertyInfo> EmptyProperties = new List<PropertyInfo>();
+        private static List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>> EmptyProperties = new List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>>();
 
         internal static void SetFieldName(string propertyName, string fieldName)
         {
@@ -82,7 +83,11 @@ namespace Modl.Fields
                     if (instance.Store.LastInsertedMemberName == null)
                     { 
                         instance.Store.SetValue(property.Name, defaultValue, true);
-                        EmptyProperties.Add(property);
+
+                        var getDelegate = (Func<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeGetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true), instance });
+                        var setDelegate = (Action<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeSetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true), instance });
+                        EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
+                        
                     }
                     
                     SetFieldName(property.Name, instance.Store.LastInsertedMemberName);
@@ -97,16 +102,42 @@ namespace Modl.Fields
                 instance.Store.SetValue(field.Key, Helper.GetDefault(field.Value));
         }
 
+
         internal static void ReadFromEmptyProperties(Modl<M, IdType> instance)
         {
             foreach (var property in EmptyProperties)
-                instance.Store.SetValue(property.Name, property.GetValue(instance, null), true);
+                instance.Store.SetValue(property.Item1.Name, property.Item2((M)instance), true);
         }
 
         internal static void WriteToEmptyProperties(Modl<M, IdType> instance)
         {
             foreach (var property in EmptyProperties)
-                property.SetValue(instance, instance.Store.GetValue<object>(property.Name), null);
+                property.Item3((M)instance, instance.Store.GetValue<object>(property.Item1.Name));
         }
+
+        //internal static void ReadFromEmptyProperties(Modl<M, IdType> instance)
+        //{
+        //    foreach (var property in EmptyProperties)
+        //        instance.Store.SetValue(property.Name, property.GetValue(instance, null), true);
+        //}
+
+        //internal static void WriteToEmptyProperties(Modl<M, IdType> instance)
+        //{
+        //    foreach (var property in EmptyProperties)
+        //        property.SetValue(instance, instance.Store.GetValue<object>(property.Name), null);
+        //}
+
+        public static Func<M, object> MakeGetDelegate<T>(MethodInfo @get, Modl<M, IdType> instance)
+        {
+            var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, @get);
+            return m => f(m);
+        }
+
+        public static Action<M, object> MakeSetDelegate<T>(MethodInfo @get, Modl<M, IdType> instance)
+        {
+            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, @get);
+            return (m, t) => f(m, (T)t);
+        }
+
     }
 }

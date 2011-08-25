@@ -36,17 +36,18 @@ namespace Modl.Fields
     internal class Store<M, IdType> : IStore
         where M : Modl<M, IdType>, new()
     {
-        //internal Type IdType { get; set; }
-        protected IdType id; // = default(IdType);
+        protected Modl<M, IdType> instance;
+
+        protected IdType id;
         internal IdType Id { get { return id; } set { id = value; } }
 
         public DynamicFields<M, IdType> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
-        //string NameOfLastInsertedMember;
 
-        public Store()
+        public Store(Modl<M, IdType> instance)
         {
-            //this.IdType = IdType;
+            this.instance = instance;
+
             DynamicFields = new DynamicFields<M, IdType>(this);
         }
 
@@ -54,8 +55,19 @@ namespace Modl.Fields
         {
             get
             {
+                ReadFromEmptyProperties();
                 return Fields.Values.Any(x => x.IsDirty);
             }
+        }
+
+        protected void ReadFromEmptyProperties()
+        {
+            Statics<M, IdType>.ReadFromEmptyProperties(instance);
+        }
+
+        protected void WriteToEmptyProperties()
+        {
+            Statics<M, IdType>.WriteToEmptyProperties(instance);
         }
 
         public T GetValue<T>(string name)
@@ -102,10 +114,14 @@ namespace Modl.Fields
                 //else
                 SetField(key, Helper.GetSafeValue(reader, key, Statics<M, IdType>.GetFieldType(key)));
             }
+
+            WriteToEmptyProperties();
         }
 
         internal void BaseAddSaveFields(Change<M, IdType> statement)
         {
+            ReadFromEmptyProperties();
+
             foreach (var field in Fields)
             {
                 //if (field.Value.Type.GetInterface("IModl") != null && !(field.Value.Value is int))

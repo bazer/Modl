@@ -62,7 +62,7 @@ namespace Modl.DataAccess
             {
                 var m = Modl<M, IdType>.New(database);
                 m.Store.Load(reader);
-                Statics<M, IdType>.WriteToEmptyProperties(m);
+                //Statics<M, IdType>.WriteToEmptyProperties(m);
                 m.isNew = false;
                 return m;
             }

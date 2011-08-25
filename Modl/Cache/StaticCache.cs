@@ -35,13 +35,10 @@ namespace Modl.Cache
 
         private static readonly object deleteLock = new object();
         private static readonly object preliminaryLock = new object();
-        //private static Dictionary<Database, Dictionary<IdType, M>> cache = new Dictionary<Database, Dictionary<IdType, M>>();
-        private static ConcurrentDictionary<Database, ConcurrentDictionary<IdType, M>> cache = new ConcurrentDictionary<Database, ConcurrentDictionary<IdType, M>>();
-        //private static Dictionary<Database, AsyncCache<IdType, M>> cache = new Dictionary<Database, AsyncCache<IdType, M>>();
-        private static Dictionary<Database, HashSet<IdType>> deleted = new Dictionary<Database, HashSet<IdType>>();
-        private static ConcurrentDictionary<Database, HashSet<M>> preliminaryCache = new ConcurrentDictionary<Database, HashSet<M>>();
 
-        //AsyncCache<IdType, M> cache;
+        private static ConcurrentDictionary<Database, ConcurrentDictionary<IdType, M>> cache = new ConcurrentDictionary<Database, ConcurrentDictionary<IdType, M>>();
+        private static ConcurrentDictionary<Database, HashSet<IdType>> deleted = new ConcurrentDictionary<Database, HashSet<IdType>>();
+        private static ConcurrentDictionary<Database, HashSet<M>> preliminaryCache = new ConcurrentDictionary<Database, HashSet<M>>();
 
         static StaticCache()
         {
@@ -53,15 +50,16 @@ namespace Modl.Cache
         {
             foreach (var database in Database.GetAll())
             {
-                //cache.Add(database, new AsyncCache<IdType, M>(id => new Select<M, IdType>(database).Where(Modl<M, IdType>.IdName).EqualTo(id).GetAsync(false)));
                 cache.TryAdd(database, new ConcurrentDictionary<IdType, M>());
-                deleted.Add(database, new HashSet<IdType>());
+
+                lock (deleteLock)
+                    deleted.TryAdd(database, new HashSet<IdType>());
 
                 lock (preliminaryLock)
-                {
                     preliminaryCache.TryAdd(database, new HashSet<M>());
-                }
             }
+
+            
         }
 
         internal static void Clear()
@@ -86,7 +84,8 @@ namespace Modl.Cache
         {
             //lock (workLock)
             //{
-            return deleted[database].Contains(id);
+            lock (deleteLock)
+                return deleted[database].Contains(id);
             //}
         }
 
