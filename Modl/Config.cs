@@ -32,34 +32,53 @@ namespace Modl
     public enum CacheLevel
     {
         On,
-        Off
+        Off,
+        All
+    }
+
+    public enum Timeout
+    {
+        Never = 0,
+        TenMinutes = 10,
+        TwentyMinutes = 20,
+        ThirtyMinutes = 30,
+        OneHour = 60,
+        OneDay = 1440
     }
 
     public class Config
     {
-        private static CacheLevel cacheLevel;
-        public static CacheLevel CacheLevel 
-        { 
-            get
-            {
-                return cacheLevel;
-            }
-            set 
-            {
-                cacheLevel = value;
+        public static CacheLevel DefaultCacheLevel { get { return CacheConfig.DefaultCacheLevel; } set { CacheConfig.DefaultCacheLevel = value; } }
+        public static int DefaultCacheTimeout { get { return CacheConfig.DefaultCacheTimeout; } set { CacheConfig.DefaultCacheTimeout = value; } }
 
-                if (cacheLevel == Modl.CacheLevel.Off)
-                {
-                    AsyncDbAccess.DisposeAllWorkers();
-                    CacheManager.Clear();
-                }
-            }
-        }
+
+        //private static CacheLevel cacheLevel;
+        //public static CacheLevel CacheLevel 
+        //{ 
+        //    get
+        //    {
+        //        return cacheLevel;
+        //    }
+        //    set 
+        //    {
+        //        cacheLevel = value;
+
+        //        if (cacheLevel == Modl.CacheLevel.Off)
+        //        {
+        //            AsyncDbAccess.DisposeAllWorkers();
+        //            CacheManager.Clear();
+        //        }
+        //    }
+        //}
+
         
         protected static Dictionary<string, Database> DatabaseProviders = new Dictionary<string, Database>();
 
         static Config()
         {
+            DefaultCacheLevel = CacheLevel.On;
+            DefaultCacheTimeout = 20;
+
             foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
                 if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
                     Database.AddFromConnectionString(connString);

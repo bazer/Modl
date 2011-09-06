@@ -18,27 +18,34 @@ along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
+using System.Text;
 
-namespace Modl.Cache
+namespace Modl
 {
-    internal static class CacheManager
+    [AttributeUsage(AttributeTargets.Class)]
+    public class CacheAttribute : Attribute
     {
-        private static HashSet<Action> cacheList = new HashSet<Action>();
+        public int CacheTimeout { get; private set; }
+        public CacheLevel CacheLevel { get; private set; }
 
-        
-
-        internal static void RegisterClearMethod(Action clearMethod)
+        public CacheAttribute(CacheLevel cacheLevel)
         {
-            cacheList.Add(clearMethod);
+            CacheTimeout = Config.DefaultCacheTimeout;
+            CacheLevel = cacheLevel;
         }
 
-        internal static void Clear()
+        public CacheAttribute(CacheLevel cacheLevel, int minutesToTimeout)
         {
-            foreach (var cache in cacheList)
-                cache.Invoke();
+            CacheTimeout = minutesToTimeout;
+            CacheLevel = cacheLevel;
+
         }
 
-        
+        public CacheAttribute(CacheLevel cacheLevel, Timeout timeout)
+        {
+            CacheTimeout = (int)timeout;
+            CacheLevel = cacheLevel;
+        }
     }
 }

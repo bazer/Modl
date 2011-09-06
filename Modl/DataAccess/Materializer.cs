@@ -80,7 +80,8 @@ namespace Modl.DataAccess
         public M ReadAndClose()
         {
             if (IsDone)
-                throw new Exception("Reader is closed");
+                return null;
+                //throw new Exception("Reader is closed");
 
             var m = Read();
             Close();

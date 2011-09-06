@@ -18,21 +18,31 @@ along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Modl;
+using System.Threading;
 
-namespace ExampleModel
+namespace Modl.Cache
 {
-    [Table("Cars")]
-    [Id("Id")]
-    [Cache(CacheLevel.Off, Timeout.Never)]
-    public class Car : Modl<Car, int>
+    internal class CacheConfig
     {
-        public string Name { get; set; }
-        public string Manufacturer { get; set; }
+        public static CacheLevel DefaultCacheLevel { get; set; }
+        public static int DefaultCacheTimeout { get; set; }
 
-        //public string Name { get { return Fields.Name; } set { Fields.Name = value; } }
-        //public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
+        private static HashSet<Action> cacheList = new HashSet<Action>();
+
+        public static void SetDefaultCacheTimeout(Timeout timeout)
+        {
+            DefaultCacheTimeout = (int)timeout;
+        }
+
+        internal static void RegisterClearMethod(Action clearMethod)
+        {
+            cacheList.Add(clearMethod);
+        }
+
+        internal static void Clear()
+        {
+            foreach (var cache in cacheList)
+                cache.Invoke();
+        }
     }
 }

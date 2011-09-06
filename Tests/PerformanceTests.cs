@@ -64,7 +64,7 @@ namespace Tests
 
         public TimeSpan TimeMethod(Database db, int iterations, CacheLevel cache, Action<Database> testMethod)
         {
-            Config.CacheLevel = cache;
+            Config.DefaultCacheLevel = cache;
             var watch = Stopwatch.StartNew();
 
             for (int i = 0; i < iterations; i++)
@@ -78,7 +78,7 @@ namespace Tests
 
         public void TimeMethodAsync(Database db, int iterations, CacheLevel cache, Action<Database> testMethod, int threads)
         {
-            Config.CacheLevel = cache;
+            Config.DefaultCacheLevel = cache;
             var watch = Stopwatch.StartNew();
 
             Parallel.For(0, threads, i =>

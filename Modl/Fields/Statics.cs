@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using Modl.Cache;
 
 namespace Modl.Fields
 {
@@ -28,6 +29,8 @@ namespace Modl.Fields
     {
         internal static string TableName;
         internal static string IdName;
+        internal static CacheLevel CacheLevel;
+        internal static int CacheTimeout;
 
         private static Dictionary<string, string> Properties = new Dictionary<string, string>();
         private static Dictionary<string, Type> Types = new Dictionary<string, Type>();
@@ -56,12 +59,20 @@ namespace Modl.Fields
 
         internal static void Initialize(Modl<M, IdType> instance)
         {
+            CacheLevel = CacheConfig.DefaultCacheLevel;
+            CacheTimeout = CacheConfig.DefaultCacheTimeout;
+
             foreach (var attribute in typeof(M).GetCustomAttributes(true))
             {
                 if (attribute is TableAttribute)
                     TableName = ((TableAttribute)attribute).Name;
                 else if (attribute is IdAttribute)
                     IdName = ((IdAttribute)attribute).Name;
+                else if (attribute is CacheAttribute)
+                {
+                    CacheLevel = ((CacheAttribute)attribute).CacheLevel;
+                    CacheTimeout = ((CacheAttribute)attribute).CacheTimeout;
+                }
             }
 
             if (string.IsNullOrEmpty(TableName))

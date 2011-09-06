@@ -217,7 +217,7 @@ namespace Modl
         public static void DisposeAll()
         {
             AsyncDbAccess.DisposeAllWorkers();
-            CacheManager.Clear();
+            CacheConfig.Clear();
         }
 
         public void Dispose()

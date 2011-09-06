@@ -43,7 +43,7 @@ namespace Modl.Query
                 DatabaseProvider.GetParameterComparison(sql, with.Key, Relation.Equal, paramPrefix + "v" + i);
 
                 if (i + 1 < length)
-                    sql.AddText(" AND \r\n");
+                    sql.AddText(",");
 
                 i++;
             }

@@ -104,8 +104,6 @@ namespace Tests
             car3.Delete();
             Assert.IsTrue(car3.IsDeleted);
             Assert.AreEqual(null, GetModl<Car, int>(car.Id, database));
-
-            
         }
 
         public void CRUDExplicitId(Database database)
@@ -132,6 +130,38 @@ namespace Tests
             Assert.AreEqual(null, Manufacturer.Get(m1.Id, database));
         }
 
+        //public void CRUDTransaction(Database database = null)
+        //{
+        //    Transaction.Start();
+
+        //    using (var trans = database.StartTransaction())
+        //    {
+        //        Car car = Car.New(database);
+        //        Assert.AreEqual(false, car.IsDirty);
+        //        car.Name = "M3";
+        //        car.Manufacturer = "BMW";
+        //        Assert.AreEqual(true, car.IsDirty);
+        //        car.Save();
+        //        Assert.IsTrue(!car.IsNew);
+        //        Assert.AreEqual(false, car.IsDirty);
+
+        //        Car car2 = Car.Get(car.Id, database);
+        //        AssertEqual(car, car2);
+
+        //        car2.Manufacturer = "Mercedes";
+        //        Assert.AreEqual("Mercedes", car2.Manufacturer);
+        //        car2.Save();
+
+        //        Car car3 = Car.Get(car.Id, database);
+        //        Assert.AreEqual("Mercedes", car3.Manufacturer);
+        //        car3.Delete();
+        //        Assert.IsTrue(car3.IsDeleted);
+        //        Assert.AreEqual(null, Car.Get(car.Id, database));
+
+        //        trans.Commit();
+        //    }
+
+        //}
 
 
         public T NewModl<T, IdType>(Database database) where T : Modl<T, IdType>, new()

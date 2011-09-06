@@ -95,7 +95,7 @@ namespace Modl.DataAccess
                 object r = null;
 
                 if (Type == WorkType.Write)
-                    DbAccess.ExecuteNonQuery(GetWork());
+                    r = DbAccess.ExecuteNonQuery(GetWork());
                 else if (Type == WorkType.Scalar)
                     r = DbAccess.ExecuteScalar<T>(GetWork());
                 else if (Type == WorkType.Read)

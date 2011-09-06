@@ -99,25 +99,28 @@ namespace Modl.DataAccess
             }
         }
 
-        public static void ExecuteNonQuery(params IQuery[] queries)
+        public static Task<bool> ExecuteNonQuery(Database database, params IQuery[] queries)
         {
-            if (Config.CacheLevel == CacheLevel.Off)
-                DbAccess.ExecuteNonQuery(queries);
-            else
-            {
-                foreach (var list in queries.GroupBy(x => x.DatabaseProvider))
-                {
+            //if (Config.DefaultCacheLevel == CacheLevel.Off)
+            //    DbAccess.ExecuteNonQuery(queries);
+            //else
+            //{
+                //foreach (var list in queries.GroupBy(x => x.DatabaseProvider))
+                //{
                     //new WorkPackage<object>(WorkType.Write, list.ToArray()).DoWorkAsync();
-                    GetWorker(list.Key).Enqueue(new WorkPackage<object>(WorkType.Write, list.ToArray()));
-                }
-            }
+            var work = new WorkPackage<bool>(WorkType.Write, queries);
+            GetWorker(database).Enqueue(work);
+            
+            return work.AwaitResult();
+                //}
+            //}
         }
 
         public static Task<T> ExecuteScalar<T>(Database database, bool onQueue, params IQuery[] queries)
         {
             var work = new WorkPackage<T>(WorkType.Scalar, queries);
 
-            if (Config.CacheLevel == CacheLevel.Off || !onQueue)
+            if (/*Config.DefaultCacheLevel == CacheLevel.Off ||*/ !onQueue)
                 return work.DoWorkAsync();
             else
             {
@@ -132,7 +135,7 @@ namespace Modl.DataAccess
         {
             var work = new WorkPackage<DbDataReader>(WorkType.Read, query);
 
-            if (Config.CacheLevel == CacheLevel.Off || !onQueue)
+            if (/*Config.DefaultCacheLevel == CacheLevel.Off ||*/ !onQueue)
                 return work.DoWorkAsync();
             else
             {

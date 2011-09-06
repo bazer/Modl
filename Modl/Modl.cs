@@ -165,7 +165,7 @@ namespace Modl
         internal bool isDeleted = false;
         public bool IsDeleted { get { return isDeleted; } }
 
-        public bool IsDirty { get { /*Statics<M, IdType>.ReadFromEmptyProperties(this);*/ return Store.IsDirty; } }
+        public bool IsDirty { get { return Store.IsDirty; } }
         
         public IdType Id 
         { 
@@ -179,7 +179,7 @@ namespace Modl
         }
 
         internal Task<IdType> IdTask;
-        internal bool IsIdLoaded = true;
+        internal volatile bool IsIdLoaded = true;
         internal bool AutomaticId = true;
 
         internal static string IdName { get { return Statics<M, IdType>.IdName; } }
@@ -217,6 +217,19 @@ namespace Modl
             {
                 staticDbProvider = value;
             }
+        }
+
+        
+        public static CacheLevel CacheLevel
+        {
+            get { return Statics<M, IdType>.CacheLevel; }
+            set { Statics<M, IdType>.CacheLevel = value; }
+        }
+
+        public static int CacheTimeout
+        {
+            get { return Statics<M, IdType>.CacheTimeout; }
+            set { Statics<M, IdType>.CacheTimeout = value; }
         }
 
         //internal static dynamic Constants;
@@ -334,7 +347,7 @@ namespace Modl
 
         public static M Get(IdType id, Database database = null)
         {
-            if (Config.CacheLevel == CacheLevel.On)
+            if (CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase);
             else
                 return new Select<M, IdType>(database ?? DefaultDatabase).Where(Modl<M, IdType>.IdName).EqualTo(id).Get();
@@ -342,7 +355,7 @@ namespace Modl
 
         public static Task<M> GetAsync(IdType id, Database database = null)
         {
-            if (Config.CacheLevel == CacheLevel.On)
+            if (CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetAsync(id, database ?? DefaultDatabase);
             else
                 return new Select<M, IdType>(database ?? DefaultDatabase).Where(Modl<M, IdType>.IdName).EqualTo(id).GetAsync();
@@ -391,7 +404,7 @@ namespace Modl
 
         public static M GetWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            if (Config.CacheLevel == CacheLevel.On)
+            if (CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetWhere(query, database ?? DefaultDatabase);
             else
                 return new Select<M, IdType>(database ?? DefaultDatabase, query).Get();
@@ -401,7 +414,7 @@ namespace Modl
 
         public static IEnumerable<M> GetAll(Database database = null)
         {
-            if (Config.CacheLevel == CacheLevel.On)
+            if (CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetAll(database ?? DefaultDatabase);
             else
                 return new Select<M, IdType>(database ?? DefaultDatabase).GetAll();
@@ -413,7 +426,7 @@ namespace Modl
 
         public static IEnumerable<M> GetAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            if (Config.CacheLevel == CacheLevel.On)
+            if (CacheLevel == CacheLevel.On)
                 return StaticCache<M, IdType>.GetAllWhere(query, database ?? DefaultDatabase);
             else
                 return new Select<M, IdType>(database ?? DefaultDatabase, query).GetAll();
@@ -523,10 +536,25 @@ namespace Modl
         //    Save<int>();
         //}
 
-        public void Save()
+        public bool Save()
+        {
+            return SaveAsync().Result;
+        }
+
+        public Task<bool> SaveAsync()
         {
             if (isDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Table, Id));
+
+            Task<bool> task;
+
+            if (!IsDirty)
+            {
+                task = new Task<bool>(() => true);
+                task.RunSynchronously();
+
+                return task;
+            }
 
             Change<M, IdType> query;
 
@@ -538,13 +566,15 @@ namespace Modl
             //Statics<M, IdType>.ReadFromEmptyProperties(this);
             Store.BaseAddSaveFields(query);
 
+            
+
             if (IsNew)
             {
                 if (!AutomaticId)
                 {
                     query.With(IdName, Id);
                     StaticCache<M, IdType>.Add((IdType)Store.Id, (M)this, Database);
-                    AsyncDbAccess.ExecuteNonQuery(query);
+                    task = AsyncDbAccess.ExecuteNonQuery(Database, query);
                 }
                 else
                 {
@@ -558,15 +588,19 @@ namespace Modl
                         return id;
                     });
 
+                    task = IdTask.ContinueWith<bool>(_ => true);
+
                     IsIdLoaded = false;
                     StaticCache<M, IdType>.AddPreliminary((M)this, Database);
                 }
             }
             else
-                AsyncDbAccess.ExecuteNonQuery(query);
+                task = AsyncDbAccess.ExecuteNonQuery(Database, query);
 
             isNew = false;
             Store.ResetFields();
+
+            return task;
         }
 
         //private void BaseTransactionSave(Change<M> statement, Modl.DataAccess.DbTransaction trans)
@@ -582,33 +616,59 @@ namespace Modl
         //    isNew = false;
         //}
 
-        public virtual void Delete()
+        public virtual bool Delete()
         {
-            Delete(Id, Database);
-            isDeleted = true;
+            return DeleteAsync().Result;
         }
 
-        public static void Delete(IdType id, Database database = null)
+        public virtual Task<bool> DeleteAsync()
         {
-            Delete<M, IdType> statement = new Delete<M, IdType>(database ?? DefaultDatabase);
+            isDeleted = true;
+            return DeleteAsync(Id, Database);
+        }
+
+        public static bool Delete(IdType id, Database database = null)
+        {
+            return DeleteAsync(id, database).Result;
+        }
+
+        public static Task<bool> DeleteAsync(IdType id, Database database = null)
+        {
+            var db = database ?? DefaultDatabase;
+
+            Delete<M, IdType> statement = new Delete<M, IdType>(db);
             statement.Where(IdName).EqualTo(id);
 
-            StaticCache<M, IdType>.Delete(id, database ?? DefaultDatabase);
-            AsyncDbAccess.ExecuteNonQuery(statement);
+            StaticCache<M, IdType>.Delete(id, db);
+            return AsyncDbAccess.ExecuteNonQuery(db, statement);
         }
 
-        public static void DeleteAll(Database database = null)
+        public static bool DeleteAll(Database database = null)
         {
-            StaticCache<M, IdType>.DeleteAll(database ?? DefaultDatabase);
-            AsyncDbAccess.ExecuteNonQuery(new Delete<M, IdType>(database ?? DefaultDatabase));
+            return DeleteAllAsync(database).Result;
         }
 
-        public static void DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
+        public static Task<bool> DeleteAllAsync(Database database = null)
         {
+            var db = database ?? DefaultDatabase;
+
+            StaticCache<M, IdType>.DeleteAll(db);
+            return AsyncDbAccess.ExecuteNonQuery(db, new Delete<M, IdType>(db));
+        }
+
+        public static bool DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
+        {
+            return DeleteAllWhereAsync(query, database).Result;
+        }
+
+        public static Task<bool> DeleteAllWhereAsync(Expression<Func<M, bool>> query, Database database = null)
+        {
+            var db = database ?? DefaultDatabase;
+
             foreach (var modl in GetAllWhere(query, database))
-                StaticCache<M, IdType>.Delete(modl.Id, database ?? DefaultDatabase);
+                StaticCache<M, IdType>.Delete(modl.Id, db);
 
-            AsyncDbAccess.ExecuteNonQuery(new Delete<M, IdType>(database ?? DefaultDatabase, query));
+            return AsyncDbAccess.ExecuteNonQuery(db, new Delete<M, IdType>(db, query));
         }
 
         //protected void LogSave()

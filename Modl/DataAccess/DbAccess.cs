@@ -26,17 +26,17 @@ namespace Modl.DataAccess
 {
 	public class DbAccess
 	{
-		static public void ExecuteNonQuery(params IQuery[] queries)
+        static public bool ExecuteNonQuery(params IQuery[] queries)
 		{
-			ExecuteNonQuery(new List<IQuery>(queries));
+            return ExecuteNonQuery(new List<IQuery>(queries));
 		}
 
-		static public void ExecuteNonQuery(List<IQuery> queries)
+        static public bool ExecuteNonQuery(List<IQuery> queries)
 		{
-			ExecuteNonQuery(Database.GetDbCommands(queries));
+			return ExecuteNonQuery(Database.GetDbCommands(queries));
 		}
 
-		static public void ExecuteNonQuery(List<IDbCommand> commands)
+		static public bool ExecuteNonQuery(List<IDbCommand> commands)
 		{
 			for (int i = 0; i < commands.Count; i++)
 			{
@@ -48,6 +48,8 @@ namespace Modl.DataAccess
                 if (i + 1 == commands.Count || commands[i].Connection != commands[i + 1].Connection)
                     commands[i].Connection.Close();
 			}
+
+            return true;
 		}
 
 		static public T ExecuteScalar<T>(params IQuery[] queries)

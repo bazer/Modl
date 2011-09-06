@@ -45,12 +45,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\CacheAttribute.cs" />
     <Compile Include="Attributes\IdAttribute.cs" />
     <Compile Include="Attributes\TableAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
     <Compile Include="DataAccess\Materializer.cs" />
     <Compile Include="DataAccess\WorkPackage.cs" />
-    <Compile Include="Cache\CacheManager.cs" />
+    <Compile Include="Cache\CacheConfig.cs" />
     <Compile Include="DataAccess\AsyncDbAccess.cs" />
     <Compile Include="Cache\StaticCache.cs" />
     <Compile Include="DataAccess\AsyncWorker.cs" />

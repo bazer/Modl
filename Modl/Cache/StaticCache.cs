@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System;
 using System.Linq.Expressions;
 using System.Collections.Concurrent;
+using Modl.Fields;
 
 namespace Modl.Cache
 {
@@ -40,7 +41,7 @@ namespace Modl.Cache
         static StaticCache()
         {
             Initialize();
-            CacheManager.RegisterClearMethod(Clear);
+            CacheConfig.RegisterClearMethod(Clear);
         }
 
         internal static void Initialize()
@@ -131,7 +132,7 @@ namespace Modl.Cache
 
             foreach (var m in cacheList)
             {
-                if (!m.IsIdLoaded || !resultList.Contains(m.Id))
+                if (/*!m.IsIdLoaded ||*/ !resultList.Contains(m.Id))
                 {
                     if (writeDebugText)
                         Console.WriteLine("[{0}] Cache Return", database.Name);
@@ -160,7 +161,7 @@ namespace Modl.Cache
 
             foreach (var m in cacheList.Where(q))
             {
-                if (!m.IsIdLoaded || !resultList.Contains(m.Id))
+                if (/*!m.IsIdLoaded ||*/ !resultList.Contains(m.Id))
                 {
                     if (writeDebugText)
                         Console.WriteLine("[{0}] Cache Return: {1}", database.Name, m.Id);
@@ -184,7 +185,7 @@ namespace Modl.Cache
             if (writeDebugText)
                 Console.WriteLine("[{0}] Cache Add: {1}", database.Name, id);
 
-            if (Config.CacheLevel == CacheLevel.On)
+            if (Statics<M, IdType>.CacheLevel == CacheLevel.On)
             {
                 deleted[database].TryRemove(id);
                 cache[database].GetOrAdd(id, instance);
@@ -203,7 +204,7 @@ namespace Modl.Cache
             if (writeDebugText)
                 Console.WriteLine("[{0}] Cache AddPreliminary", database.Name);
 
-            if (Config.CacheLevel == CacheLevel.On)
+            if (Statics<M, IdType>.CacheLevel == CacheLevel.On)
             {
                 preliminaryCache[database].Add(instance);
             }
@@ -214,7 +215,7 @@ namespace Modl.Cache
             if (writeDebugText)
                 Console.WriteLine("[{0}] Cache Delete: {1}", database.Name, id);
 
-            if (Config.CacheLevel == CacheLevel.On)
+            if (Statics<M, IdType>.CacheLevel == CacheLevel.On)
             {
                 deleted[database].Add(id);
                 M m;
@@ -227,7 +228,7 @@ namespace Modl.Cache
             if (writeDebugText)
                 Console.WriteLine("[{0}] Cache DeleteAll", database.Name);
 
-            if (Config.CacheLevel == CacheLevel.On)
+            if (Statics<M, IdType>.CacheLevel == CacheLevel.On)
             {
                 deleted[database] = new ConcurrentHashSet<IdType>(new Select<M, IdType>(database).GetMaterializer().GetIds());
                 deleted[database].AddRange(AllInCache(database).Select(x => x.Id));
