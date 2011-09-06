@@ -71,6 +71,22 @@ namespace Modl.Query
             return where;
         }
 
+        public Q WhereNotAny(IEnumerable<M> collection)
+        {
+            foreach (var m in collection)
+                Where(Modl<M, IdType>.IdName).NotEqualTo(m.Id);
+
+            return (Q)this;
+        }
+
+        public Q WhereNotAny(IEnumerable<IdType> collection)
+        {
+            foreach (var id in collection)
+                Where(Modl<M, IdType>.IdName).NotEqualTo(id);
+
+            return (Q)this;
+        }
+
         protected Sql GetWhere(Sql sql, string paramPrefix)
         {
             int length = whereList.Count;

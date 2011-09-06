@@ -33,12 +33,9 @@ namespace Modl.Cache
     {
         private const bool writeDebugText = false;
 
-        private static readonly object deleteLock = new object();
-        private static readonly object preliminaryLock = new object();
-
         private static ConcurrentDictionary<Database, ConcurrentDictionary<IdType, M>> cache = new ConcurrentDictionary<Database, ConcurrentDictionary<IdType, M>>();
-        private static ConcurrentDictionary<Database, HashSet<IdType>> deleted = new ConcurrentDictionary<Database, HashSet<IdType>>();
-        private static ConcurrentDictionary<Database, HashSet<M>> preliminaryCache = new ConcurrentDictionary<Database, HashSet<M>>();
+        private static ConcurrentDictionary<Database, ConcurrentHashSet<M>> preliminaryCache = new ConcurrentDictionary<Database, ConcurrentHashSet<M>>();
+        private static ConcurrentDictionary<Database, ConcurrentHashSet<IdType>> deleted = new ConcurrentDictionary<Database, ConcurrentHashSet<IdType>>();
 
         static StaticCache()
         {
@@ -51,42 +48,28 @@ namespace Modl.Cache
             foreach (var database in Database.GetAll())
             {
                 cache.TryAdd(database, new ConcurrentDictionary<IdType, M>());
-
-                lock (deleteLock)
-                    deleted.TryAdd(database, new HashSet<IdType>());
-
-                lock (preliminaryLock)
-                    preliminaryCache.TryAdd(database, new HashSet<M>());
+                deleted.TryAdd(database, new ConcurrentHashSet<IdType>());
+                preliminaryCache.TryAdd(database, new ConcurrentHashSet<M>());
             }
-
-            
         }
 
         internal static void Clear()
         {
             cache.Clear();
-
-            lock (deleteLock)
-                deleted.Clear();
-
-            lock (preliminaryLock)
-                preliminaryCache.Clear();
+            deleted.Clear();
+            preliminaryCache.Clear();
 
             Initialize();
         }
 
-        //internal static bool CacheContains(IdType id, Database database)
-        //{
-        //    return cache.ContainsKey(database) && cache[database].ContainsKey(id);
-        //}
+        internal static bool Contains(IdType id, Database database)
+        {
+            return cache[database].ContainsKey(id);
+        }
 
         internal static bool DeletedContains(IdType id, Database database)
         {
-            //lock (workLock)
-            //{
-            lock (deleteLock)
-                return deleted[database].Contains(id);
-            //}
+            return deleted[database].Contains(id);
         }
 
         internal static M Get(IdType id, Database database)
@@ -131,47 +114,28 @@ namespace Modl.Cache
             if (writeDebugText)
                 Console.WriteLine("[{0}] Cache GetAll", database.Name);
 
-            var listFromDb = new Select<M, IdType>(database).GetAllAsync(false);
+            var cacheList = AllInCache(database);
+            var resultList = new HashSet<IdType>();
 
-            //HashSet<IdType> list = new HashSet<IdType>();
-
-            foreach (var m in cache[database].Values)
+            foreach (var m in new Select<M, IdType>(database).WhereNotAny(cacheList.Where(x => x.IsIdLoaded)).WhereNotAny(deleted[database]).GetAll())
             {
-                if (!DeletedContains(m.Id, database))
-                {
-                    //Add(m.Id, m, database);
-
-                    //list.Add(m.Id);
-                    if (writeDebugText)
-                        Console.WriteLine("[{0}] Cache Return: {1}", database.Name, m.Id);
-                    yield return m;
-                }
-            }
-
-            List<M> prel;
-            lock (preliminaryLock)
-            {
-                prel = preliminaryCache[database].ToList();
-            }
-
-            foreach (var m in prel)
-            {
-                //list.Add(m.Id);
                 if (writeDebugText)
-                    Console.WriteLine("[{0}] Prel Return: {1}", database.Name, m.Id);
+                    Console.WriteLine("[{0}] Cache calling Add: {1}", database.Name, m.Id);
+                Add(m.Id, m, database);
+                if (writeDebugText)
+                    Console.WriteLine("[{0}] DB Return: {1}", database.Name, m.Id);
                 yield return m;
+
+                resultList.Add(m.Id);
             }
 
-            var list = AllInCache(database);
-            foreach (var m in listFromDb.Result)
+            foreach (var m in cacheList)
             {
-                if (!list.Contains(m.Id) && !DeletedContains(m.Id, database))
+                if (!m.IsIdLoaded || !resultList.Contains(m.Id))
                 {
                     if (writeDebugText)
-                        Console.WriteLine("[{0}] Cache calling Add: {1}", database.Name, m.Id);
-                    Add(m.Id, m, database);
-                    if (writeDebugText)
-                        Console.WriteLine("[{0}] DB Return: {1}", database.Name, m.Id);
+                        Console.WriteLine("[{0}] Cache Return", database.Name);
+
                     yield return m;
                 }
             }
@@ -183,51 +147,34 @@ namespace Modl.Cache
                 Console.WriteLine("[{0}] Cache GetAllWhere: {1}", database.Name, query.ToString());
 
             var q = query.Compile();
-            //HashSet<IdType> list = new HashSet<IdType>();
+            var cacheList = AllInCache(database);
+            var resultList = new HashSet<IdType>();
 
-            foreach (var m in cache[database].Values.Where(q))
+            foreach (var m in new Select<M, IdType>(database, query).WhereNotAny(cacheList.Where(x => x.IsIdLoaded)).WhereNotAny(deleted[database]).GetAll())
             {
-                if (!DeletedContains(m.Id, database))
-                {
-                    //Add(m.Id, m, database);
-                    //list.Add(m.Id);
-                    yield return m;
-                }
-            }
-
-            List<M> prel;
-            lock (preliminaryLock)
-            {
-                prel = preliminaryCache[database].Where(q).ToList();
-            }
-
-            foreach (var m in prel)
-            {
-                //list.Add(m.Id);
+                Add(m.Id, m, database);
                 yield return m;
+
+                resultList.Add(m.Id);
             }
 
-            var list = AllInCache(database);
-            foreach (var m in new Select<M, IdType>(database, query).GetAll())
+            foreach (var m in cacheList.Where(q))
             {
-                if (!list.Contains(m.Id) && !DeletedContains(m.Id, database))
+                if (!m.IsIdLoaded || !resultList.Contains(m.Id))
                 {
-                    Add(m.Id, m, database);
+                    if (writeDebugText)
+                        Console.WriteLine("[{0}] Cache Return: {1}", database.Name, m.Id);
+
                     yield return m;
                 }
             }
         }
 
-        private static HashSet<IdType> AllInCache(Database database)
+        private static HashSet<M> AllInCache(Database database)
         {
-            HashSet<IdType> list = new HashSet<IdType>();
-
+            var list = new HashSet<M>(preliminaryCache[database]);
             foreach (var m in cache[database].Values)
-                //if (!DeletedContains(m.Id, database))
-                    list.Add(m.Id);
-
-            foreach (var m in preliminaryCache[database].ToList())
-                list.Add(m.Id);
+                list.Add(m);
 
             return list;
         }
@@ -239,19 +186,15 @@ namespace Modl.Cache
 
             if (Config.CacheLevel == CacheLevel.On)
             {
+                deleted[database].TryRemove(id);
                 cache[database].GetOrAdd(id, instance);
+                preliminaryCache[database].TryRemove(instance);
 
-                if (DeletedContains(id, database))
-                {
-                    lock (deleteLock)
-                        deleted[database].Remove(id);
-                }
+                //if (deleted[database].Contains(id))
+                //    deleted[database].Remove(id);
 
-                lock (preliminaryLock)
-                {
-                    if (preliminaryCache[database].Contains(instance))
-                        preliminaryCache[database].Remove(instance);
-                }
+                //if (preliminaryCache[database].Contains(instance))
+                //    preliminaryCache[database].Remove(instance);
             }
         }
 
@@ -262,10 +205,7 @@ namespace Modl.Cache
 
             if (Config.CacheLevel == CacheLevel.On)
             {
-                lock (preliminaryLock)
-                {
-                    preliminaryCache[database].Add(instance);
-                }
+                preliminaryCache[database].Add(instance);
             }
         }
 
@@ -276,19 +216,9 @@ namespace Modl.Cache
 
             if (Config.CacheLevel == CacheLevel.On)
             {
-                //if (CacheContains(id, database))
-                //    cache[database].Remove(id);
+                deleted[database].Add(id);
                 M m;
                 cache[database].TryRemove(id, out m);
-
-                lock (deleteLock)
-                {
-                    //if (!deleted.ContainsKey(database))
-                    //    deleted.Add(database, new HashSet<IdType>());
-
-                    deleted[database].Add(id);
-                }
-
             }
         }
 
@@ -299,33 +229,19 @@ namespace Modl.Cache
 
             if (Config.CacheLevel == CacheLevel.On)
             {
+                deleted[database] = new ConcurrentHashSet<IdType>(new Select<M, IdType>(database).GetMaterializer().GetIds());
+                deleted[database].AddRange(AllInCache(database).Select(x => x.Id));
 
+                //foreach (var m in cache[database].Values)
+                //    deleted[database].Add(m.Id);
 
-                lock (deleteLock)
-                {
-                    //if (!deleted.ContainsKey(database))
-                    //    deleted.Add(database, new HashSet<IdType>());
+                //foreach (var m in preliminaryCache[database])
+                //    deleted[database].Add(m.Id);
 
-                    deleted[database] = new HashSet<IdType>(new Select<M, IdType>(database).GetMaterializer().GetIds()); //(IdType)Convert.ChangeType(x.Id, typeof(IdType))));
-
-                    foreach (var m in cache[database].Values)
-                        deleted[database].Add(m.Id);
-
-                    foreach (var m in preliminaryCache[database])
-                        deleted[database].Add(m.Id);
-                }
-
-                
                 cache[database].Clear();
-
-                lock (preliminaryLock)
-                {
-                    preliminaryCache[database].Clear();
-                }
+                preliminaryCache[database].Clear();
             }
         }
-
-
 
         //private static M ReturnNullOrThrow(bool throwExceptionOnNotFound)
         //{

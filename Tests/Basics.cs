@@ -338,13 +338,15 @@ namespace Tests
 
             Assert.AreEqual(10, Car.GetAll().Count());
 
-            foreach (var car in Car.GetAll())
+            List<Task<Car>> carsAsync = new List<Task<Car>>();
+            var cars = Car.GetAll().ToList();
+            foreach (var car in cars)
+                carsAsync.Add(Car.GetAsync(car.Id));
+
+            for (int i = 0; i < cars.Count; i++)
             {
-                var aCar = Car.GetAsync(car.Id);
-
-                AssertEqual(car, aCar.Result);
-
-                aCar.Result.Delete();
+                AssertEqual(cars[i], carsAsync[i].Result);
+                carsAsync[i].Result.Delete();
             }
 
             Assert.AreEqual(0, Car.GetAll().Count());

@@ -62,6 +62,8 @@ namespace Modl.Query
             //    where.Parameters);
         }
 
+        
+
         public override int ParameterCount
         {
             get { return whereList.Count; }

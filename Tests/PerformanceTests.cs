@@ -27,7 +27,7 @@ namespace Tests
             };
         }
         
-        [TestMethod]
+        //[TestMethod]
         public void RunAllTest()
         {
             var watch = Stopwatch.StartNew();

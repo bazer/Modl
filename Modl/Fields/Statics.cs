@@ -84,8 +84,8 @@ namespace Modl.Fields
                     { 
                         instance.Store.SetValue(property.Name, defaultValue, true);
 
-                        var getDelegate = (Func<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeGetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true), instance });
-                        var setDelegate = (Action<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeSetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true), instance });
+                        var getDelegate = (Func<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeGetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true) });
+                        var setDelegate = (Action<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeSetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true) });
                         EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
                         
                     }
@@ -127,15 +127,15 @@ namespace Modl.Fields
         //        property.SetValue(instance, instance.Store.GetValue<object>(property.Name), null);
         //}
 
-        public static Func<M, object> MakeGetDelegate<T>(MethodInfo @get, Modl<M, IdType> instance)
+        public static Func<M, object> MakeGetDelegate<T>(MethodInfo method)
         {
-            var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, @get);
+            var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, method);
             return m => f(m);
         }
 
-        public static Action<M, object> MakeSetDelegate<T>(MethodInfo @get, Modl<M, IdType> instance)
+        public static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
         {
-            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, @get);
+            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
             return (m, t) => f(m, (T)t);
         }
 
