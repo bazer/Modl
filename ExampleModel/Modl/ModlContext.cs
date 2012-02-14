@@ -20,14 +20,22 @@ namespace ExampleModel
             this.db = Database.Get(databaseName);
         }
 
+        public Car GetCar(int id)
+        {
+            return DbModl<Car>.Get(id);
+        }
+
         public IQueryable<Car> Cars
         {
-            get { return Car.Query(db); }
+            get 
+            {
+                return DbModl<Car>.Query(db);
+            }
         }
 
         public IQueryable<Manufacturer> Manufacturers
         {
-            get { return Manufacturer.Query(db); ; }
+            get { return DbModl<Manufacturer>.Query(db); }
         }
     }
 }

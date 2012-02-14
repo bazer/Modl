@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -26,8 +26,21 @@ namespace ExampleModel
 {
     [Table("Manufacturers")]
     [Id("ManufacturerID")]
-    public class Manufacturer : Modl<Manufacturer, Guid>
+    public class Manufacturer : IDbModl<Manufacturer>
     {
+        
+        //[Id("ManufacturerID")]
+        public Guid ManufacturerID { get; set; }
         public string Name { get; set; }
+
+        //public object GetId()
+        //{
+        //    return ManufacturerID;
+        //}
+
+        //public void SetId(object id)
+        //{
+        //    ManufacturerID = (Guid)id;
+        //}
     }
 }

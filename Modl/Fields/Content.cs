@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -27,28 +27,45 @@ using Modl.Query;
 
 namespace Modl.Fields
 {
-    interface IStore
+    interface IContent
     {
         T GetValue<T>(string name);
         void SetValue<T>(string name, T value, bool emptyProperty = false);
     }
 
-    internal class Store<M, IdType> : IStore
-        where M : Modl<M, IdType>, new()
+    internal class Content<M> : IContent
+        where M : IModl<M>, new()
     {
-        protected Modl<M, IdType> instance;
+        protected IModl<M> instance;
 
-        protected IdType id;
-        internal IdType Id { get { return id; } set { id = value; } }
+        //protected object id;
+        //internal object Id { get { return id; } set { id = value; } }
 
-        public DynamicFields<M, IdType> DynamicFields;
+        public bool IsNew { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool AutomaticId { get; set; }
+
+        //public DynamicFields<M> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
 
-        public Store(Modl<M, IdType> instance)
+        public Content(IModl<M> instance)
         {
             this.instance = instance;
+            IsNew = true;
+            AutomaticId = true;
+            //DynamicFields = new DynamicFields<M, IdType>(this);
+        }
 
-            DynamicFields = new DynamicFields<M, IdType>(this);
+        public Database instanceDbProvider = null;
+        public Database Database
+        {
+            get
+            {
+                if (instanceDbProvider == null)
+                    instanceDbProvider = Statics<M>.DefaultDatabase;
+
+                return instanceDbProvider;
+            }
         }
 
         public bool IsDirty
@@ -62,12 +79,12 @@ namespace Modl.Fields
 
         protected void ReadFromEmptyProperties()
         {
-            Statics<M, IdType>.ReadFromEmptyProperties(instance);
+            Statics<M>.ReadFromEmptyProperties(instance);
         }
 
         protected void WriteToEmptyProperties()
         {
-            Statics<M, IdType>.WriteToEmptyProperties(instance);
+            Statics<M>.WriteToEmptyProperties(instance);
         }
 
         public T GetValue<T>(string name)
@@ -101,7 +118,8 @@ namespace Modl.Fields
 
         internal void Load(DbDataReader reader)
         {
-            id = Helper.GetSafeValue<IdType>(reader, Statics<M, IdType>.IdName);
+            //id = Helper.GetSafeValue<object>(reader, Statics<M>.IdName);
+
 
             var keys = Fields.Keys.ToList();
 
@@ -112,13 +130,13 @@ namespace Modl.Fields
                 //if (Fields[key].Type.GetInterface("IModl") != null)
                 //    SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
                 //else
-                SetField(key, Helper.GetSafeValue(reader, key, Statics<M, IdType>.GetFieldType(key)));
+                SetField(key, Helper.GetSafeValue(reader, key, Statics<M>.GetFieldType(key)));
             }
 
             WriteToEmptyProperties();
         }
 
-        internal void BaseAddSaveFields(Change<M, IdType> statement)
+        internal IEnumerable<KeyValuePair<string, object>> GetFields(bool includeId = false)
         {
             ReadFromEmptyProperties();
 
@@ -136,8 +154,9 @@ namespace Modl.Fields
                 //        statement.With(field.Key, value.Id);
                 //}
                 //else 
-                if (field.Value.IsDirty)
-                    statement.With(field.Key, field.Value.Value);
+                if (field.Value.IsDirty && (includeId || field.Key != Statics<M>.IdName))
+                    yield return new KeyValuePair<string, object>(field.Key, field.Value.Value);
+                    //statement.With(field.Key, field.Value.Value);
             }
         }
 

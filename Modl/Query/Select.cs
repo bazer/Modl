@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -29,8 +29,8 @@ using System.Threading.Tasks;
 
 namespace Modl.Query
 {
-    public class Select<M, IdType> : Query<M, IdType, Select<M, IdType>>
-        where M : Modl<M, IdType>, new()
+    public class Select<M> : Query<M, Select<M>>
+        where M : IDbModl<M>, new()
     {
         Expression expression;
 
@@ -44,14 +44,14 @@ namespace Modl.Query
             : base(database)
         {
             this.expression = expression;
-            var parser = new LinqParser<M, IdType, Select<M, IdType>>(this);
+            var parser = new LinqParser<M, Select<M>>(this);
             parser.ParseTree(expression);
         }
 
         public override Sql ToSql(string paramPrefix)
         {
             return GetWhere(
-                new Sql().AddFormat("SELECT * FROM {0} \r\n", Modl<M, IdType>.Table),
+                new Sql().AddFormat("SELECT * FROM {0} \r\n", DbModl<M>.Table),
                 paramPrefix);
 
 
@@ -76,17 +76,17 @@ namespace Modl.Query
 
         public M Get()
         {
-            return new Materializer<M, IdType>(Execute(), DatabaseProvider).ReadAndClose();
+            return new Materializer<M>(Execute(), DatabaseProvider).ReadAndClose();
         }
 
         public IEnumerable<M> GetAll()
         {
-            return new Materializer<M, IdType>(Execute(), DatabaseProvider).GetAll();
+            return new Materializer<M>(Execute(), DatabaseProvider).GetAll();
         }
 
-        public Materializer<M, IdType> GetMaterializer()
+        public Materializer<M> GetMaterializer()
         {
-            return new Materializer<M, IdType>(Execute(), DatabaseProvider);
+            return new Materializer<M>(Execute(), DatabaseProvider);
         }
 
         public Task<DbDataReader> ExecuteAsync(bool onQueue = true)
@@ -96,17 +96,17 @@ namespace Modl.Query
 
         public Task<M> GetAsync(bool onQueue = true)
         {
-            return Materializer<M, IdType>.Async(ExecuteAsync(onQueue), DatabaseProvider).ContinueWith(x => x.Result.ReadAndClose());
+            return Materializer<M>.Async(ExecuteAsync(onQueue), DatabaseProvider).ContinueWith(x => x.Result.ReadAndClose());
         }
 
         public Task<IEnumerable<M>> GetAllAsync(bool onQueue = true)
         {
-            return Materializer<M, IdType>.Async(ExecuteAsync(onQueue), DatabaseProvider).ContinueWith(x => x.Result.GetAll());
+            return Materializer<M>.Async(ExecuteAsync(onQueue), DatabaseProvider).ContinueWith(x => x.Result.GetAll());
         }
 
-        public Task<Materializer<M, IdType>> GetMaterializerAsync(bool onQueue = true)
+        public Task<Materializer<M>> GetMaterializerAsync(bool onQueue = true)
         {
-            return Materializer<M, IdType>.Async(ExecuteAsync(onQueue), DatabaseProvider);
+            return Materializer<M>.Async(ExecuteAsync(onQueue), DatabaseProvider);
         }
     }
 }

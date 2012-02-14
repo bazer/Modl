@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -24,8 +24,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public abstract class QueryPart<M, IdType>
-        where M : Modl<M, IdType>, new()
+    public abstract class QueryPart<M>
+        where M : IDbModl<M>, new()
     {
         public abstract Sql GetCommandString(Sql sql, string prefix, int number);
         public abstract Sql GetCommandParameter(Sql sql, string prefix, int number);

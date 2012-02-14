@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -26,8 +26,8 @@ using Modl.Query;
 
 namespace Modl.Linq
 {
-    public class LinqQuery<M, IdType> : IQueryable<M>
-        where M : Modl<M, IdType>, new()
+    public class LinqQuery<M> : IQueryable<M>
+        where M : IDbModl<M>, new()
     {
         Database database;
         Expression expression;
@@ -37,14 +37,14 @@ namespace Modl.Linq
         { 
             this.database = database;
             this.expression = Expression.Constant(this);
-            this.provider = new LinqQueryProvider<M, IdType>(database);
+            this.provider = new LinqQueryProvider<M>(database);
         }
 
         public LinqQuery(Database database, Expression expression)
         {
             this.database = database;
             this.expression = expression;
-            this.provider = new LinqQueryProvider<M, IdType>(database);
+            this.provider = new LinqQueryProvider<M>(database);
         }
 
         protected IEnumerator<M> GetList()
@@ -54,7 +54,7 @@ namespace Modl.Linq
             //else
             //    return Modl<M, IdType>.GetAllWhere((Expression<Func<M, bool>>)expression, database).GetEnumerator();
 
-            return new Select<M, IdType>(database, expression).GetAllAsync().Result.GetEnumerator();
+            return new Select<M>(database, expression).GetAllAsync().Result.GetEnumerator();
         }
 
         public IEnumerator<M> GetEnumerator()

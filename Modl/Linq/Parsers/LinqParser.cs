@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -25,17 +25,17 @@ using Modl.Query;
 
 namespace Modl.Linq.Parsers
 {
-    internal class LinqParser<M, IdType, Q> : ExpressionVisitor
-        where M : Modl<M, IdType>, new()
-        where Q : Query<M, IdType, Q>
+    internal class LinqParser<M, Q> : ExpressionVisitor
+        where M : IDbModl<M>, new()
+        where Q : Query<M, Q>
     {
-        protected Query<M, IdType, Q> select;
-        protected WhereParser<M, IdType, Q> whereParser;
+        protected Query<M, Q> select;
+        protected WhereParser<M, Q> whereParser;
 
-        internal LinqParser(Query<M, IdType, Q> select) 
+        internal LinqParser(Query<M, Q> select) 
         {
             this.select = select;
-            whereParser = new WhereParser<M, IdType, Q>(select);
+            whereParser = new WhereParser<M, Q>(select);
         }
 
         internal void ParseTree(Expression expression)

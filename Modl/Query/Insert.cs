@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -25,8 +25,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public class Insert<M, IdType> : Change<M, IdType>
-        where M : Modl<M, IdType>, new()
+    public class Insert<M> : Change<M>
+        where M : IDbModl<M>, new()
     {
         public Insert(Database database) : base(database) { }
 
@@ -77,7 +77,7 @@ namespace Modl.Query
         public override Sql ToSql(string paramPrefix)
         {
             return GetWith(
-                new Sql().AddFormat("INSERT INTO {0} ", Modl<M, IdType>.Table),
+                new Sql().AddFormat("INSERT INTO {0} ", DbModl<M>.Table),
                 paramPrefix);
 
             //var with = GetWith(paramPrefix);

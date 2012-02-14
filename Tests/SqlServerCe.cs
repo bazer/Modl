@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -28,6 +28,7 @@ using System.Diagnostics;
 namespace Tests
 {
     [TestClass]
+    [DeploymentItem("SQLCE4.sdf")]
     public class SqlServerCe
     {
         string databaseName = "SqlServerCeDb";

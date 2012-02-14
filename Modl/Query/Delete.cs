@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -27,8 +27,8 @@ using Modl.Linq.Parsers;
 
 namespace Modl.Query
 {
-    public class Delete<M, IdType> : Query<M, IdType, Delete<M, IdType>>
-        where M : Modl<M, IdType>, new()
+    public class Delete<M> : Query<M, Delete<M>>
+        where M : IDbModl<M>, new()
     {
         Expression expression;
 
@@ -38,7 +38,7 @@ namespace Modl.Query
             : base(database)
         {
             this.expression = expression;
-            var parser = new LinqParser<M, IdType, Delete<M, IdType>>(this);
+            var parser = new LinqParser<M, Delete<M>>(this);
             parser.ParseTree(expression);
         }
 
@@ -47,7 +47,7 @@ namespace Modl.Query
             //var sql = new Sql().AddFormat("DELETE FROM {0} \r\n", Modl<M, IdType>.Table);
 
             return GetWhere(
-                new Sql().AddFormat("DELETE FROM {0} \r\n", Modl<M, IdType>.Table), 
+                new Sql().AddFormat("DELETE FROM {0} \r\n", DbModl<M>.Table), 
                 paramPrefix);
 
 

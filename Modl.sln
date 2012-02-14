@@ -8,18 +8,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{760E80C2-5BBD-4691-9522-D7D48C8C886E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B451B8FA-1609-4205-A4EB-C130227FF729}"
-	ProjectSection(SolutionItems) = preProject
-		Local.testsettings = Local.testsettings
-		Modl.vsmdi = Modl.vsmdi
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modl.Mvc", "Modl.MVC\Modl.Mvc.csproj", "{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modl.Mvc", "Modl.Mvc\Modl.Mvc.csproj", "{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Modl.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

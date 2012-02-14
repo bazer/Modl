@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -52,19 +52,20 @@ namespace Modl.DataAccess
             return true;
 		}
 
-		static public T ExecuteScalar<T>(params IQuery[] queries)
+		static public object ExecuteScalar(Type type, params IQuery[] queries)
 		{
-			return ExecuteScalar<T>(new List<IQuery>(queries));
+			return ExecuteScalar(type, new List<IQuery>(queries));
 		}
 
-		static public T ExecuteScalar<T>(List<IQuery> queries)
+        static public object ExecuteScalar(Type type, List<IQuery> queries)
 		{
-			return ExecuteScalar<T>(Database.GetDbCommands(queries));
+            return ExecuteScalar(type, Database.GetDbCommands(queries));
 		}
 
-		static public T ExecuteScalar<T>(List<IDbCommand> commands)
+        static public object ExecuteScalar(Type type, List<IDbCommand> commands)
 		{
-			T result = default(T);
+			//T result = default(T);
+            object result = null;
 			
 			for (int i = 0; i < commands.Count; i++)
 			{
@@ -76,8 +77,8 @@ namespace Modl.DataAccess
                 if (i + 1 == commands.Count || commands[i].Connection != commands[i + 1].Connection)
                     commands[i].Connection.Close();
 
-				if (o != null)
-					result = (T)Convert.ChangeType(o, typeof(T));
+				if (o != null && o != DBNull.Value)
+					result = Convert.ChangeType(o, type);
 			}
 
 			return result;

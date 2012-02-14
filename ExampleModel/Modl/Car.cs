@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -25,14 +25,15 @@ using Modl;
 namespace ExampleModel
 {
     [Table("Cars")]
-    [Id("Id")]
+    //[Id("Id")]
     [Cache(CacheLevel.Off, Timeout.Never)]
-    public class Car : Modl<Car, int>
+    public class Car : IDbModl<Car>, ITxtModl<Car>, IMvcModl<Car>
     {
+        [Id("Id")]
+        public int Id { get; set; }
+
         public string Name { get; set; }
         public string Manufacturer { get; set; }
-
-        //public string Name { get { return Fields.Name; } set { Fields.Name = value; } }
         //public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -50,7 +50,8 @@ namespace Modl.Fields
             set
             {
                 newValue = value;
-                isDirty = oldValue != newValue;
+                isDirty = !object.Equals(oldValue, newValue);
+                //isDirty = oldValue != newValue;
                 //isDirty = !EqualityComparer<T>.Default.Equals(oldValue, newValue);
             }
         }

@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Modl.DataAccess
 {
-    public class Materializer<M, IdType> : IDisposable
-        where M : Modl<M, IdType>, new()
+    public class Materializer<M> : IDisposable
+        where M : IDbModl<M>, new()
     {
         private DbDataReader reader;
         private Database database;
@@ -17,14 +17,14 @@ namespace Modl.DataAccess
         public bool IsDone { get { return reader.IsClosed; } }
         //public bool IsDone { get; private set; }
 
-        private IdType id;
+        private object id;
         private bool isIdSet = false;
 
-        public static Task<Materializer<M, IdType>> Async(Task<DbDataReader> reader, Database database)
+        public static Task<Materializer<M>> Async(Task<DbDataReader> reader, Database database)
         {
             return reader.ContinueWith(r =>
             {
-                return new Materializer<M, IdType>(r.Result, database);
+                return new Materializer<M>(r.Result, database);
             });
         }
 
@@ -37,14 +37,14 @@ namespace Modl.DataAccess
         }
 
 
-        public IdType Peak()
+        public object Peak()
         {
             if (IsDone)
                 throw new Exception("Reader is closed");
 
             if (!isIdSet)
             {
-                id = Helper.GetSafeValue<IdType>(reader, Statics<M, IdType>.IdName);
+                id = Helper.GetSafeValue<object>(reader, Statics<M>.IdName);
                 isIdSet = true;
             }
 
@@ -60,16 +60,16 @@ namespace Modl.DataAccess
             //    return null;
             try
             {
-                var m = Modl<M, IdType>.New(database);
-                m.Store.Load(reader);
+                var m = DbModl<M>.New(database);
+                m.GetContent().Load(reader);
                 //Statics<M, IdType>.WriteToEmptyProperties(m);
-                m.isNew = false;
+                m.GetContent().IsNew = false;
                 return m;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error on read: {0}\r\n{1}", e.Message, e.StackTrace);
-                return null;
+                return default(M);
             }
             finally
             {
@@ -80,7 +80,7 @@ namespace Modl.DataAccess
         public M ReadAndClose()
         {
             if (IsDone)
-                return null;
+                return default(M);
                 //throw new Exception("Reader is closed");
 
             var m = Read();
@@ -90,7 +90,7 @@ namespace Modl.DataAccess
         }
 
 
-        public IEnumerable<IdType> GetIds()
+        public IEnumerable<object> GetIds()
         {
             //if (IsDone)
             //    throw new Exception("Reader is closed");

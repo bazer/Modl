@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -22,33 +22,34 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using Modl.Exceptions;
+using Modl.Fields;
 
 namespace Modl.Linq
 {
     internal class LinqHelper
     {
-        internal static KeyValuePair<string, object> GetFields<T, IdType>(BinaryExpression node) where T : Modl<T, IdType>, new()
+        internal static KeyValuePair<string, object> GetFields<T>(BinaryExpression node) where T : IModl<T>, new()
         {
             if (node.Left is ConstantExpression && node.Right is ConstantExpression)
                 throw new InvalidQueryException("Unable to compare 2 constants.");
 
             if (node.Left is MemberExpression)
-                return GetValues<T, IdType>(node.Left, node.Right);
+                return GetValues<T>(node.Left, node.Right);
             else
-                return GetValues<T, IdType>(node.Right, node.Left);
+                return GetValues<T>(node.Right, node.Left);
         }
 
-        internal static KeyValuePair<string, object> GetValues<T, IdType>(Expression field, Expression value) where T : Modl<T, IdType>, new()
+        internal static KeyValuePair<string, object> GetValues<T>(Expression field, Expression value) where T : IModl<T>, new()
         {
-            return new KeyValuePair<string, object>((string)GetValue<T, IdType>(field), GetValue<T, IdType>(value));
+            return new KeyValuePair<string, object>((string)GetValue<T>(field), GetValue<T>(value));
         }
 
-        internal static object GetValue<T, IdType>(Expression expression) where T : Modl<T, IdType>, new()
+        internal static object GetValue<T>(Expression expression) where T : IModl<T>, new()
         {
             if (expression is ConstantExpression)
                 return ((ConstantExpression)expression).Value;
             else if (expression is MemberExpression)
-                return Modl<T, IdType>.GetFieldName(((MemberExpression)expression).Member.Name);
+                return Statics<T>.GetFieldName(((MemberExpression)expression).Member.Name);
             //else if (expression.NodeType == ExpressionType.Lambda)
             //    return GetValue<T>(((LambdaExpression)expression).Body);
             else

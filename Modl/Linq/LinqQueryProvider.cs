@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -25,8 +25,8 @@ using System.Reflection;
 
 namespace Modl.Linq
 {
-    internal class LinqQueryProvider<M, IdType> : IQueryProvider
-         where M : Modl<M, IdType>, new()
+    internal class LinqQueryProvider<M> : IQueryProvider
+         where M : IDbModl<M>, new()
     {
         Database database;
 
@@ -37,25 +37,25 @@ namespace Modl.Linq
 
         public IQueryable<T> CreateQuery<T>(System.Linq.Expressions.Expression expression)
         {
-            return (IQueryable<T>)new LinqQuery<M, IdType>(database, expression);
+            return (IQueryable<T>)new LinqQuery<M>(database, expression);
 
            // return CreateNewQuery<T>(expression);    
         }
 
         public IQueryable CreateQuery(System.Linq.Expressions.Expression expression)
         {
-            return new LinqQuery<M, IdType>(database, expression);
+            return new LinqQuery<M>(database, expression);
         }
 
         public T Execute<T>(System.Linq.Expressions.Expression expression)
         {
-            return Helper.ConvertTo<T>(new Query.Select<M, IdType>(database, expression).GetAsync().Result);
+            return Helper.ConvertTo<T>(new Query.Select<M>(database, expression).GetAsync().Result);
             //return Helper.ConvertTo<T>(Modl<M>.Get(new Query.Select<M>(database, expression)));
         }
 
         public object Execute(System.Linq.Expressions.Expression expression)
         {
-            return new Query.Select<M, IdType>(database, expression).GetAsync().Result;
+            return new Query.Select<M>(database, expression).GetAsync().Result;
         }
 
         //return new LinqQuery<T>(database, expression);

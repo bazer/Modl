@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -26,13 +26,13 @@ using Modl.Exceptions;
 
 namespace Modl.Linq.Parsers
 {
-    internal class WhereParser<M, IdType, Q> : ExpressionVisitor
-        where M : Modl<M, IdType>, new()
-        where Q : Query<M, IdType, Q>
+    internal class WhereParser<M, Q> : ExpressionVisitor
+        where M : IDbModl<M>, new()
+        where Q : Query<M, Q>
     {
-        protected Query<M, IdType, Q> select;
+        protected Query<M, Q> select;
 
-        internal WhereParser(Query<M, IdType, Q> select)
+        internal WhereParser(Query<M, Q> select)
         {
             this.select = select;
         }
@@ -44,7 +44,7 @@ namespace Modl.Linq.Parsers
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var fields = LinqHelper.GetFields<M, IdType>(node);
+            var fields = LinqHelper.GetFields<M>(node);
 
             //IWhere<Select<M>> where = ((Select<M>)select).Where(fields.Key);
             var where = select.Where(fields.Key);

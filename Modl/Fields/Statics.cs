@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -25,10 +25,11 @@ using Modl.Cache;
 
 namespace Modl.Fields
 {
-    internal class Statics<M, IdType> where M : Modl<M, IdType>, new()
+    internal class Statics<M> where M : IModl<M>, new()
     {
         internal static string TableName;
         internal static string IdName;
+        internal static Type IdType;
         internal static CacheLevel CacheLevel;
         internal static int CacheTimeout;
 
@@ -36,6 +37,68 @@ namespace Modl.Fields
         private static Dictionary<string, Type> Types = new Dictionary<string, Type>();
         //private static List<PropertyInfo> EmptyProperties = new List<PropertyInfo>();
         private static List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>> EmptyProperties = new List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>>();
+
+        private static Dictionary<int, Content<M>> Contents = new Dictionary<int, Content<M>>();
+
+        private static Database staticDbProvider = null;
+
+
+        /// <summary>
+        /// The default database of this Modl entity. 
+        /// This is the same as Config.DefaultDatabase unless a value is specified.
+        /// Set to null to clear back to the value of Config.DefaultDatabase.
+        /// </summary>
+        public static Database DefaultDatabase
+        {
+            get
+            {
+                if (staticDbProvider == null)
+                    return Config.DefaultDatabase;
+
+                return staticDbProvider;
+            }
+            set
+            {
+                staticDbProvider = value;
+            }
+        }
+
+        static Statics()
+        {
+            Initialize(new M());
+        }
+
+        internal static Content<M> AddInstance(IModl<M> instance)
+        {
+            var content = new Content<M>(instance);
+            FillFields(content);
+            Contents.Add(instance.GetHashCode(), content);
+
+            return content;
+        }
+
+        internal static Content<M> GetContents(IModl<M> instance)
+        {
+            Content<M> content;
+            if (!Contents.TryGetValue(instance.GetHashCode(), out content))
+                content = AddInstance(instance);
+
+            return content;
+        }
+
+        internal static void SetId(IModl<M> instance, object value)
+        {
+            var content = GetContents(instance);
+            content.SetValue<object>(IdName, value);
+            content.AutomaticId = false;
+
+            WriteToEmptyProperties(instance, IdName);
+        }
+
+        internal static object GetId(IModl<M> instance)
+        {
+            return GetContents(instance).GetValue<object>(IdName);
+        }
 
         internal static void SetFieldName(string propertyName, string fieldName)
         {
@@ -57,7 +120,7 @@ namespace Modl.Fields
             return Types[fieldName];
         }
 
-        internal static void Initialize(Modl<M, IdType> instance)
+        internal static void Initialize(IModl<M> instance)
         {
             CacheLevel = CacheConfig.DefaultCacheLevel;
             CacheTimeout = CacheConfig.DefaultCacheTimeout;
@@ -81,49 +144,52 @@ namespace Modl.Fields
             if (string.IsNullOrEmpty(IdName))
                 IdName = "Id";
 
-
+            var content = GetContents(instance);
             foreach (PropertyInfo property in typeof(M).GetProperties())
             {
                 if (property.CanWrite)
                 {
-                    instance.Store.LastInsertedMemberName = null;
+                    content.LastInsertedMemberName = null;
 
                     object defaultValue = Helper.GetDefault(property.PropertyType);
                     property.SetValue(instance, defaultValue, null);
 
-                    if (instance.Store.LastInsertedMemberName == null)
-                    { 
-                        instance.Store.SetValue(property.Name, defaultValue, true);
+                    if (content.LastInsertedMemberName == null)
+                    {
+                        content.SetValue(property.Name, defaultValue, true);
 
-                        var getDelegate = (Func<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeGetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true) });
-                        var setDelegate = (Action<M, object>)typeof(Statics<M, IdType>).GetMethod("MakeSetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true) });
+                        var getDelegate = (Func<M, object>)typeof(Statics<M>).GetMethod("MakeGetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true) });
+                        var setDelegate = (Action<M, object>)typeof(Statics<M>).GetMethod("MakeSetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true) });
                         EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
                         
                     }
-                    
-                    SetFieldName(property.Name, instance.Store.LastInsertedMemberName);
-                    SetFieldType(instance.Store.LastInsertedMemberName, property.PropertyType);
+
+                    SetFieldName(property.Name, content.LastInsertedMemberName);
+                    SetFieldType(content.LastInsertedMemberName, property.PropertyType);
                 }
             }
+
+            IdType = GetFieldType(IdName);
         }
 
-        internal static void FillFields(Modl<M, IdType> instance)
+        internal static void FillFields(Content<M> content)
         {
             foreach (var field in Types)
-                instance.Store.SetValue(field.Key, Helper.GetDefault(field.Value));
+                content.SetValue(field.Key, Helper.GetDefault(field.Value));
         }
 
 
-        internal static void ReadFromEmptyProperties(Modl<M, IdType> instance)
+        internal static void ReadFromEmptyProperties(IModl<M> instance)
         {
             foreach (var property in EmptyProperties)
-                instance.Store.SetValue(property.Item1.Name, property.Item2((M)instance), true);
+                GetContents(instance).SetValue(property.Item1.Name, property.Item2((M)instance), true);
         }
 
-        internal static void WriteToEmptyProperties(Modl<M, IdType> instance)
+        internal static void WriteToEmptyProperties(IModl<M> instance, string propertyName = null)
         {
             foreach (var property in EmptyProperties)
-                property.Item3((M)instance, instance.Store.GetValue<object>(property.Item1.Name));
+                if (propertyName == null || property.Item1.Name == propertyName)
+                    property.Item3((M)instance, GetContents(instance).GetValue<object>(property.Item1.Name));
         }
 
         //internal static void ReadFromEmptyProperties(Modl<M, IdType> instance)
@@ -147,7 +213,7 @@ namespace Modl.Fields
         public static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
         {
             var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
-            return (m, t) => f(m, (T)t);
+            return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         }
 
     }

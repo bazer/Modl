@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -24,19 +24,19 @@ using Modl.DatabaseProviders;
 
 namespace Modl.Query
 {
-    public abstract class Change<M, IdType> : Query<M, IdType, Change<M, IdType>>
-        where M : Modl<M, IdType>, new()
+    public abstract class Change<M> : Query<M, Change<M>>
+        where M : IDbModl<M>, new()
     {
         public Change(Database database) : base(database) { }
 
         protected Dictionary<string, object> withList = new Dictionary<string, object>();
 
-        public Change<M, IdType> With(string key, string value)
+        public Change<M> With(string key, string value)
         {
             return With<string>(key, value);
         }
 
-        public Change<M, IdType> With<V>(string key, V value)
+        public Change<M> With<V>(string key, V value)
         {
             withList.Add(key, value);
             return this;

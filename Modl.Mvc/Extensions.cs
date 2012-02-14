@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -26,10 +26,10 @@ namespace Modl.Mvc
 {
     public static class Extensions
     {
-        public static IEnumerable<SelectListItem> AsSelectList<M, IdType>(this IEnumerable<M> list, Func<M, string> text, Func<M, string> value = null) where M : Modl<M, IdType>, new()
+        public static IEnumerable<SelectListItem> AsSelectList<M>(this IEnumerable<M> list, Func<M, string> text, Func<M, string> value = null) where M : IModl<M>, new()
         {
             if (value == null)
-                value = x => x.Id.ToString();
+                value = x => x.GetId().ToString();
 
             return from c in list
                    select new SelectListItem

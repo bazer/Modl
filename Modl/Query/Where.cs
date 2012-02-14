@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2011 Sebastian Öberg (https://github.com/bazer)
+Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
 
@@ -35,9 +35,9 @@ namespace Modl.Query
         SmallerThanOrEqual
     }
 
-    public class Where<M, IdType, Q> : QueryPart<M, IdType>
-        where M : Modl<M, IdType>, new()
-        where Q : Query<M, IdType, Q>
+    public class Where<M, Q> : QueryPart<M>
+        where M : IDbModl<M>, new()
+        where Q : Query<M, Q>
     {
         Q Query;
         string Key;
