@@ -197,10 +197,13 @@ namespace Modl
             foreach (var f in content.GetFields(!content.AutomaticId))
                 query.With(f.Key, f.Value);
 
-            var newId = DbAccess.ExecuteScalar(Statics<M>.IdType, query, content.Database.GetLastIdQuery());
+            if (m.IsNew() && content.AutomaticId)
+                m.SetId(DbAccess.ExecuteScalar(Statics<M>.IdType, query, content.Database.GetLastIdQuery()));
+            else
+                 DbAccess.ExecuteScalar(typeof(object), query, content.Database.GetLastIdQuery());
             
-            if (newId != null)
-                m.SetId(newId);
+            //if (newId != null)
+            //    m.SetId(newId);
 
             content.IsNew = false;
             content.ResetFields();

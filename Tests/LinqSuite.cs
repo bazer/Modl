@@ -333,9 +333,9 @@
 //        public void SelectAnonymousTest()
 //        {
 //            var result = from o in db.Orders
-//                         select new { OrderID = o.Id, o.OrderDate, o.Freight };
+//                         select new { OrderID = o.OrderId, o.OrderDate, o.Freight };
 //            var expected = from o in Orders
-//                           select new { OrderID = o.Id, o.OrderDate, o.Freight };
+//                           select new { OrderID = o.OrderId, o.OrderDate, o.Freight };
 //            var list = result.ToList();
 //            Assert.AreEqual(expected.Count(), list.Count);
 //            Assert.AreEqual(0, expected.Except(list).Count());
@@ -347,9 +347,9 @@
 //        public void SelectSubqueryTest()
 //        {
 //            var result = from o in db.Orders
-//                         select db.Customers.Where(c => c.Id == o.Customer.Id);
+//                         select db.Customers.Where(c => c.CustomerId == o.Customer.CustomerId);
 //            var expected = from o in Orders
-//                           select Customers.Where(c => c.Id == o.Customer.Id);
+//                           select Customers.Where(c => c.CustomerId == o.Customer.CustomerId);
 //            var list = result.ToList();
 
 //            var expectedList = expected.ToList();
@@ -362,7 +362,7 @@
 //        public void SelectDtoTest()
 //        {
 //            var result = from o in db.Orders
-//                         select new OrderDTO { Id = o.Id, CustomerId = o.Customer.Id, OrderDate = o.OrderDate };
+//                         select new OrderDTO { Id = o.OrderId, CustomerId = o.Customer.CustomerId, OrderDate = o.OrderDate };
 //            var list = result.ToList();
 //            Assert.AreEqual(Orders.Count(), list.Count);
 //        }
@@ -374,7 +374,7 @@
 //        {
 //            var result = from r in
 //                             from o in db.Orders
-//                             select new OrderDTO { Id = o.Id, CustomerId = o.Customer.Id, OrderDate = o.OrderDate }
+//                             select new OrderDTO { Id = o.OrderId, CustomerId = o.Customer.CustomerId, OrderDate = o.OrderDate }
 //                         where r.OrderDate > new DateTime(1998, 01, 01)
 //                         select r;
 //            var list = result.ToList();
@@ -389,7 +389,7 @@
 //            var result = from c in db.Customers
 //                         from o in c.Orders
 //                         where o.Freight < 500.00M
-//                         select new { CustomerId = c.Id, o.Id, o.Freight };
+//                         select new { CustomerId = c.CustomerId, o.OrderId, o.Freight };
 //            var list = result.ToList();
 //            Assert.AreEqual(817, list.Count);
 //        }
@@ -403,7 +403,7 @@
 //                         from o in c.Orders
 //                         let freight = o.Freight
 //                         where freight < 500.00M
-//                         select new { CustomerId = c.Id, o.Id, freight };
+//                         select new { CustomerId = c.CustomerId, o.OrderId, freight };
 //            var list = result.ToList();
 //            Assert.AreEqual(817, list.Count);
 //        }
@@ -440,7 +440,7 @@
 //        {
 //            var result =
 //              from c in db.Customers
-//              from o in c.Orders.Select(o => new { o.Id, c.CompanyName }).DefaultIfEmpty()
+//              from o in c.Orders.Select(o => new { o.OrderId, c.CompanyName }).DefaultIfEmpty()
 //              select new { c.ContactName, o };
 
 //            var list = result.ToList();
@@ -457,10 +457,10 @@
 //        public void TakeTest()
 //        {
 //            var result = (from o in db.Orders
-//                          orderby o.OrderDate, o.Id
+//                          orderby o.OrderDate, o.OrderId
 //                          select o).Take(10);
 //            var expected = (from o in Orders
-//                            orderby o.OrderDate, o.Id
+//                            orderby o.OrderDate, o.OrderId
 //                            select o).Take(10);
 //            var list = result.ToList();
 //            Assert.AreEqual(10, list.Count);
@@ -473,10 +473,10 @@
 //        public void SkipTest()
 //        {
 //            var result = (from o in db.Orders
-//                          orderby o.OrderDate, o.Id
+//                          orderby o.OrderDate, o.OrderId
 //                          select o).Skip(10);
 //            var expected = (from o in Orders
-//                            orderby o.OrderDate, o.Id
+//                            orderby o.OrderDate, o.OrderId
 //                            select o).Skip(10);
 //            var list = result.ToList();
 //            Assert.AreEqual(820, list.Count);
@@ -490,10 +490,10 @@
 //        public void TakeSkipTest()
 //        {
 //            var result = (from o in db.Orders
-//                          orderby o.OrderDate, o.Id
+//                          orderby o.OrderDate, o.OrderId
 //                          select o).Skip(10).Take(10);
 //            var expected = (from o in Orders
-//                            orderby o.OrderDate, o.Id
+//                            orderby o.OrderDate, o.OrderId
 //                            select o).Skip(10).Take(10);
 //            var list = result.ToList();
 //            Assert.AreEqual(10, list.Count);
@@ -564,11 +564,11 @@
 //        {
 //            var result =
 //              from o in db.Orders
-//              orderby o.OrderDate, o.ShippedDate descending, o.Id
+//              orderby o.OrderDate, o.ShippedDate descending, o.OrderId
 //              select o;
 //            var expected =
 //              from o in Orders
-//              orderby o.OrderDate, o.ShippedDate descending, o.Id
+//              orderby o.OrderDate, o.ShippedDate descending, o.OrderId
 //              select o;
 
 //            var list = result.ToList();
@@ -583,12 +583,12 @@
 //        public void OrderByWhereTest()
 //        {
 //            var result = (from o in db.Orders
-//                          orderby o.OrderDate, o.Id
+//                          orderby o.OrderDate, o.OrderId
 //                          where o.OrderDate > new DateTime(1997, 1, 1)
 //                          select o).Take(10);
 //            var expected = (from o in Orders
 //                            where o.OrderDate > new DateTime(1997, 1, 1)
-//                            orderby o.OrderDate, o.Id
+//                            orderby o.OrderDate, o.OrderId
 //                            select o).Take(10);
 //            var list = result.ToList();
 //            Assert.AreEqual(10, list.Count);
@@ -602,11 +602,11 @@
 //        {
 //            var result =
 //              from o in db.Orders
-//              orderby o.Freight * o.Id descending
+//              orderby o.Freight * o.OrderId descending
 //              select o;
 //            var expected =
 //              from o in Orders
-//              orderby o.Freight * o.Id descending
+//              orderby o.Freight * o.OrderId descending
 //              select o;
 //            Assert.IsTrue(expected.SequenceEqual(result));
 //        }
@@ -626,7 +626,7 @@
 //              select o;
 //            var expected =
 //              from o in Orders
-//              orderby o.Id
+//              orderby o.OrderId
 //              select o;
 //            Assert.IsTrue(expected.SequenceEqual(result));
 //        }
@@ -638,11 +638,11 @@
 //        {
 //            var result =
 //              from o in db.Orders
-//              orderby new { o.OrderDate, o.ShippedDate, o.Id }
+//              orderby new { o.OrderDate, o.ShippedDate, o.OrderId }
 //              select o;
 //            var expected =
 //              from o in Orders
-//              orderby o.OrderDate, o.ShippedDate, o.Id
+//              orderby o.OrderDate, o.ShippedDate, o.OrderId
 //              select o;
 //            Assert.IsTrue(expected.SequenceEqual(result));
 //        }
@@ -694,9 +694,9 @@
 //        // Passed.
 //        public void OrderByPredicateTest()
 //        {
-//            var result = db.Orders.OrderBy(o => o.Freight > 0 && o.ShippedDate != null).ThenBy(o => o.Id).Select(o => o.Id);
+//            var result = db.Orders.OrderBy(o => o.Freight > 0 && o.ShippedDate != null).ThenBy(o => o.OrderId).Select(o => o.OrderId);
 //            var list = result.ToList();
-//            var original = Orders.OrderBy(o => o.Freight > 0 && o.ShippedDate != null).ThenBy(o => o.Id).Select(o => o.Id).ToList();
+//            var original = Orders.OrderBy(o => o.Freight > 0 && o.ShippedDate != null).ThenBy(o => o.OrderId).Select(o => o.OrderId).ToList();
 //            Assert.IsTrue(list.SequenceEqual(original));
 //        }
 
@@ -1078,7 +1078,7 @@
 //        // Passed.
 //        public void FirstOrDefaultTest()
 //        {
-//            var customer = db.Customers.Where(c => c.Id == "ALFKI").FirstOrDefault();
+//            var customer = db.Customers.Where(c => c.CustomerId == "ALFKI").FirstOrDefault();
 //            Assert.IsNotNull(customer);
 //        }
 
@@ -1087,7 +1087,7 @@
 //        // Passed.
 //        public void FirstPredicateTest()
 //        {
-//            var customer = db.Customers.First(c => c.Id == "ALFKI");
+//            var customer = db.Customers.First(c => c.CustomerId == "ALFKI");
 //            Assert.IsNotNull(customer);
 //        }
 
@@ -1100,7 +1100,7 @@
 //              from p in db.Products
 //              select new
 //              {
-//                  ProductID = p.Id,
+//                  ProductID = p.ProductId,
 //                  MaxOrder = db.OrderDetails
 //                    .Where(od => od.Product == p)
 //                    .OrderByDescending(od => od.UnitPrice * od.Quantity)
@@ -1157,9 +1157,9 @@
 //        //   LINQ to Entities does not recognize the method 'OrmBattle.EFModel.Customer ElementAt[Customer](System.Linq.IQueryable`1[OrmBattle.EFModel.Customer], Int32)' method, and this method cannot be translated into a store expression.
 //        public void ElementAtTest()
 //        {
-//            var customer = db.Customers.OrderBy(c => c.Id).ElementAt(15);
+//            var customer = db.Customers.OrderBy(c => c.CustomerId).ElementAt(15);
 //            Assert.IsNotNull(customer);
-//            Assert.AreEqual("CONSH", customer.Id);
+//            Assert.AreEqual("CONSH", customer.CustomerId);
 //        }
 
 //        [TestMethod]
@@ -1265,7 +1265,7 @@
 //        public void AnyParameterizedTest()
 //        {
 //            var ids = new[] { "ABCDE", "ALFKI" };
-//            var result = db.Customers.Where(c => ids.Any(id => c.Id == id));
+//            var result = db.Customers.Where(c => ids.Any(id => c.CustomerId == id));
 //            var list = result.ToList();
 //            Assert.IsTrue(list.Count > 0);
 //        }
@@ -1276,7 +1276,7 @@
 //        public void ContainsParameterizedTest()
 //        {
 //            var customerIDs = new[] { "ALFKI", "ANATR", "AROUT", "BERGS" };
-//            var result = db.Orders.Where(o => customerIDs.Contains(o.Customer.Id));
+//            var result = db.Orders.Where(o => customerIDs.Contains(o.Customer.CustomerId));
 //            var list = result.ToList();
 //            Assert.IsTrue(list.Count > 0);
 //            Assert.AreEqual(41, list.Count);
@@ -1301,8 +1301,8 @@
 //        // Passed.
 //        public void CountPredicateTest()
 //        {
-//            var count = db.Orders.Count(o => o.Id > 10);
-//            var count1 = Orders.Count(o => o.Id > 10);
+//            var count = db.Orders.Count(o => o.OrderId > 10);
+//            var count1 = Orders.Count(o => o.OrderId > 10);
 //            Assert.AreEqual(count1, count);
 //        }
 
@@ -1311,8 +1311,8 @@
 //        // Passed.
 //        public void NestedCountTest()
 //        {
-//            var result = db.Customers.Where(c => db.Orders.Count(o => o.Customer.Id == c.Id) > 5);
-//            var expected = Customers.Where(c => db.Orders.Count(o => o.Customer.Id == c.Id) > 5);
+//            var result = db.Customers.Where(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId) > 5);
+//            var expected = Customers.Where(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId) > 5);
 
 //            Assert.IsTrue(expected.Except(result).Count() == 0);
 //        }
@@ -1322,8 +1322,8 @@
 //        // Passed.
 //        public void NullableSumTest()
 //        {
-//            var sum = db.Orders.Select(o => (int?)o.Id).Sum();
-//            var sum1 = Orders.Select(o => (int?)o.Id).Sum();
+//            var sum = db.Orders.Select(o => (int?)o.OrderId).Sum();
+//            var sum1 = Orders.Select(o => (int?)o.OrderId).Sum();
 //            Assert.AreEqual(sum1, sum);
 //        }
 
@@ -1332,8 +1332,8 @@
 //        // Passed.
 //        public void MaxCountTest()
 //        {
-//            var max = db.Customers.Max(c => db.Orders.Count(o => o.Customer.Id == c.Id));
-//            var max1 = Customers.Max(c => db.Orders.Count(o => o.Customer.Id == c.Id));
+//            var max = db.Customers.Max(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId));
+//            var max1 = Customers.Max(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId));
 //            Assert.AreEqual(max1, max);
 //        }
 
@@ -1348,7 +1348,7 @@
 //        {
 //            var result =
 //              from c in db.Customers
-//              join o in db.Orders on c.Id equals o.Customer.Id into go
+//              join o in db.Orders on c.CustomerId equals o.Customer.CustomerId into go
 //              join e in db.Employees on c.City equals e.City into ge
 //              select new
 //              {
@@ -1366,7 +1366,7 @@
 //        {
 //            var result =
 //              from p in db.Products
-//              join s in db.Suppliers on p.Supplier.Id equals s.Id
+//              join s in db.Suppliers on p.Supplier.SupplierId equals s.SupplierId
 //              select new { p.ProductName, s.ContactName, s.Phone };
 
 //            var list = result.ToList();
@@ -1395,7 +1395,7 @@
 //        {
 //            var result =
 //              from c in db.Categories
-//              join p in db.Products on c.Id equals p.Category.Id into g
+//              join p in db.Products on c.CategoryId equals p.Category.CategoryId into g
 //              from p in g.DefaultIfEmpty()
 //              select new { Name = p == null ? "Nothing!" : p.ProductName, c.CategoryName };
 
@@ -1478,7 +1478,7 @@
 //        {
 //            var result = db.Suppliers.Select(
 //              supplier => db.Products.Select(
-//                            product => db.Products.Where(p => p.Id == product.Id && p.Supplier.Id == supplier.Id)));
+//                            product => db.Products.Where(p => p.ProductId == product.ProductId && p.Supplier.SupplierId == supplier.SupplierId)));
 //            var count = result.ToList().Count;
 //            Assert.IsTrue(count > 0);
 //            foreach (var queryable in result)
@@ -1520,7 +1520,7 @@
 //                                {
 //                                    Product = p,
 //                                    Suppliers = suppliers
-//                             .Where(s => s.Id == p.Supplier.Id)
+//                             .Where(s => s.SupplierId == p.Supplier.SupplierId)
 //                             .Select(s => s.CompanyName)
 //                                };
 //            var list = result.ToList();
@@ -1585,7 +1585,7 @@
 //        // Passed.
 //        public void StringStartsWithTest()
 //        {
-//            var result = db.Customers.Where(c => c.Id.StartsWith("A") || c.Id.StartsWith("L"));
+//            var result = db.Customers.Where(c => c.CustomerId.StartsWith("A") || c.CustomerId.StartsWith("L"));
 
 //            var list = result.ToList();
 //            Assert.AreEqual(13, list.Count);
@@ -1598,7 +1598,7 @@
 //        {
 //            var likeA = "A";
 //            var likeL = "L";
-//            var result = db.Customers.Where(c => c.Id.StartsWith(likeA) || c.Id.StartsWith(likeL));
+//            var result = db.Customers.Where(c => c.CustomerId.StartsWith(likeA) || c.CustomerId.StartsWith(likeL));
 
 //            var list = result.ToList();
 //            Assert.AreEqual(13, list.Count);
@@ -1723,7 +1723,7 @@
 //        // Passed.
 //        public void MathAbsTest()
 //        {
-//            var order = db.Orders.Where(o => Math.Abs(o.Id) == 10 || o.Id > 0).First();
+//            var order = db.Orders.Where(o => Math.Abs(o.OrderId) == 10 || o.OrderId > 0).First();
 //            Assert.IsNotNull(order);
 //        }
 
@@ -1735,7 +1735,7 @@
 //        //   LINQ to Entities does not recognize the method 'Double Asin(Double)' method, and this method cannot be translated into a store expression.
 //        public void MathTrignometricTest()
 //        {
-//            var order = db.Orders.Where(o => Math.Asin(Math.Cos(o.Id)) == 0 || o.Id > 0).First();
+//            var order = db.Orders.Where(o => Math.Asin(Math.Cos(o.OrderId)) == 0 || o.OrderId > 0).First();
 //            Assert.IsNotNull(order);
 //        }
 

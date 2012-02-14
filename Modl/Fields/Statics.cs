@@ -213,7 +213,8 @@ namespace Modl.Fields
         public static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
         {
             var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
-            return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
+            return (m, t) => f(m, (T)t);
+            //return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         }
 
     }
