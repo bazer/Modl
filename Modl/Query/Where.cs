@@ -36,7 +36,7 @@ namespace Modl.Query
     }
 
     public class Where<M, Q> : QueryPart<M>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
         where Q : Query<M, Q>
     {
         Q Query;

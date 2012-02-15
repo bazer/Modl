@@ -25,7 +25,7 @@ using Modl.Cache;
 
 namespace Modl.Fields
 {
-    internal class Statics<M> where M : IModl<M>, new()
+    internal class Statics<M> where M : IModl, new()
     {
         internal static string TableName;
         internal static string IdName;
@@ -68,7 +68,7 @@ namespace Modl.Fields
             Initialize(new M());
         }
 
-        internal static Content<M> AddInstance(IModl<M> instance)
+        internal static Content<M> AddInstance(IModl instance)
         {
             var content = new Content<M>(instance);
             FillFields(content);
@@ -77,7 +77,7 @@ namespace Modl.Fields
             return content;
         }
 
-        internal static Content<M> GetContents(IModl<M> instance)
+        internal static Content<M> GetContents(IModl instance)
         {
             Content<M> content;
             if (!Contents.TryGetValue(instance.GetHashCode(), out content))
@@ -86,7 +86,7 @@ namespace Modl.Fields
             return content;
         }
 
-        internal static void SetId(IModl<M> instance, object value)
+        internal static void SetId(IModl instance, object value)
         {
             var content = GetContents(instance);
             content.SetValue<object>(IdName, value);
@@ -95,7 +95,7 @@ namespace Modl.Fields
             WriteToEmptyProperties(instance, IdName);
         }
 
-        internal static object GetId(IModl<M> instance)
+        internal static object GetId(IModl instance)
         {
             return GetContents(instance).GetValue<object>(IdName);
         }
@@ -120,7 +120,7 @@ namespace Modl.Fields
             return Types[fieldName];
         }
 
-        internal static void Initialize(IModl<M> instance)
+        internal static void Initialize(IModl instance)
         {
             CacheLevel = CacheConfig.DefaultCacheLevel;
             CacheTimeout = CacheConfig.DefaultCacheTimeout;
@@ -179,13 +179,13 @@ namespace Modl.Fields
         }
 
 
-        internal static void ReadFromEmptyProperties(IModl<M> instance)
+        internal static void ReadFromEmptyProperties(IModl instance)
         {
             foreach (var property in EmptyProperties)
                 GetContents(instance).SetValue(property.Item1.Name, property.Item2((M)instance), true);
         }
 
-        internal static void WriteToEmptyProperties(IModl<M> instance, string propertyName = null)
+        internal static void WriteToEmptyProperties(IModl instance, string propertyName = null)
         {
             foreach (var property in EmptyProperties)
                 if (propertyName == null || property.Item1.Name == propertyName)

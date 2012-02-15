@@ -26,7 +26,7 @@ using System.Data;
 namespace Modl.Query
 {
     public class Insert<M> : Change<M>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         public Insert(Database database) : base(database) { }
 

@@ -26,7 +26,7 @@ using System.Reflection;
 namespace Modl.Linq
 {
     internal class LinqQueryProvider<M> : IQueryProvider
-         where M : IDbModl<M>, new()
+         where M : IDbModl, new()
     {
         Database database;
 

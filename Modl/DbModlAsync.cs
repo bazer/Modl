@@ -20,7 +20,7 @@ namespace Modl
 
     public static class DbModlAsyncExtensions
     {
-        //public static IdType Id<M, IdType>(this IDbModl<M> dbReader) where IdType : IDbType<IdType>
+        //public static IdType Id<M, IdType>(this IDbModl dbReader) where IdType : IDbType<IdType>
         //{
         //    //if (IsIdLoaded)
         //    //    return Store.Id;

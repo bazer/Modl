@@ -26,7 +26,7 @@ using Modl.Query;
 namespace Modl.Linq.Parsers
 {
     internal class LinqParser<M, Q> : ExpressionVisitor
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
         where Q : Query<M, Q>
     {
         protected Query<M, Q> select;

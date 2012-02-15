@@ -20,9 +20,21 @@ namespace ExampleModel
             this.db = Database.Get(databaseName);
         }
 
-        public Car GetCar(int id)
+        public Vehicle GetVehicle(int id)
         {
-            return DbModl<Car>.Get(id);
+            return Modl<Vehicle>.New();
+        }
+
+        public bool GetCar(int id)
+        {
+            var car = new Car();
+            car.IsNew();
+            car.IsNewText();
+
+            var man = new Manufacturer();
+            man.WriteToDb();
+
+            return TxtModl<Car>.New().IsNewText();
         }
 
         public IQueryable<Car> Cars

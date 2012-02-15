@@ -25,15 +25,12 @@ using Modl;
 namespace ExampleModel
 {
     [Table("Cars")]
-    //[Id("Id")]
     [Cache(CacheLevel.Off, Timeout.Never)]
-    public class Car : IDbModl<Car>, ITxtModl<Car>, IMvcModl<Car>
+    public class Car : Vehicle, IMvcModl
     {
-        [Id("Id")]
-        public int Id { get; set; }
-
+        [Id("CarId")]
+        public int CarId { get; set; }
         public string Name { get; set; }
-        public string Manufacturer { get; set; }
-        //public string Manufacturer { get { return GetValue<string>("Manufacturer"); } set { SetValue("Manufacturer", value); } }
+        public CarType Type_fk { get; set; }
     }
 }

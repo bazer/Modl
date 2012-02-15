@@ -28,7 +28,7 @@ namespace Modl.Linq
 {
     internal class LinqHelper
     {
-        internal static KeyValuePair<string, object> GetFields<T>(BinaryExpression node) where T : IModl<T>, new()
+        internal static KeyValuePair<string, object> GetFields<T>(BinaryExpression node) where T : IModl, new()
         {
             if (node.Left is ConstantExpression && node.Right is ConstantExpression)
                 throw new InvalidQueryException("Unable to compare 2 constants.");
@@ -39,12 +39,12 @@ namespace Modl.Linq
                 return GetValues<T>(node.Right, node.Left);
         }
 
-        internal static KeyValuePair<string, object> GetValues<T>(Expression field, Expression value) where T : IModl<T>, new()
+        internal static KeyValuePair<string, object> GetValues<T>(Expression field, Expression value) where T : IModl, new()
         {
             return new KeyValuePair<string, object>((string)GetValue<T>(field), GetValue<T>(value));
         }
 
-        internal static object GetValue<T>(Expression expression) where T : IModl<T>, new()
+        internal static object GetValue<T>(Expression expression) where T : IModl, new()
         {
             if (expression is ConstantExpression)
                 return ((ConstantExpression)expression).Value;

@@ -8,12 +8,12 @@ using System.Linq.Expressions;
 
 namespace Modl
 {
-    public interface IMvcModl<M> : IModl
+    public interface IMvcModl : IModl
     {
     }
 
-    public static class MvcModl<M>
-        where M : IMvcModl<M>, new()
+    public class MvcModl<M> : Modl<M>
+        where M : IMvcModl, new()
     {
     }
 

@@ -26,7 +26,7 @@ using System.Data;
 namespace Modl.Query
 {
     public class Update<M> : Change<M>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         public Update(Database database) : base(database) { }
 

@@ -18,25 +18,17 @@ along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using System.Web.Mvc;
 using System.Linq;
-using System.Linq.Expressions;
+using System.Text;
+using Modl;
 
-namespace Modl.Mvc
+namespace ExampleModel
 {
-    public static class Extensions
+    [Table("CarType")]
+    [Id("TypeID")]
+    public class CarType : IDbModl
     {
-        public static IEnumerable<SelectListItem> AsSelectList<M>(this IEnumerable<M> list, Func<M, string> text, Func<M, string> value = null) where M : IMvcModl, new()
-        {
-            if (value == null)
-                value = x => x.GetId().ToString();
-
-            return from c in list
-                   select new SelectListItem
-                   {
-                       Text = text.Invoke(c),
-                       Value = value.Invoke(c)
-                   };
-        }
+        public int TypeID { get; set; }
+        public string Description { get; set; }
     }
 }

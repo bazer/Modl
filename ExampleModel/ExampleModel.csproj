@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modl\Car.cs" />
+    <Compile Include="Modl\CarType.cs" />
+    <Compile Include="Modl\Vehicle.cs" />
     <Compile Include="Modl\Manufacturer.cs" />
     <Compile Include="Modl\ModlContext.cs" />
     <Compile Include="Northwind\Northwind.cs" />

@@ -34,9 +34,9 @@ namespace Modl.Fields
     }
 
     internal class Content<M> : IContent
-        where M : IModl<M>, new()
+        where M : IModl, new()
     {
-        protected IModl<M> instance;
+        protected IModl instance;
 
         //protected object id;
         //internal object Id { get { return id; } set { id = value; } }
@@ -48,7 +48,7 @@ namespace Modl.Fields
         //public DynamicFields<M> DynamicFields;
         protected Dictionary<string, Field> Fields = new Dictionary<string, Field>();
 
-        public Content(IModl<M> instance)
+        public Content(IModl instance)
         {
             this.instance = instance;
             IsNew = true;

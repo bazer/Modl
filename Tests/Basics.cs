@@ -83,10 +83,10 @@ namespace Tests
 
         public void CRUD(Database database = null)
         {
-            Car car = NewModl<Car>(database);
+            Car car = DbModl<Car>.New(database);
             Assert.AreEqual(false, car.IsDirty());
             car.Name = "M3";
-            car.Manufacturer = "BMW";
+            car.Manufacturer_fk = new Manufacturer("BMW");
             Assert.AreEqual(true, car.IsDirty());
             car.WriteToDb();
             Assert.IsTrue(!car.IsNew());
@@ -95,12 +95,12 @@ namespace Tests
             Car car2 = GetModl<Car>(car.Id, database); // Car.Get(car.Id);
             AssertEqual(car, car2);
 
-            car2.Manufacturer = "Mercedes";
-            Assert.AreEqual("Mercedes", car2.Manufacturer);
-            car2.WriteToDb();
+            car2.Manufacturer_fk.Name = "Mercedes";
+            Assert.AreEqual("Mercedes", car2.Manufacturer_fk.Name);
+            car2.Manufacturer_fk.WriteToDb();
 
             Car car3 = GetModl<Car>(car.Id, database);
-            Assert.AreEqual("Mercedes", car3.Manufacturer);
+            Assert.AreEqual("Mercedes", car3.Manufacturer_fk.Name);
             car3.DeleteFromDb();
             Assert.IsTrue(car3.IsDeleted());
             Assert.AreEqual(null, GetModl<Car>(car.Id, database));
@@ -165,7 +165,7 @@ namespace Tests
         //}
 
 
-        public T NewModl<T>(Database database) where T : IDbModl<T>, new()
+        public T NewModl<T>(Database database) where T : IDbModl, new()
         {
             T modl;
 
@@ -179,7 +179,7 @@ namespace Tests
             return modl;
         }
 
-        public T GetModl<T>(object id, Database database) where T : IDbModl<T>, new()
+        public T GetModl<T>(object id, Database database) where T : IDbModl, new()
         {
             T modl = DbModl<T>.Get(id, database);
 
@@ -209,7 +209,7 @@ namespace Tests
             var db = Database.Get(databaseName);
 
             var car = DbModl<Car>.New(db); // db.New<Car, int>();
-            car.Manufacturer = "Saab";
+            car.Manufacturer_fk = new Manufacturer("Saab");
             car.Name = "9000";
             car.WriteToDb();
 
@@ -222,7 +222,7 @@ namespace Tests
         public void GetFromLinq()
         {
             var car = new Car();
-            car.Manufacturer = "Saab";
+            car.Manufacturer_fk = new Manufacturer("Saab");
             car.Name = "9000";
             car.WriteToDb();
 
@@ -243,14 +243,14 @@ namespace Tests
             var db = Database.Get(databaseName);
 
             var car = DbModl<Car>.New(db); //db.New<Car, int>();
-            car.Manufacturer = "Saab";
+            car.Manufacturer_fk = new Manufacturer("Saab");
             car.Name = "9000";
             car.WriteToDb();
 
             var cars = DbModl<Car>.Query(db).Where(x => x.Id == car.Id).ToList();
             Assert.AreEqual(1, cars.Count);
 
-            var selectList = DbModl<Car>.Query(db).Where(x => x.Name != "dsklhfsd").AsEnumerable().AsSelectList(x => x.Manufacturer + " " + x.Name);
+            var selectList = DbModl<Car>.Query(db).Where(x => x.Name != "dsklhfsd").AsEnumerable().AsSelectList(x => x.Manufacturer_fk.Name + " " + x.Name);
             Assert.IsTrue(selectList.Count() > 0);
             
             //var car2 = cars.First();
@@ -268,14 +268,14 @@ namespace Tests
             var db = Database.Get(databaseName);
 
             var car = DbModl<Car>.New(db);
-            car.Manufacturer = "Saab";
+            car.Manufacturer_fk = new Manufacturer("Saab");
             car.Name = "9000";
             car.WriteToDb();
 
-            var cars = DbModl<Car>.Query(db).Where(x => x.Id == car.Id && x.Manufacturer == car.Manufacturer && x.Name != "M5").ToList();
+            var cars = DbModl<Car>.Query(db).Where(x => x.Id == car.Id && x.Manufacturer_fk == car.Manufacturer_fk && x.Name != "M5").ToList();
             Assert.AreEqual(1, cars.Count);
 
-            var car2 = DbModl<Car>.Query(db).Where(x => x.Id == car.Id && x.Manufacturer == car.Manufacturer && x.Name != "M5").First();
+            var car2 = DbModl<Car>.Query(db).Where(x => x.Id == car.Id && x.Manufacturer_fk == car.Manufacturer_fk && x.Name != "M5").First();
             AssertEqual(car, car2);
             
             car2.DeleteFromDb();
@@ -313,7 +313,7 @@ namespace Tests
             while (count-- > 0)
             {
                 var car = new Car();
-                car.Manufacturer = "Saab";
+                car.Manufacturer_fk = new Manufacturer("Saab");
                 car.Name = "9000";
 
                 if (save)
@@ -330,7 +330,7 @@ namespace Tests
             Assert.AreEqual(car1.Database(), car2.Database());
             Assert.AreEqual(car1.Database().Name, car2.Database().Name);
             Assert.AreEqual(car1.Id, car2.Id);
-            Assert.AreEqual(car1.Manufacturer, car2.Manufacturer);
+            Assert.AreEqual(car1.Manufacturer_fk, car2.Manufacturer_fk);
             Assert.AreEqual(car1.Name, car2.Name);
         }
 

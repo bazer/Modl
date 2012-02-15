@@ -27,7 +27,7 @@ using Modl.Exceptions;
 namespace Modl.Linq.Parsers
 {
     internal class WhereParser<M, Q> : ExpressionVisitor
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
         where Q : Query<M, Q>
     {
         protected Query<M, Q> select;

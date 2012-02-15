@@ -26,21 +26,17 @@ namespace ExampleModel
 {
     [Table("Manufacturers")]
     [Id("ManufacturerID")]
-    public class Manufacturer : IDbModl<Manufacturer>
+    public class Manufacturer : IDbModl
     {
-        
         //[Id("ManufacturerID")]
         public Guid ManufacturerID { get; set; }
         public string Name { get; set; }
 
-        //public object GetId()
-        //{
-        //    return ManufacturerID;
-        //}
-
-        //public void SetId(object id)
-        //{
-        //    ManufacturerID = (Guid)id;
-        //}
+        public Manufacturer() { }
+        public Manufacturer(string name)
+        {
+            Name = name;
+            ManufacturerID = Guid.NewGuid();
+        }
     }
 }

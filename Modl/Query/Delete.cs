@@ -28,7 +28,7 @@ using Modl.Linq.Parsers;
 namespace Modl.Query
 {
     public class Delete<M> : Query<M, Delete<M>>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         Expression expression;
 

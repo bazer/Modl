@@ -11,35 +11,19 @@ using Modl.DataAccess;
 
 namespace Modl
 {
-    public interface IDbModl<M> : IModl<M>
+    public interface IDbModl : IModl
     {
         
     }
 
-    public static class DbModl<M>
-        where M : IDbModl<M>, new()
+    public class DbModl<M> : Modl<M>
+        where M : IDbModl, new()
     {
-        internal static string IdName { get { return Statics<M>.IdName; } }
+        
         internal static string Table { get { return Statics<M>.TableName; } }
 
         public static Database DefaultDatabase { get { return Statics<M>.DefaultDatabase; } set { Statics<M>.DefaultDatabase = value; } }
 
-
-        public static M New()
-        {
-            var m = new M();
-            var content = Statics<M>.AddInstance(m);
-
-            return m;
-        }
-
-        public static M New(object id)
-        {
-            var m = New();
-            m.SetId(id);
-
-            return m;
-        }
 
         public static M New(object id, string databaseName)
         {
@@ -149,69 +133,43 @@ namespace Modl
 
     public static class DbModlExtensions
     {
-        internal static Content<M> GetContent<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
-        {
-            if (m == null)
-                throw new NullReferenceException("Modl object is null");
-
-            return Statics<M>.GetContents(m);
-        }
-
-       
-        public static bool IsNew<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
-        {
-            return m.GetContent().IsNew; 
-        }
-
-        public static bool IsDeleted<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
-        {
-            return m.GetContent().IsDeleted;
-        }
-
-        public static bool IsDirty<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
-        {
-            return m.GetContent().IsDirty;
-        }
-
-        public static Database Database<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
+        public static Database Database<M>(this M m) where M : IDbModl, new()
         {
             return m.GetContent().Database;
         }
 
-        public static bool WriteToDb<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
+        public static bool WriteToDb<M>(this M m) where M : IDbModl, new()
         {
-            if (m.IsDeleted())
+            var content = m.GetContent();
+
+            if (content.IsDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Statics<M>.TableName, m.GetId()));
 
-            if (!m.IsDirty())
+            if (!content.IsDirty)
                 return false;
 
             Change<M> query;
 
-            if (m.IsNew())
+            if (content.IsNew)
                 query = new Insert<M>(m.Database());
             else
                 query = new Update<M>(m.Database()).Where(Statics<M>.IdName).EqualTo(m.GetId());
-
-            var content = m.GetContent();
+            
             foreach (var f in content.GetFields(!content.AutomaticId))
                 query.With(f.Key, f.Value);
 
-            if (m.IsNew() && content.AutomaticId)
+            if (content.IsNew && content.AutomaticId)
                 m.SetId(DbAccess.ExecuteScalar(Statics<M>.IdType, query, content.Database.GetLastIdQuery()));
             else
                  DbAccess.ExecuteScalar(typeof(object), query, content.Database.GetLastIdQuery());
             
-            //if (newId != null)
-            //    m.SetId(newId);
-
             content.IsNew = false;
             content.ResetFields();
 
             return true;
         }
 
-        public static bool DeleteFromDb<M>(this IDbModl<M> m) where M : IDbModl<M>, new()
+        public static bool DeleteFromDb<M>(this M m) where M : IDbModl, new()
         {
             var result = DbModl<M>.Delete(m.GetId(), m.Database());
             

@@ -37,7 +37,7 @@ namespace Modl.Query
     }
 
     public abstract class Query<M, Q> : IQuery
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
         where Q : Query<M, Q>
     {
         protected List<Where<M, Q>> whereList = new List<Where<M, Q>>();

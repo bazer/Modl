@@ -34,23 +34,68 @@ namespace Modl
 {
     public interface IModl
     {
-        
     }
 
-    public interface IModl<M> : IModl
+    //public interface IModl<M> : IModl
+    //{
+    //    //object GetId();
+    //    //void SetId(object id);
+    //}
+
+    public class Modl<M>
+        where M : IModl, new()
     {
-        //object GetId();
-        //void SetId(object id);
+        internal static string IdName { get { return Statics<M>.IdName; } }
+
+        public static M New()
+        {
+            var m = new M();
+            var content = Statics<M>.AddInstance(m);
+
+            return m;
+        }
+
+        public static M New(object id)
+        {
+            var m = New();
+            m.SetId(id);
+
+            return m;
+        }
     }
 
-    public static class ModlExtensions
+    public static class IModlExtensions
     {
-        public static void SetId<M>(this IModl<M> m, object value) where M : IModl<M>, new()
+        internal static Content<M> GetContent<M>(this M m) where M : IModl, new()
+        {
+            if (m == null)
+                throw new NullReferenceException("Modl object is null");
+
+            return Statics<M>.GetContents(m);
+            //throw new NotImplementedException();
+        }
+
+        public static bool IsNew<M>(this M m) where M : IModl, new()
+        {
+            return m.GetContent().IsNew;
+        }
+
+        public static bool IsDeleted<M>(this M m) where M : IModl, new()
+        {
+            return m.GetContent().IsDeleted;
+        }
+
+        public static bool IsDirty<M>(this M m) where M : IModl, new()
+        {
+            return m.GetContent().IsDirty;
+        }
+
+        public static void SetId<M>(this M m, object value) where M : IModl, new()
         {
             Statics<M>.SetId(m, value);
         }
 
-        public static object GetId<M>(this IModl<M> m) where M : IModl<M>, new()
+        public static object GetId<M>(this M m) where M : IModl, new()
         {
             return Statics<M>.GetId(m);
         }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Modl.DataAccess
 {
     public class Materializer<M> : IDisposable
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         private DbDataReader reader;
         private Database database;

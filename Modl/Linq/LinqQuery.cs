@@ -27,7 +27,7 @@ using Modl.Query;
 namespace Modl.Linq
 {
     public class LinqQuery<M> : IQueryable<M>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         Database database;
         Expression expression;

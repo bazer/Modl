@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 namespace Modl.Query
 {
     public class Select<M> : Query<M, Select<M>>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         Expression expression;
 

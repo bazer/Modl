@@ -25,7 +25,7 @@ using Modl.DatabaseProviders;
 namespace Modl.Query
 {
     public abstract class Change<M> : Query<M, Change<M>>
-        where M : IDbModl<M>, new()
+        where M : IDbModl, new()
     {
         public Change(Database database) : base(database) { }
 
