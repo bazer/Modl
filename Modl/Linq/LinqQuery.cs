@@ -54,7 +54,7 @@ namespace Modl.Linq
             //else
             //    return Modl<M, IdType>.GetAllWhere((Expression<Func<M, bool>>)expression, database).GetEnumerator();
 
-            return new Select<M>(database, expression).GetAllAsync().Result.GetEnumerator();
+            return new Select(database, DbModl<M>.Tables[0], expression).GetAllAsync<M>().Result.GetEnumerator();
         }
 
         public IEnumerator<M> GetEnumerator()

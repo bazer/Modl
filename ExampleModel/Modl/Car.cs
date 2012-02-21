@@ -24,12 +24,12 @@ using Modl;
 
 namespace ExampleModel
 {
-    [Table("Cars")]
+    [Name("Cars")]
     [Cache(CacheLevel.Off, Timeout.Never)]
     public class Car : Vehicle, IMvcModl
     {
-        [Id("CarId")]
-        public int CarId { get; set; }
+        [ForeignKey(typeof(Vehicle))]
+        public int Vehicle_fk { get; set; }
         public string Name { get; set; }
         public CarType Type_fk { get; set; }
     }

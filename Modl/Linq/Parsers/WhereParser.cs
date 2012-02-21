@@ -28,11 +28,11 @@ namespace Modl.Linq.Parsers
 {
     internal class WhereParser<M, Q> : ExpressionVisitor
         where M : IDbModl, new()
-        where Q : Query<M, Q>
+        where Q : Query<Q>
     {
-        protected Query<M, Q> select;
+        protected Query<Q> select;
 
-        internal WhereParser(Query<M, Q> select)
+        internal WhereParser(Query<Q> select)
         {
             this.select = select;
         }

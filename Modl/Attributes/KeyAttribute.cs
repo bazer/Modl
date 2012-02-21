@@ -23,14 +23,26 @@ using System.Text;
 
 namespace Modl
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public class TableAttribute : Attribute
-    {
-        public string Name { get; private set; }
+    //public enum IdType
+    //{
+    //    Int,
+    //    Guid
+    //}
 
-        public TableAttribute(string name)
+    [AttributeUsage(AttributeTargets.Property)]
+    public class KeyAttribute : Attribute
+    {
+        //public string Name { get; private set; }
+        //public IdType Type { get; private set; }
+
+        public KeyAttribute()
         {
-            Name = name;
         }
+
+        //public KeyAttribute(string name)
+        //{
+        //    Name = name;
+        //    //Type = type;
+        //}
     }
 }

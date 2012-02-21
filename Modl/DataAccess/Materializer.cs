@@ -60,11 +60,13 @@ namespace Modl.DataAccess
             //    return null;
             try
             {
-                var m = DbModl<M>.New(database);
-                m.GetContent().Load(reader);
-                //Statics<M, IdType>.WriteToEmptyProperties(m);
-                m.GetContent().IsNew = false;
-                return m;
+                return DbModl<M>.Load(reader, database);
+
+                //var m = DbModl<M>.New(database);
+                //m.GetContent().Load(reader);
+                ////Statics<M, IdType>.WriteToEmptyProperties(m);
+                //m.GetContent().IsNew = false;
+                //return m;
             }
             catch (Exception e)
             {

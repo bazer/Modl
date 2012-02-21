@@ -21,22 +21,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
+using Modl.Fields;
 
 namespace Modl.Query
 {
-    public abstract class Change<M> : Query<M, Change<M>>
-        where M : IDbModl, new()
+    public abstract class Change : Query<Change>
+        //where M : IDbModl, new()
     {
-        public Change(Database database) : base(database) { }
+        public Change(Database database, Table table) : base(database, table) { }
 
         protected Dictionary<string, object> withList = new Dictionary<string, object>();
 
-        public Change<M> With(string key, string value)
+        public Change With(string key, string value)
         {
             return With<string>(key, value);
         }
 
-        public Change<M> With<V>(string key, V value)
+        public Change With<V>(string key, V value)
         {
             withList.Add(key, value);
             return this;

@@ -35,20 +35,21 @@ namespace Modl.Query
         SmallerThanOrEqual
     }
 
-    public class Where<M, Q> : QueryPart<M>
-        where M : IDbModl, new()
-        where Q : Query<M, Q>
+    public class Where<Q> : QueryPart
+        //where M : IDbModl, new()
+        where Q : Query<Q>
     {
         Q Query;
         string Key;
         object Value;
         Relation Relation;
+        bool IsValue = true;
 
-
-        internal Where(Q query, string key)
+        internal Where(Q query, string key, bool isValue = true)
         {
             this.Query = query;
             this.Key = key;
+            this.IsValue = isValue;
         }
 
         public Where(string key)
@@ -58,6 +59,12 @@ namespace Modl.Query
 
         public Q EqualTo<V>(V value)
         {
+            return SetAndReturn(value, Modl.Query.Relation.Equal);
+        }
+
+        public Q EqualTo<V>(V value, bool isValue)
+        {
+            this.IsValue = isValue;
             return SetAndReturn(value, Modl.Query.Relation.Equal);
         }
 
@@ -106,14 +113,23 @@ namespace Modl.Query
 
         public override Sql GetCommandString(Sql sql, string prefix, int number)
         {
-            return Query.DatabaseProvider.GetParameterComparison(sql, Key, Relation, prefix + "w" + number);
+            if (IsValue)
+                return Query.DatabaseProvider.GetParameterComparison(sql, Key, Relation, prefix + "w" + number);
+            else
+                return sql.AddFormat("{0} {1} {2}", Key, Relation.ToSql(), Value.ToString());
+                
+            
+            //return Query.DatabaseProvider.GetParameterComparison(sql, Key, Relation, Value.ToString());
 
             //return string.Format("{0} {1} @{2}", Key, RelationToString(Relation), number);
         }
 
         public override Sql GetCommandParameter(Sql sql, string prefix, int number)
         {
-            return Query.DatabaseProvider.GetParameter(sql, prefix + "w" + number, Value);
+            if (IsValue)
+                return Query.DatabaseProvider.GetParameter(sql, prefix + "w" + number, Value);
+            else
+                return sql;
 
             //return new Tuple<string, object>("@" + number, Value);
         }

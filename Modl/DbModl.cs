@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using Modl.Cache;
 using Modl.Fields;
 using Modl.DataAccess;
+using System.Data.Common;
 
 namespace Modl
 {
@@ -20,7 +21,7 @@ namespace Modl
         where M : IDbModl, new()
     {
         
-        internal static string Table { get { return Statics<M>.TableName; } }
+        internal static List<Table> Tables { get { return Statics<M>.Tables; } }
 
         public static Database DefaultDatabase { get { return Statics<M>.DefaultDatabase; } set { Statics<M>.DefaultDatabase = value; } }
 
@@ -47,7 +48,17 @@ namespace Modl
         {
             var m = new M();
             var content = Statics<M>.AddInstance(m);
-            content.instanceDbProvider = database;
+
+            if (database != null)
+                content.Database = database;
+
+            return m;
+        }
+
+        internal static M Load(DbDataReader reader, Database database)
+        {
+            var m = New(database);
+            Statics<M>.Load(m, reader);
 
             return m;
         }
@@ -64,10 +75,15 @@ namespace Modl
 
         public static M Get(object id, Database database = null)
         {
+            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0]).Where(Tables[0].PrimaryKeyName).EqualTo(id).AddJoins(Tables).Get<M>();
+
+
             //if (CacheLevel == CacheLevel.On)
             //    return StaticCache<M, IdType>.Get(id, database ?? DefaultDatabase);
             //else
-            return new Select<M>(database ?? Statics<M>.DefaultDatabase).Where(DbModl<M>.IdName).EqualTo(id).Get();
+
+
+            //return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0]).Where(DbModl<M>.IdName).EqualTo(id).Get<M>();
 
             //return new M();
         }
@@ -77,7 +93,7 @@ namespace Modl
             //if (CacheLevel == CacheLevel.On)
             //    return StaticCache<M, IdType>.GetWhere(query, database ?? DefaultDatabase);
             //else
-            return new Select<M>(database ?? Statics<M>.DefaultDatabase, query).Get();
+            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0], query).AddJoins(Tables).Get<M>();
 
             //return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
@@ -87,7 +103,7 @@ namespace Modl
             //if (CacheLevel == CacheLevel.On)
             //    return StaticCache<M, IdType>.GetAll(database ?? DefaultDatabase);
             //else
-            return new Select<M>(database ?? Statics<M>.DefaultDatabase).GetAll();
+            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0]).AddJoins(Tables).GetAll<M>();
 
             //return StaticCache<M, IdType>.GetAll(new Select<M, IdType>(database ?? DefaultDatabase));
             //return new Select<M, IdType>(database ?? DefaultDatabase).GetList(true);
@@ -99,7 +115,7 @@ namespace Modl
             //if (CacheLevel == CacheLevel.On)
             //    return StaticCache<M, IdType>.GetAllWhere(query, database ?? DefaultDatabase);
             //else
-            return new Select<M>(database ?? Statics<M>.DefaultDatabase, query).GetAll();
+            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0], query).AddJoins(Tables).GetAll<M>();
 
             //return new Select<M, IdType>(database ?? DefaultDatabase, query).GetList(true);
             //return GetList(new Select<M>(database ?? DefaultDatabase, query));
@@ -109,7 +125,7 @@ namespace Modl
         {
             var db = database ?? DefaultDatabase;
 
-            Delete<M> statement = new Delete<M>(db);
+            Delete statement = new Delete(db, Tables[0]);
             statement.Where(IdName).EqualTo(id);
 
             return DbAccess.ExecuteNonQuery(statement);
@@ -117,18 +133,20 @@ namespace Modl
 
         public static bool DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return DbAccess.ExecuteNonQuery(new Delete<M>(database ?? DefaultDatabase, query));
+            return DbAccess.ExecuteNonQuery(new Delete(database ?? DefaultDatabase, Tables[0], query));
         }
 
         public static bool DeleteAll(Database database = null)
         {
-            return DbAccess.ExecuteNonQuery(new Delete<M>(database ?? DefaultDatabase));
+            return DbAccess.ExecuteNonQuery(new Delete(database ?? DefaultDatabase, Tables[0]));
         }
 
         public static IQueryable<M> Query(Database database = null)
         {
             return new LinqQuery<M>(database ?? DefaultDatabase);
         }
+
+        
     }
 
     public static class DbModlExtensions
@@ -141,30 +159,75 @@ namespace Modl
         public static bool WriteToDb<M>(this M m) where M : IDbModl, new()
         {
             var content = m.GetContent();
+            Statics<M>.ReadFromEmptyProperties(m);
 
             if (content.IsDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Table: {0}, Id: {1}", Statics<M>.TableName, m.GetId()));
+                throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", typeof(M), m.GetId()));
 
-            if (!content.IsDirty)
+            if (!Statics<M>.IsDirty(m))
                 return false;
 
-            Change<M> query;
+            object keyValue = null;
+            Type parentType = null;
 
-            if (content.IsNew)
-                query = new Insert<M>(m.Database());
-            else
-                query = new Update<M>(m.Database()).Where(Statics<M>.IdName).EqualTo(m.GetId());
-            
-            foreach (var f in content.GetFields(!content.AutomaticId))
-                query.With(f.Key, f.Value);
+            foreach (var t in Statics<M>.Tables)
+            {
+                if (keyValue != null && parentType != null && t.ForeignKeys.Count != 0)
+                {
+                    var fk = t.ForeignKeys.Where(x => x.Value == parentType).Select(x => x.Key).SingleOrDefault();
 
-            if (content.IsNew && content.AutomaticId)
-                m.SetId(DbAccess.ExecuteScalar(Statics<M>.IdType, query, content.Database.GetLastIdQuery()));
-            else
-                 DbAccess.ExecuteScalar(typeof(object), query, content.Database.GetLastIdQuery());
+                    if (fk != null)
+                        content.SetValue(fk, keyValue);
+                }
+
+                Change query;
+
+                if (content.IsNew)
+                    query = new Insert(content.Database, t);
+                else
+                    query = new Update(content.Database, t).Where(t.PrimaryKeyName).EqualTo(content.GetValue<object>(t.PrimaryKeyName));
+
+                foreach (var f in t.Fields)
+                {
+                    var field = content.Fields[f.Key];
+                    //if (field.Value.Type.GetInterface("IModl") != null) // && !(field.Value.Value is int))
+                    //{
+                    //    var m = (M)field.Value.Value;
+
+                    //    if (m == null)
+                    //        yield return new KeyValuePair<string, object>(field.Key, null);
+                    //    //statement.With(field.Key, null);
+                    //    else
+                    //    {
+                    //        if (m.IsDirty())
+                    //            throw new Exception("Child " + m + " is dirty");
+
+                    //        yield return new KeyValuePair<string, object>(field.Key, m.GetId());
+                    //        //statement.With(field.Key, value.Id);
+                    //    }
+                    //}
+                    if (field.IsDirty && (!content.AutomaticId || !t.HasKey || f.Key != t.PrimaryKeyName))
+                        query.With(f.Key, field.Value);
+                }
+
+                
+
+                if (content.IsNew && content.AutomaticId && t.HasKey)
+                    keyValue = DbAccess.ExecuteScalar(t.PrimaryKeyType, query, content.Database.GetLastIdQuery());
+                else
+                    DbAccess.ExecuteScalar(typeof(object), query);
+
+                if (keyValue != null && t.Keys.Count != 0)
+                    content.SetValue(t.PrimaryKeyName, keyValue);
+
+                parentType = t.Type;
+            }
+
             
             content.IsNew = false;
             content.ResetFields();
+
+            Statics<M>.WriteToEmptyProperties(m);
 
             return true;
         }
@@ -177,6 +240,23 @@ namespace Modl
                 m.GetContent().IsDeleted = true;
 
             return result;
+        }
+
+        public static Select AddJoins(this Select s, List<Table> tables)
+        {
+            Table parent = tables[0];
+            foreach (var t in tables.Skip(1))
+            {
+                if (t.ForeignKeys.Count != 0)
+                {
+                    var fk = t.ForeignKeys.Where(x => x.Value == parent.Type).Select(x => x.Key).SingleOrDefault();
+
+                    if (fk != null)
+                        s.InnerJoin(t.Name).Where(fk).EqualTo(parent.PrimaryKeyName);
+                }
+            }
+
+            return s;
         }
     }
 }

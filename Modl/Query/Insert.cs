@@ -22,19 +22,21 @@ using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
 using System.Data;
+using Modl.Fields;
 
 namespace Modl.Query
 {
-    public class Insert<M> : Change<M>
-        where M : IDbModl, new()
+    public class Insert : Change
+        //where M : IDbModl, new()
     {
-        public Insert(Database database) : base(database) { }
+        public Insert(Database database, Table table) : base(database, table) { }
 
         protected Sql GetWith(Sql sql, string paramPrefix)
         {
             int length = withList.Count;
             if (length == 0)
-                return sql;
+                return sql.AddFormat("VALUES (NULL)");
+             
 
             sql.AddFormat("({0}) VALUES (", string.Join(",", withList.Keys));
 
@@ -77,7 +79,7 @@ namespace Modl.Query
         public override Sql ToSql(string paramPrefix)
         {
             return GetWith(
-                new Sql().AddFormat("INSERT INTO {0} ", DbModl<M>.Table),
+                new Sql().AddFormat("INSERT INTO {0} ", table.Name),
                 paramPrefix);
 
             //var with = GetWith(paramPrefix);

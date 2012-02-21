@@ -48,10 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\CacheAttribute.cs" />
-    <Compile Include="Attributes\IdAttribute.cs" />
-    <Compile Include="Attributes\TableAttribute.cs" />
+    <Compile Include="Attributes\ForeignKeyAttribute.cs" />
+    <Compile Include="Attributes\NameAttribute.cs" />
+    <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
+    <Compile Include="Fields\Table.cs" />
     <Compile Include="MvcModl.cs" />
+    <Compile Include="Query\Join.cs" />
     <Compile Include="TxtModl.cs" />
     <Compile Include="DbModlAsync.cs" />
     <Compile Include="DataAccess\Materializer.cs" />

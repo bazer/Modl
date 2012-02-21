@@ -23,43 +23,50 @@ using System.Text;
 
 namespace Modl.Fields
 {
-    internal class Field
+    public class Table
     {
-        protected object oldValue;
-        protected object newValue;
-        protected bool isDirty = false;
-        internal bool IsDirty { get { return isDirty; } }
+        internal string Name { get; set; }
         internal Type Type { get; set; }
-        //protected bool emptyProperty;
 
-        internal Field(object value, Type type)
-        {
-            oldValue = value;
-            newValue = value;
+        internal Dictionary<string, Type> Fields = new Dictionary<string, Type>();
+        internal Dictionary<string, Type> Keys = new Dictionary<string, Type>();
+        internal Dictionary<string, Type> ForeignKeys = new Dictionary<string, Type>();
 
-            Type = type;
-            //this.emptyProperty = emptyProperty;
-        }
-
-        internal object Value
+        internal bool HasKey
         {
             get
             {
-                return newValue;
-            }
-            set
-            {
-                newValue = value;
-                isDirty = !object.Equals(oldValue, newValue);
-                //isDirty = oldValue != newValue;
-                //isDirty = !EqualityComparer<T>.Default.Equals(oldValue, newValue);
+                return Keys.Count != 0;
             }
         }
 
-        internal void Reset()
+        internal KeyValuePair<string, Type> PrimaryKey
         {
-            oldValue = newValue;
-            isDirty = false;
+            get
+            {
+                if (Keys.Count != 0)
+                    return Keys.First();
+                else if (ForeignKeys.Count != 0)
+                    return ForeignKeys.First();
+
+                throw new Exception("Table " + Name + " has no primary key");
+            }
+        }
+
+        internal string PrimaryKeyName
+        {
+            get
+            {
+                return PrimaryKey.Key;
+            }
+        }
+
+        internal Type PrimaryKeyType
+        {
+            get
+            {
+                return PrimaryKey.Value;
+            }
         }
     }
 }

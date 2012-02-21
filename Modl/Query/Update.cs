@@ -22,13 +22,14 @@ using System.Linq;
 using System.Text;
 using Modl.DatabaseProviders;
 using System.Data;
+using Modl.Fields;
 
 namespace Modl.Query
 {
-    public class Update<M> : Change<M>
-        where M : IDbModl, new()
+    public class Update : Change
+        //where M : IDbModl, new()
     {
-        public Update(Database database) : base(database) { }
+        public Update(Database database, Table table) : base(database, table) { }
 
         protected Sql GetWith(Sql sql, string paramPrefix)
         {
@@ -64,7 +65,7 @@ namespace Modl.Query
         public override Sql ToSql(string paramPrefix)
         {
             var sql = GetWith(
-                new Sql().AddFormat("UPDATE {0} SET ", DbModl<M>.Table),
+                new Sql().AddFormat("UPDATE {0} SET ", table.Name),
                 paramPrefix);
 
             return GetWhere(

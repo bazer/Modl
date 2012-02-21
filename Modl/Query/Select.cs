@@ -29,39 +29,62 @@ using System.Threading.Tasks;
 
 namespace Modl.Query
 {
-    public class Select<M> : Query<M, Select<M>>
-        where M : IDbModl, new()
+    public class Select : Query<Select>
+        //where M : IDbModl, new()
     {
         Expression expression;
+        protected List<Join<Select>> joinList = new List<Join<Select>>();
 
-        public Select(Database database)
-            : base(database)
+        public Select(Database database, Table table)
+            : base(database, table)
         {
             expression = Expression.Constant(this);
         }
 
-        public Select(Database database, Expression expression)
-            : base(database)
+        public Select(Database database, Table table, Expression expression)
+            : base(database, table)
         {
             this.expression = expression;
-            var parser = new LinqParser<M, Select<M>>(this);
-            parser.ParseTree(expression);
+            //var parser = new LinqParser<Select>(this);
+            //parser.ParseTree(expression);
         }
 
         public override Sql ToSql(string paramPrefix)
         {
-            return GetWhere(
-                new Sql().AddFormat("SELECT * FROM {0} \r\n", DbModl<M>.Table),
-                paramPrefix);
+            var sql = new Sql().AddFormat("SELECT * FROM {0} \r\n", table.Name);
+            GetJoins(sql, "");
+            GetWhere(sql, paramPrefix);
 
+            return sql;
 
-            //var where = GetWhere(paramPrefix);
-
-            //return new Sql(
-            //    string.Format("SELECT * FROM {0} \r\n{1}", Modl<M, IdType>.Table, where.Text),
-            //    where.Parameters);
+            //return GetWhere(
+            //    new Sql().AddFormat("SELECT * FROM {0} \r\n", table.Name),
+            //    paramPrefix);
         }
 
+        protected Sql GetJoins(Sql sql, string tableAlias)
+        {
+            foreach (var join in joinList)
+                join.GetSql(sql, tableAlias);
+
+            return sql;
+        }
+
+        public Join<Select> InnerJoin(string tableName)
+        {
+            var join = new Join<Select>(this, tableName, JoinType.Inner);
+            joinList.Add(join);
+
+            return join;
+        }
+
+        public Join<Select> OuterJoin(string tableName)
+        {
+            var join = new Join<Select>(this, tableName, JoinType.Outer);
+            joinList.Add(join);
+
+            return join;
+        }
         
 
         public override int ParameterCount
@@ -74,17 +97,17 @@ namespace Modl.Query
             return DbAccess.ExecuteReader(this).First();
         }
 
-        public M Get()
+        public M Get<M>() where M : IDbModl, new()
         {
             return new Materializer<M>(Execute(), DatabaseProvider).ReadAndClose();
         }
 
-        public IEnumerable<M> GetAll()
+        public IEnumerable<M> GetAll<M>() where M : IDbModl, new()
         {
             return new Materializer<M>(Execute(), DatabaseProvider).GetAll();
         }
 
-        public Materializer<M> GetMaterializer()
+        public Materializer<M> GetMaterializer<M>() where M : IDbModl, new()
         {
             return new Materializer<M>(Execute(), DatabaseProvider);
         }
@@ -94,17 +117,17 @@ namespace Modl.Query
             return AsyncDbAccess.ExecuteReader(this, onQueue);
         }
 
-        public Task<M> GetAsync(bool onQueue = true)
+        public Task<M> GetAsync<M>(bool onQueue = true) where M : IDbModl, new()
         {
             return Materializer<M>.Async(ExecuteAsync(onQueue), DatabaseProvider).ContinueWith(x => x.Result.ReadAndClose());
         }
 
-        public Task<IEnumerable<M>> GetAllAsync(bool onQueue = true)
+        public Task<IEnumerable<M>> GetAllAsync<M>(bool onQueue = true) where M : IDbModl, new()
         {
             return Materializer<M>.Async(ExecuteAsync(onQueue), DatabaseProvider).ContinueWith(x => x.Result.GetAll());
         }
 
-        public Task<Materializer<M>> GetMaterializerAsync(bool onQueue = true)
+        public Task<Materializer<M>> GetMaterializerAsync<M>(bool onQueue = true) where M : IDbModl, new()
         {
             return Materializer<M>.Async(ExecuteAsync(onQueue), DatabaseProvider);
         }

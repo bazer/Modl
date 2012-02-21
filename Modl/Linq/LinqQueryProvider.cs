@@ -49,13 +49,13 @@ namespace Modl.Linq
 
         public T Execute<T>(System.Linq.Expressions.Expression expression)
         {
-            return Helper.ConvertTo<T>(new Query.Select<M>(database, expression).GetAsync().Result);
+            return Helper.ConvertTo<T>(new Query.Select(database, DbModl<M>.Tables[0], expression).GetAsync<M>().Result);
             //return Helper.ConvertTo<T>(Modl<M>.Get(new Query.Select<M>(database, expression)));
         }
 
         public object Execute(System.Linq.Expressions.Expression expression)
         {
-            return new Query.Select<M>(database, expression).GetAsync().Result;
+            return new Query.Select(database, DbModl<M>.Tables[0], expression).GetAsync<M>().Result;
         }
 
         //return new LinqQuery<T>(database, expression);

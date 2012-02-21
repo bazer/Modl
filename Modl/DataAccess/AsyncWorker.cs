@@ -168,7 +168,7 @@ namespace Modl.DataAccess
 
     internal class AsyncWorker : IDisposable
     {
-        private const bool writeDebugText = false;
+        private const bool writeDebugText = true;
 
         private Database database;
         private ConcurrentQueue<IWorkPackage> workerQueue = new ConcurrentQueue<IWorkPackage>();

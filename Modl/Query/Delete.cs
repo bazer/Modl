@@ -24,22 +24,23 @@ using Modl.DatabaseProviders;
 using System.Data;
 using System.Linq.Expressions;
 using Modl.Linq.Parsers;
+using Modl.Fields;
 
 namespace Modl.Query
 {
-    public class Delete<M> : Query<M, Delete<M>>
-        where M : IDbModl, new()
+    public class Delete : Query<Delete>
+        //where M : IDbModl, new()
     {
         Expression expression;
 
-        public Delete(Database database) : base(database) { }
+        public Delete(Database database, Table table) : base(database, table) { }
 
-        public Delete(Database database, Expression expression)
-            : base(database)
+        public Delete(Database database, Table table, Expression expression)
+            : base(database, table)
         {
             this.expression = expression;
-            var parser = new LinqParser<M, Delete<M>>(this);
-            parser.ParseTree(expression);
+            //var parser = new LinqParser<Delete>(this);
+            //parser.ParseTree(expression);
         }
 
         public override Sql ToSql(string paramPrefix)
@@ -47,7 +48,7 @@ namespace Modl.Query
             //var sql = new Sql().AddFormat("DELETE FROM {0} \r\n", Modl<M, IdType>.Table);
 
             return GetWhere(
-                new Sql().AddFormat("DELETE FROM {0} \r\n", DbModl<M>.Table), 
+                new Sql().AddFormat("DELETE FROM {0} \r\n", table.Name), 
                 paramPrefix);
 
 

@@ -20,15 +20,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Modl;
 
-namespace ExampleModel
+namespace Modl
 {
-    [Name("CarType")]
-    public class CarType : IDbModl
+    //public enum IdType
+    //{
+    //    Int,
+    //    Guid
+    //}
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    public class NameAttribute : Attribute
     {
-        [Key]
-        public int TypeID { get; set; }
-        public string Description { get; set; }
+        public string Name { get; private set; }
+        //public IdType Type { get; private set; }
+
+        public NameAttribute(string name)
+        {
+            Name = name;
+            //Type = type;
+        }
     }
 }

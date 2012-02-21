@@ -24,11 +24,10 @@ using Modl;
 
 namespace ExampleModel
 {
-    [Table("Manufacturers")]
-    [Id("ManufacturerID")]
+    [Name("Manufacturers")]
     public class Manufacturer : IDbModl
     {
-        //[Id("ManufacturerID")]
+        [Key]
         public Guid ManufacturerID { get; set; }
         public string Name { get; set; }
 

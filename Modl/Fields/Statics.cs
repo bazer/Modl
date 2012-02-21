@@ -22,33 +22,33 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Modl.Cache;
+using System.Data.Common;
+using Modl.Query;
 
 namespace Modl.Fields
 {
     internal class Statics<M> where M : IModl, new()
     {
-        internal static string TableName;
-        internal static string IdName;
-        internal static Type IdType;
+        internal static List<Table> Tables = new List<Table>();
+        //internal static string TableName;
+        internal static string IdName { get { return Tables[0].PrimaryKeyName; } }
+        internal static Type IdType { get { return Tables[0].PrimaryKeyType; } }
         internal static CacheLevel CacheLevel;
         internal static int CacheTimeout;
 
         private static Dictionary<string, string> Properties = new Dictionary<string, string>();
         private static Dictionary<string, Type> Types = new Dictionary<string, Type>();
-        //private static List<PropertyInfo> EmptyProperties = new List<PropertyInfo>();
         private static List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>> EmptyProperties = new List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>>();
+        
 
-        private static Dictionary<int, Content<M>> Contents = new Dictionary<int, Content<M>>();
 
         private static Database staticDbProvider = null;
-
-
         /// <summary>
         /// The default database of this Modl entity. 
         /// This is the same as Config.DefaultDatabase unless a value is specified.
         /// Set to null to clear back to the value of Config.DefaultDatabase.
         /// </summary>
-        public static Database DefaultDatabase
+        internal static Database DefaultDatabase
         {
             get
             {
@@ -68,23 +68,32 @@ namespace Modl.Fields
             Initialize(new M());
         }
 
-        internal static Content<M> AddInstance(IModl instance)
+        internal static bool IsDirty(IModl instance)
         {
-            var content = new Content<M>(instance);
-            FillFields(content);
-            Contents.Add(instance.GetHashCode(), content);
-
-            return content;
+            ReadFromEmptyProperties(instance);
+            return GetContents(instance).IsDirty;
         }
 
-        internal static Content<M> GetContents(IModl instance)
+        internal static Content GetContents(IModl instance)
         {
-            Content<M> content;
-            if (!Contents.TryGetValue(instance.GetHashCode(), out content))
+            var content = Content.GetContents(instance);
+
+            if (content == null)
                 content = AddInstance(instance);
 
             return content;
         }
+
+        internal static Content AddInstance(IModl instance)
+        {
+            var content = Content.AddInstance(instance);
+            content.Database = DefaultDatabase;
+            FillFields(content);
+
+            return content;
+        }
+
+        
 
         internal static void SetId(IModl instance, object value)
         {
@@ -122,15 +131,32 @@ namespace Modl.Fields
 
         internal static void Initialize(IModl instance)
         {
+            Type instanceType = typeof(M);
+
             CacheLevel = CacheConfig.DefaultCacheLevel;
             CacheTimeout = CacheConfig.DefaultCacheTimeout;
+            //Table.Name = instanceType.Name;
 
-            foreach (var attribute in typeof(M).GetCustomAttributes(true))
+            var content = GetContents(instance);
+
+            ParseClassHierarchy(instanceType, content);
+
+            //Table.IdType = GetFieldType(Table.IdName);
+        }
+
+        private static void ParseClassHierarchy(Type type, Content content)
+        {
+            if (type.BaseType != null && type.BaseType != typeof(object))
+                ParseClassHierarchy(type.BaseType, content);
+
+            Table table = new Fields.Table();
+            table.Name = type.Name;
+            table.Type = type;
+
+            foreach (var attribute in type.GetCustomAttributes(false))
             {
-                if (attribute is TableAttribute)
-                    TableName = ((TableAttribute)attribute).Name;
-                else if (attribute is IdAttribute)
-                    IdName = ((IdAttribute)attribute).Name;
+                if (attribute is NameAttribute)
+                    table.Name = ((NameAttribute)attribute).Name;
                 else if (attribute is CacheAttribute)
                 {
                     CacheLevel = ((CacheAttribute)attribute).CacheLevel;
@@ -138,41 +164,53 @@ namespace Modl.Fields
                 }
             }
 
-            if (string.IsNullOrEmpty(TableName))
-                TableName = typeof(M).Name;
-
-            if (string.IsNullOrEmpty(IdName))
-                IdName = "Id";
-
-            var content = GetContents(instance);
-            foreach (PropertyInfo property in typeof(M).GetProperties())
+            foreach (PropertyInfo property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 if (property.CanWrite)
                 {
-                    content.LastInsertedMemberName = null;
+                    string fieldName = property.Name;
+                    bool key = false;
+                    Type foreignKey = null;
 
-                    object defaultValue = Helper.GetDefault(property.PropertyType);
-                    property.SetValue(instance, defaultValue, null);
-
-                    if (content.LastInsertedMemberName == null)
+                    foreach (var attribute in property.GetCustomAttributes(false))
                     {
-                        content.SetValue(property.Name, defaultValue, true);
-
-                        var getDelegate = (Func<M, object>)typeof(Statics<M>).GetMethod("MakeGetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true) });
-                        var setDelegate = (Action<M, object>)typeof(Statics<M>).GetMethod("MakeSetDelegate").MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true) });
-                        EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
-                        
+                        if (attribute is NameAttribute)
+                            fieldName = ((NameAttribute)attribute).Name;
+                        else if (attribute is KeyAttribute)
+                            key = true;
+                        else if (attribute is ForeignKeyAttribute)
+                            foreignKey = ((ForeignKeyAttribute)attribute).Entity;
+                        else if (attribute is CacheAttribute)
+                        {
+                            CacheLevel = ((CacheAttribute)attribute).CacheLevel;
+                            CacheTimeout = ((CacheAttribute)attribute).CacheTimeout;
+                        }
                     }
 
-                    SetFieldName(property.Name, content.LastInsertedMemberName);
-                    SetFieldType(content.LastInsertedMemberName, property.PropertyType);
+                    //content.SetValue(fieldName, Helper.GetDefault(property.PropertyType));
+
+                    var getDelegate = (Func<M, object>)typeof(Statics<M>).GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true) });
+                    var setDelegate = (Action<M, object>)typeof(Statics<M>).GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true) });
+                    EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
+
+                    SetFieldName(property.Name, fieldName);
+                    SetFieldType(fieldName, property.PropertyType);
+
+
+                    table.Fields.Add(fieldName, property.PropertyType);
+
+                    if (key)
+                        table.Keys.Add(fieldName, property.PropertyType);
+
+                    if (foreignKey != null)
+                        table.ForeignKeys.Add(fieldName, foreignKey);
                 }
             }
 
-            IdType = GetFieldType(IdName);
+            Tables.Add(table);
         }
 
-        internal static void FillFields(Content<M> content)
+        internal static void FillFields(Content content)
         {
             foreach (var field in Types)
                 content.SetValue(field.Key, Helper.GetDefault(field.Value));
@@ -182,7 +220,7 @@ namespace Modl.Fields
         internal static void ReadFromEmptyProperties(IModl instance)
         {
             foreach (var property in EmptyProperties)
-                GetContents(instance).SetValue(property.Item1.Name, property.Item2((M)instance), true);
+                GetContents(instance).SetValue(property.Item1.Name, property.Item2((M)instance));
         }
 
         internal static void WriteToEmptyProperties(IModl instance, string propertyName = null)
@@ -192,30 +230,93 @@ namespace Modl.Fields
                     property.Item3((M)instance, GetContents(instance).GetValue<object>(property.Item1.Name));
         }
 
-        //internal static void ReadFromEmptyProperties(Modl<M, IdType> instance)
-        //{
-        //    foreach (var property in EmptyProperties)
-        //        instance.Store.SetValue(property.Name, property.GetValue(instance, null), true);
-        //}
-
-        //internal static void WriteToEmptyProperties(Modl<M, IdType> instance)
-        //{
-        //    foreach (var property in EmptyProperties)
-        //        property.SetValue(instance, instance.Store.GetValue<object>(property.Name), null);
-        //}
-
-        public static Func<M, object> MakeGetDelegate<T>(MethodInfo method)
+        private static Func<M, object> MakeGetDelegate<T>(MethodInfo method)
         {
             var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, method);
             return m => f(m);
         }
 
-        public static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
+        private static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
         {
             var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
             return (m, t) => f(m, (T)t);
             //return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         }
 
+        internal static void Load(IModl instance, DbDataReader reader)
+        {
+            //id = Helper.GetSafeValue<object>(reader, Statics<M>.IdName);
+            
+            var content = GetContents(instance);
+
+            foreach (var property in Properties)
+            {
+
+                content.SetValue(property.Value, Helper.GetSafeValue(reader, property.Value, GetFieldType(property.Value)));
+            }
+
+            content.IsNew = false;
+            //var keys = Fields.Keys.ToList();
+
+            //for (int i = 0; i < Fields.Count; i++)
+            //{
+            //    string key = keys[i];
+
+            //    //if (Fields[key].Type.GetInterface("IModl") != null)
+            //    //    SetField(key, Helper.GetSafeValue(reader, key, typeof(int?)));
+            //    //else
+            //    SetField(key, Helper.GetSafeValue(reader, key, GetFieldType(key)));
+            //}
+
+            WriteToEmptyProperties(instance);
+        }
+
+
+
+        //internal static List<IQuery> GetFields(IModl instance)
+        //{
+        //    ReadFromEmptyProperties(instance);
+
+        //    var content = GetContents(instance);
+
+        //    List<IQuery> queries = new List<IQuery>();
+
+        //    foreach (var t in Tables)
+        //    {
+        //        Change query;
+
+        //        if (content.IsNew)
+        //            query = new Insert(content.Database, t);
+        //        else
+        //            query = new Update(content.Database, t).Where(t.Keys.First().Key).EqualTo(content.GetValue<object>(t.Keys.First().Key));
+
+        //        foreach (var fieldName in t.Fields)
+        //        {
+        //            var field = content.Fields[fieldName];
+        //            //if (field.Value.Type.GetInterface("IModl") != null) // && !(field.Value.Value is int))
+        //            //{
+        //            //    var m = (M)field.Value.Value;
+
+        //            //    if (m == null)
+        //            //        yield return new KeyValuePair<string, object>(field.Key, null);
+        //            //    //statement.With(field.Key, null);
+        //            //    else
+        //            //    {
+        //            //        if (m.IsDirty())
+        //            //            throw new Exception("Child " + m + " is dirty");
+
+        //            //        yield return new KeyValuePair<string, object>(field.Key, m.GetId());
+        //            //        //statement.With(field.Key, value.Id);
+        //            //    }
+        //            //}
+        //            if (field.IsDirty && (!content.AutomaticId || fieldName != t.IdName))
+        //                query.With(fieldName, field.Value);
+        //        }
+
+        //        queries.Add(query);
+        //    }
+
+        //    return queries;
+        //}
     }
 }

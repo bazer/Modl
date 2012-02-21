@@ -29,16 +29,23 @@ namespace Modl
     //    Guid
     //}
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
-    public class IdAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ForeignKeyAttribute : Attribute
     {
-        public string Name { get; private set; }
+        public Type Entity { get; private set; }
         //public IdType Type { get; private set; }
-        
-        public IdAttribute(string name)
+
+
+
+        public ForeignKeyAttribute(Type entity)
         {
-            Name = name;
-            //Type = type;
+            this.Entity = entity;
         }
+
+        //public KeyAttribute(string name)
+        //{
+        //    Name = name;
+        //    //Type = type;
+        //}
     }
 }

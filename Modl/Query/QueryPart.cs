@@ -24,8 +24,8 @@ using System.Data;
 
 namespace Modl.Query
 {
-    public abstract class QueryPart<M>
-        where M : IDbModl, new()
+    public abstract class QueryPart
+        //where M : IDbModl, new()
     {
         public abstract Sql GetCommandString(Sql sql, string prefix, int number);
         public abstract Sql GetCommandParameter(Sql sql, string prefix, int number);

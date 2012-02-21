@@ -24,12 +24,13 @@ using Modl;
 
 namespace ExampleModel
 {
-    [Table("Vehicles")]
+    [Name("Vehicles")]
     [Cache(CacheLevel.Off, Timeout.Never)]
     public class Vehicle : ITxtModl, IDbModl
     {
-        [Id("Id")]
+        [Key]
         public int Id { get; set; }
-        public Manufacturer Manufacturer_fk { get; set; }
+        [Name("Manufacturer_fk")]
+        public Manufacturer Manufacturer { get; set; }
     }
 }

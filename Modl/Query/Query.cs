@@ -23,6 +23,7 @@ using System.Text;
 using System.Data.SqlClient;
 using System.Data;
 using Modl.DatabaseProviders;
+using Modl.Fields;
 
 namespace Modl.Query
 {
@@ -36,53 +37,54 @@ namespace Modl.Query
         //IEnumerable<IDataParameter> QueryPartsParameters();
     }
 
-    public abstract class Query<M, Q> : IQuery
-        where M : IDbModl, new()
-        where Q : Query<M, Q>
+    public abstract class Query<Q> : IQuery
+        //where M : IDbModl, new()
+        where Q : Query<Q>
     {
-        protected List<Where<M, Q>> whereList = new List<Where<M, Q>>();
-        protected M owner;
+        protected List<Where<Q>> whereList = new List<Where<Q>>();
+        protected IModl owner;
         protected Database provider;
         public Database DatabaseProvider { get { return provider; } }
         public abstract Sql ToSql(string paramPrefix);
         public abstract int ParameterCount { get; }
-
+        protected Table table;
         
 
         public Query()
         {
         }
 
-        public Query(Database database)
+        public Query(Database database, Table table)
         {
-            provider = database;
+            this.provider = database;
+            this.table = table;
         }
 
-        public Query(M owner)
+        public Query(IModl owner)
         {
             this.owner = owner;
         }
 
-        public Where<M, Q> Where(string key)
+        public Where<Q> Where(string key)
         {
-            var where = new Where<M, Q>((Q)this, key);
+            var where = new Where<Q>((Q)this, key);
             whereList.Add(where);
 
             return where;
         }
 
-        public Q WhereNotAny(IEnumerable<M> collection)
-        {
-            foreach (var m in collection)
-                Where(DbModl<M>.IdName).NotEqualTo(m.GetId());
+        //public Q WhereNotAny(IEnumerable<IModl> collection)
+        //{
+        //    foreach (var m in collection)
+        //        Where(table.IdName).NotEqualTo(m.GetId());
 
-            return (Q)this;
-        }
+        //    return (Q)this;
+        //}
 
         public Q WhereNotAny(IEnumerable<object> collection)
         {
             foreach (var id in collection)
-                Where(DbModl<M>.IdName).NotEqualTo(id);
+                Where(table.PrimaryKeyName).NotEqualTo(id);
 
             return (Q)this;
         }
@@ -105,27 +107,7 @@ namespace Modl.Query
             }
 
             return sql;
-
-                //.AddParameters(whereList.Select(x => x.GetCommandParameter(paramPrefix, j++)).ToArray())
-                
-                //.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(paramPrefix, i++)).ToArray());
-
-            //return new Sql("WHERE \r\n" +
-            //    string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(paramPrefix, i++))),
-            //    whereList.Select(x => x.GetCommandParameter(paramPrefix, j++)).ToArray());
         }
-
-        //protected string QueryPartsToString()
-        //{
-        //    int i = 0;
-        //    return string.Join(" AND \r\n", whereList.Select(x => x.GetCommandString(i++)));
-        //}
-
-        //public IEnumerable<IDataParameter> QueryPartsParameters()
-        //{
-        //    int i = 0;
-        //    return whereList.Select(x => x.GetCommandParameter(i++));
-        //}
 
         public IDbCommand ToDbCommand()
         {
@@ -136,15 +118,6 @@ namespace Modl.Query
         {
             var sql = ToSql(string.Empty);
             return sql.Text + "; " + string.Join(", ", sql.Parameters.Select(x => x.ParameterName + ": " + x.Value));
-
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine(sql.Item1 + "; ");
-
-
-            //foreach (var param in sql.Item2)
-            //    sb.AppendLine(param.ParameterName + ": " + param.Value);
-
-            //return sb.ToString();
         }
     }
 }
