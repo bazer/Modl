@@ -220,14 +220,14 @@ namespace Modl.Fields
         internal static void ReadFromEmptyProperties(IModl instance)
         {
             foreach (var property in EmptyProperties)
-                GetContents(instance).SetValue(property.Item1.Name, property.Item2((M)instance));
+                GetContents(instance).SetValue(Properties[property.Item1.Name], property.Item2((M)instance));
         }
 
         internal static void WriteToEmptyProperties(IModl instance, string propertyName = null)
         {
             foreach (var property in EmptyProperties)
                 if (propertyName == null || property.Item1.Name == propertyName)
-                    property.Item3((M)instance, GetContents(instance).GetValue<object>(property.Item1.Name));
+                    property.Item3((M)instance, GetContents(instance).GetValue<object>(Properties[property.Item1.Name]));
         }
 
         private static Func<M, object> MakeGetDelegate<T>(MethodInfo method)

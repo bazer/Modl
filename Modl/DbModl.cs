@@ -93,7 +93,9 @@ namespace Modl
             //if (CacheLevel == CacheLevel.On)
             //    return StaticCache<M, IdType>.GetWhere(query, database ?? DefaultDatabase);
             //else
-            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0], query).AddJoins(Tables).Get<M>();
+
+            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0]).AddJoins(Tables).GetAll<M>().SingleOrDefault(query.Compile());
+            //return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0], query).AddJoins(Tables).Get<M>();
 
             //return Get(new Select<M>(database ?? DefaultDatabase, query), throwExceptionOnNotFound);
         }
@@ -115,7 +117,8 @@ namespace Modl
             //if (CacheLevel == CacheLevel.On)
             //    return StaticCache<M, IdType>.GetAllWhere(query, database ?? DefaultDatabase);
             //else
-            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0], query).AddJoins(Tables).GetAll<M>();
+            return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0]).AddJoins(Tables).GetAll<M>().Where(query.Compile());
+            //return new Select(database ?? Statics<M>.DefaultDatabase, Tables[0], query).AddJoins(Tables).GetAll<M>();
 
             //return new Select<M, IdType>(database ?? DefaultDatabase, query).GetList(true);
             //return GetList(new Select<M>(database ?? DefaultDatabase, query));
@@ -133,7 +136,8 @@ namespace Modl
 
         public static bool DeleteAllWhere(Expression<Func<M, bool>> query, Database database = null)
         {
-            return DbAccess.ExecuteNonQuery(new Delete(database ?? DefaultDatabase, Tables[0], query));
+            throw new NotImplementedException();
+            //return DbAccess.ExecuteNonQuery(new Delete(database ?? DefaultDatabase, Tables[0], query));
         }
 
         public static bool DeleteAll(Database database = null)
@@ -156,7 +160,7 @@ namespace Modl
             return m.GetContent().Database;
         }
 
-        public static bool WriteToDb<M>(this M m) where M : IDbModl, new()
+        public static bool WriteToDb<M>(this M m, bool saveRelated = true) where M : IDbModl, new()
         {
             var content = m.GetContent();
             Statics<M>.ReadFromEmptyProperties(m);
@@ -190,23 +194,18 @@ namespace Modl
                 foreach (var f in t.Fields)
                 {
                     var field = content.Fields[f.Key];
-                    //if (field.Value.Type.GetInterface("IModl") != null) // && !(field.Value.Value is int))
-                    //{
-                    //    var m = (M)field.Value.Value;
 
-                    //    if (m == null)
-                    //        yield return new KeyValuePair<string, object>(field.Key, null);
-                    //    //statement.With(field.Key, null);
-                    //    else
-                    //    {
-                    //        if (m.IsDirty())
-                    //            throw new Exception("Child " + m + " is dirty");
+                    if (f.Value.GetInterface("IDbModl") != null && field.Value != null)
+                    {
+                        //var related = field.Value as IDbModl;
 
-                    //        yield return new KeyValuePair<string, object>(field.Key, m.GetId());
-                    //        //statement.With(field.Key, value.Id);
-                    //    }
-                    //}
-                    if (field.IsDirty && (!content.AutomaticId || !t.HasKey || f.Key != t.PrimaryKeyName))
+                        //if ((related.IsDirty() || related.IsNew()) && saveRelated)
+                        //    related.WriteToDb();
+
+                        //if (!related.IsNew() && !related.IsDeleted())
+                        //    query.With(f.Key, related.GetId());
+                    }
+                    else if (field.IsDirty && (!content.AutomaticId || !t.HasKey || f.Key != t.PrimaryKeyName))
                         query.With(f.Key, field.Value);
                 }
 
@@ -242,6 +241,26 @@ namespace Modl
             return result;
         }
 
+        public static M GetFk<M>(this IDbModl m) where M : IDbModl, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static M GetFk<M>(this IDbModl m, string name) where M : IDbModl, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static M SetFk<M>(this IDbModl m, M value) where M : IDbModl, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static M SetFk<M>(this IDbModl m, string name, M value) where M : IDbModl, new()
+        {
+            throw new NotImplementedException();
+        }
+
         public static Select AddJoins(this Select s, List<Table> tables)
         {
             Table parent = tables[0];
@@ -254,6 +273,8 @@ namespace Modl
                     if (fk != null)
                         s.InnerJoin(t.Name).Where(fk).EqualTo(parent.PrimaryKeyName);
                 }
+
+                parent = t;
             }
 
             return s;

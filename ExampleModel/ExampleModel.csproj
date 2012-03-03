@@ -50,6 +50,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Modl.Mvc\Modl.Mvc.csproj">
+      <Project>{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}</Project>
+      <Name>Modl.Mvc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Modl\Modl.csproj">
       <Project>{23EFD310-2981-4589-A8AC-BDBA33712479}</Project>
       <Name>Modl</Name>

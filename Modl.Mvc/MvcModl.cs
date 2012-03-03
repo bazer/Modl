@@ -6,7 +6,7 @@ using Modl.Linq;
 using Modl.Query;
 using System.Linq.Expressions;
 
-namespace Modl
+namespace Modl.Mvc
 {
     public interface IMvcModl : IModl
     {

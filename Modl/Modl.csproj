@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\ThirdParty\Cecil\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.4.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ThirdParty\MySql\mysql.data.dll</HintPath>
@@ -53,7 +56,6 @@
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
     <Compile Include="Fields\Table.cs" />
-    <Compile Include="MvcModl.cs" />
     <Compile Include="Query\Join.cs" />
     <Compile Include="TxtModl.cs" />
     <Compile Include="DbModlAsync.cs" />
@@ -104,9 +106,6 @@
       <Link>SQLCE4.sdf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

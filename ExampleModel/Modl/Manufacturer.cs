@@ -31,6 +31,11 @@ namespace ExampleModel
         public Guid ManufacturerID { get; set; }
         public string Name { get; set; }
 
+        [ForeignKey(typeof(Vehicle), "Manufacturer_fk")]
+        public List<Vehicle> Vechicles { get; set; }
+        //public List<Vehicle> Vehicles { get { return this.GetFk("Manufacturer"); } set { SetFk(value); } }
+        
+
         public Manufacturer() { }
         public Manufacturer(string name)
         {

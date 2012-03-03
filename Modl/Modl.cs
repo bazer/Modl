@@ -66,21 +66,34 @@ namespace Modl
 
     public static class IModlExtensions
     {
-        internal static Content GetContent<M>(this M m) where M : IModl, new()
+        internal static Content GetContent(this IModl instance)
         {
-            if (m == null)
+            var content = Content.GetContents(instance);
+
+            if (instance == null)
                 throw new NullReferenceException("Modl object is null");
 
-            return Statics<M>.GetContents(m);
-            //throw new NotImplementedException();
+            //if (content == null)
+            //    content = AddInstance(instance);
+
+            return content;
         }
 
-        public static bool IsNew<M>(this M m) where M : IModl, new()
+        //internal static Content GetContent<M>(this M m) where M : IModl, new()
+        //{
+        //    if (m == null)
+        //        throw new NullReferenceException("Modl object is null");
+
+        //    return Statics<M>.GetContents(m);
+        //    //throw new NotImplementedException();
+        //}
+
+        public static bool IsNew(this IModl m)// where M : IModl, new()
         {
             return m.GetContent().IsNew;
         }
 
-        public static bool IsDeleted<M>(this M m) where M : IModl, new()
+        public static bool IsDeleted(this IModl m)// where M : IModl, new()
         {
             return m.GetContent().IsDeleted;
         }

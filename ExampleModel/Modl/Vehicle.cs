@@ -32,5 +32,17 @@ namespace ExampleModel
         public int Id { get; set; }
         [Name("Manufacturer_fk")]
         public Manufacturer Manufacturer { get; set; }
+
+        //[Name("Manufacturer_fk")]
+        //public Manufacturer Manufacturer { get { return this.GetFk<Manufacturer>(); } set { this.SetFk(value); } }
+
+        
+        
+        
+        //public Manufacturer Manufacturer { get { return GetFk("Manufacturer_fk", id => DbModl<Manufacturer>.Get(id)); } }
+
+
+        //public Manufacturer Manufacturer { get { return GetLazy<Manufacturer>("Manufacturer", x => x. set; }
+            
     }
 }
