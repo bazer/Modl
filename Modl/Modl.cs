@@ -45,7 +45,7 @@ namespace Modl
     public class Modl<M>
         where M : IModl, new()
     {
-        internal static string IdName { get { return Statics<M>.IdName; } }
+        public static string IdName { get { return Statics<M>.IdName; } }
 
         public static M New()
         {

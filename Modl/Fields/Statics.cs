@@ -256,6 +256,8 @@ namespace Modl.Fields
             }
 
             content.IsNew = false;
+            content.ResetFields();
+
             //var keys = Fields.Keys.ToList();
 
             //for (int i = 0; i < Fields.Count; i++)

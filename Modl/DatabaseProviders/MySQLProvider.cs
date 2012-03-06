@@ -1,4 +1,5 @@
-﻿/*
+﻿using System;
+/*
 Copyright 2011-2012 Sebastian Öberg (https://github.com/bazer)
 
 This file is part of Modl.
@@ -62,7 +63,7 @@ namespace Modl.DatabaseProviders
 
         internal override Sql GetParameter(Sql sql, string key, object value)
         {
-            return sql.AddParameters(new MySqlParameter("?" + key, value));
+            return sql.AddParameters(new MySqlParameter("?" + key, value ?? DBNull.Value));
         }
 
         internal override IDbCommand ToDbCommand(IQuery query)
