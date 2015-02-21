@@ -31,7 +31,7 @@ namespace Modl
 
         public CacheAttribute(CacheLevel cacheLevel)
         {
-            CacheTimeout = Config.DefaultCacheTimeout;
+            CacheTimeout = ModlConfig.DefaultCacheTimeout;
             CacheLevel = cacheLevel;
         }
 

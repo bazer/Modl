@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ExampleModel;
 using Modl;
 using System.Diagnostics;
+using Modl.Db;
 
 namespace Tests
 {
@@ -64,68 +65,70 @@ namespace Tests
         //    Console.WriteLine(string.Format("[{0}]Total time: {1}", databaseName, watch.Elapsed.TotalMilliseconds));
         //}
 
-        [TestMethod]
-        public void GlobalCRUD()
-        {
-            basics.SwitchDatabase(databaseName);
-            basics.CRUD();
-        }
 
-        [TestMethod]
-        public void StaticCRUD()
-        {
-            basics.SwitchDatabase("SqlServerDb");
-            basics.SwitchStaticDatabaseAndCRUD(databaseName);
-        }
 
-        [TestMethod]
-        public void InstanceCRUD()
-        {
-            basics.SwitchDatabase("SqlServerDb");
-            basics.SwitchInstanceDatabaseAndCRUD(databaseName);
-        }
+        //[TestMethod]
+        //public void GlobalCRUD()
+        //{
+        //    basics.SwitchDatabase(databaseName);
+        //    basics.CRUD();
+        //}
 
-        [TestMethod]
-        public void GetFromDatabaseProvider()
-        {
-            basics.SwitchDatabase("SqlServerDb");
-            basics.GetFromDatabaseProvider(databaseName);
-        }
+        //[TestMethod]
+        //public void StaticCRUD()
+        //{
+        //    basics.SwitchDatabase("SqlServerDb");
+        //    basics.SwitchStaticDatabaseAndCRUD(databaseName);
+        //}
 
-        [TestMethod]
-        public void GetFromLinq()
-        {
-            basics.SwitchDatabase(databaseName);
-            basics.GetFromLinq();
-            basics.SwitchDatabase("SqlServerDb");
-            basics.GetFromLinqInstance(databaseName);
-        }
+        //[TestMethod]
+        //public void InstanceCRUD()
+        //{
+        //    basics.SwitchDatabase("SqlServerDb");
+        //    basics.SwitchInstanceDatabaseAndCRUD(databaseName);
+        //}
 
-        [TestMethod]
-        public void StaticDelete()
-        {
-            basics.SwitchDatabase(databaseName);
-            basics.StaticDelete();
-        }
+        //[TestMethod]
+        //public void GetFromDatabaseProvider()
+        //{
+        //    basics.SwitchDatabase("SqlServerDb");
+        //    basics.GetFromDatabaseProvider(databaseName);
+        //}
 
-        [TestMethod]
-        public void SetIdExplicit()
-        {
-            basics.SwitchDatabase(databaseName);
-            basics.SetIdExplicit();
-        }
+        //[TestMethod]
+        //public void GetFromLinq()
+        //{
+        //    basics.SwitchDatabase(databaseName);
+        //    basics.GetFromLinq();
+        //    basics.SwitchDatabase("SqlServerDb");
+        //    basics.GetFromLinqInstance(databaseName);
+        //}
 
-        [TestMethod]
-        public void CRUDIdExplicit()
-        {
-            basics.CRUDExplicitId(Database.Get(databaseName));
-        }
+        //[TestMethod]
+        //public void StaticDelete()
+        //{
+        //    basics.SwitchDatabase(databaseName);
+        //    basics.StaticDelete();
+        //}
 
-        [TestMethod]
-        public void GetAllAsync()
-        {
-            basics.SwitchDatabase(databaseName);
-            basics.GetAllAsync();
-        }
+        //[TestMethod]
+        //public void SetIdExplicit()
+        //{
+        //    basics.SwitchDatabase(databaseName);
+        //    basics.SetIdExplicit();
+        //}
+
+        //[TestMethod]
+        //public void CRUDIdExplicit()
+        //{
+        //    basics.CRUDExplicitId(Database.Get(databaseName));
+        //}
+
+        //[TestMethod]
+        //public void GetAllAsync()
+        //{
+        //    basics.SwitchDatabase(databaseName);
+        //    basics.GetAllAsync();
+        //}
     }
 }

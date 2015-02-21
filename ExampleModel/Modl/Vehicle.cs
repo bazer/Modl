@@ -26,7 +26,7 @@ namespace ExampleModel
 {
     [Name("Vehicles")]
     [Cache(CacheLevel.Off, Timeout.Never)]
-    public class Vehicle : ITxtModl, IDbModl
+    public class Vehicle : IModl
     {
         [Key]
         public int Id { get; set; }

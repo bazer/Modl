@@ -22,7 +22,7 @@ using System.Threading;
 
 namespace Modl.Cache
 {
-    internal class CacheConfig
+    public class CacheConfig
     {
         public static CacheLevel DefaultCacheLevel { get; set; }
         public static int DefaultCacheTimeout { get; set; }
@@ -39,7 +39,7 @@ namespace Modl.Cache
             cacheList.Add(clearMethod);
         }
 
-        internal static void Clear()
+        public static void Clear()
         {
             foreach (var cache in cacheList)
                 cache.Invoke();

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,9 +10,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Modl</RootNamespace>
     <AssemblyName>Modl</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,24 +32,13 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\ThirdParty\Cecil\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Data, Version=6.4.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\MySql\mysql.data.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Microsoft SQL Server Compact Edition\v4.0\Desktop\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\CacheAttribute.cs" />
@@ -55,57 +46,28 @@
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
-    <Compile Include="Fields\Table.cs" />
-    <Compile Include="Query\Join.cs" />
-    <Compile Include="TxtModl.cs" />
-    <Compile Include="DbModlAsync.cs" />
-    <Compile Include="DataAccess\Materializer.cs" />
-    <Compile Include="DataAccess\WorkPackage.cs" />
+    <Compile Include="Structure\ModlLayer.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="Interfaces\IModl.cs" />
+    <Compile Include="Interfaces\IModlExtensions.cs" />
+    <Compile Include="Interfaces\IModlPipeline.cs" />
+    <Compile Include="Interfaces\IModlSerializer.cs" />
+    <Compile Include="Interfaces\IModlEndpoint.cs" />
+    <Compile Include="Structure\ModlIdentity.cs" />
+    <Compile Include="Structure\ModlInternal.cs" />
+    <Compile Include="Structure\ModlMetadata.cs" />
+    <Compile Include="Structure\ModlSettings.cs" />
+    <Compile Include="Plugins\FileModl.cs" />
     <Compile Include="Cache\CacheConfig.cs" />
-    <Compile Include="DataAccess\AsyncDbAccess.cs" />
     <Compile Include="Cache\StaticCache.cs" />
-    <Compile Include="DataAccess\AsyncWorker.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="DatabaseProviders\MySQLProvider.cs" />
-    <Compile Include="DatabaseProviders\SqlCeProvider.cs" />
-    <Compile Include="Database.cs" />
-    <Compile Include="DatabaseProviders\SqlServerProvider.cs" />
-    <Compile Include="DbModl.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Fields\Field.cs" />
-    <Compile Include="Fields\Statics.cs" />
-    <Compile Include="Fields\Content.cs" />
-    <Compile Include="Inherits.cs" />
-    <Compile Include="Linq\Evaluator.cs" />
-    <Compile Include="Linq\LinqHelper.cs" />
-    <Compile Include="Linq\Parsers\WhereParser.cs" />
-    <Compile Include="Linq\LinqQuery.cs" />
-    <Compile Include="Linq\Parsers\LinqParser.cs" />
-    <Compile Include="Linq\LinqQueryProvider.cs" />
+    <Compile Include="Structure\ModlProperty.cs" />
+    <Compile Include="Structure\ModlInstances.cs" />
+    <Compile Include="Structure\ModlData.cs" />
     <Compile Include="Modl.cs" />
-    <Compile Include="Fields\DynamicFields.cs" />
-    <Compile Include="DataAccess\DbAccess.cs" />
-    <Compile Include="DataAccess\DbTransaction.cs" />
-    <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query\Literal.cs" />
-    <Compile Include="Query\Change.cs" />
-    <Compile Include="Query\QueryPart.cs" />
-    <Compile Include="Query\Sql.cs" />
-    <Compile Include="Query\Where.cs" />
-    <Compile Include="Query\Delete.cs" />
-    <Compile Include="Query\Insert.cs" />
-    <Compile Include="Query\Update.cs" />
-    <Compile Include="Query\Select.cs" />
-    <Compile Include="Query\Query.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Databases\SQLCE4.sdf">
-      <Link>SQLCE4.sdf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

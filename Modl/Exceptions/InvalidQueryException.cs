@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Modl.Exceptions
 {
-    class InvalidQueryException : System.Exception
+    public class InvalidQueryException : System.Exception
     {
         private string message;
 

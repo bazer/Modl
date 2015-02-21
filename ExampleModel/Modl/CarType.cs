@@ -25,7 +25,7 @@ using Modl;
 namespace ExampleModel
 {
     [Name("CarType")]
-    public class CarType : IDbModl
+    public class CarType : IModl
     {
         [Key]
         public int TypeID { get; set; }

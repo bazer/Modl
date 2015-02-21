@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Modl;
+using Modl.Db;
 
 namespace ExampleModel
 {
@@ -25,29 +26,29 @@ namespace ExampleModel
             return Modl<Vehicle>.New();
         }
 
-        public bool GetCar(int id)
-        {
-            var car = new Car();
-            car.IsNew();
-            car.IsNewText();
+        //public bool GetCar(int id)
+        //{
+        //    var car = new Car();
+        //    car.IsNew();
+        //    car.IsNewText();
 
-            var man = new Manufacturer();
-            man.WriteToDb();
+        //    var man = new Manufacturer();
+        //    //man.WriteToDb();
 
-            return TxtModl<Car>.New().IsNewText();
-        }
+        //    return TxtModl<Car>.New().IsNewText();
+        //}
 
-        public IQueryable<Car> Cars
-        {
-            get 
-            {
-                return DbModl<Car>.Query(db);
-            }
-        }
+        //public IQueryable<Car> Cars
+        //{
+        //    get 
+        //    {
+        //        return DbModl<Car>.Query(db);
+        //    }
+        //}
 
-        public IQueryable<Manufacturer> Manufacturers
-        {
-            get { return DbModl<Manufacturer>.Query(db); }
-        }
+        //public IQueryable<Manufacturer> Manufacturers
+        //{
+        //    get { return DbModl<Manufacturer>.Query(db); }
+        //}
     }
 }

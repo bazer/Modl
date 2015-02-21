@@ -22,10 +22,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Configuration;
-using Modl.DatabaseProviders;
-using System.Data;
-using Modl.DataAccess;
+
 using Modl.Cache;
+using Modl.Structure;
 
 namespace Modl
 {
@@ -46,10 +45,12 @@ namespace Modl
         OneDay = 1440
     }
 
-    public class Config
+    public class ModlConfig
     {
         public static CacheLevel DefaultCacheLevel { get { return CacheConfig.DefaultCacheLevel; } set { CacheConfig.DefaultCacheLevel = value; } }
         public static int DefaultCacheTimeout { get { return CacheConfig.DefaultCacheTimeout; } set { CacheConfig.DefaultCacheTimeout = value; } }
+
+        public static ModlSettings GlobalSettings { get; private set; }
 
 
         //private static CacheLevel cacheLevel;
@@ -71,17 +72,19 @@ namespace Modl
         //    }
         //}
 
-        
-        protected static Dictionary<string, Database> DatabaseProviders = new Dictionary<string, Database>();
 
-        static Config()
+        //protected static Dictionary<string, Database> DatabaseProviders = new Dictionary<string, Database>();
+
+        static ModlConfig()
         {
+            GlobalSettings = new ModlSettings();
+
             DefaultCacheLevel = CacheLevel.On;
             DefaultCacheTimeout = 20;
 
-            foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
-                if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
-                    Database.AddFromConnectionString(connString);
+            //foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
+            //    if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
+            //        Database.AddFromConnectionString(connString);
 
             //if (ConfigurationManager.ConnectionStrings.Count > 1)
             //    AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
@@ -89,48 +92,48 @@ namespace Modl
 
         
 
-        private static Database defaultDbProvider = null;
-        internal static Database DefaultDatabase
-        {
-            get
-            {
-                if (defaultDbProvider == null)
-                    defaultDbProvider = Config.DatabaseProviders.Last().Value;
+        //private static Database defaultDbProvider = null;
+        //internal static Database DefaultDatabase
+        //{
+        //    get
+        //    {
+        //        if (defaultDbProvider == null)
+        //            defaultDbProvider = Config.DatabaseProviders.Last().Value;
 
-                return defaultDbProvider;
-            }
-            set
-            {
-                defaultDbProvider = value;
-            }
-        }
+        //        return defaultDbProvider;
+        //    }
+        //    set
+        //    {
+        //        defaultDbProvider = value;
+        //    }
+        //}
 
-        internal static Database AddDatabase(Database database)
-        {
-            DatabaseProviders[database.Name] = database;
+        //internal static Database AddDatabase(Database database)
+        //{
+        //    DatabaseProviders[database.Name] = database;
 
-            return database;
-        }
+        //    return database;
+        //}
 
-        internal static Database GetDatabase(string databaseName)
-        {
-            return DatabaseProviders[databaseName];
-        }
+        //internal static Database GetDatabase(string databaseName)
+        //{
+        //    return DatabaseProviders[databaseName];
+        //}
 
-        internal static List<Database> GetAllDatabases()
-        {
-            return DatabaseProviders.Values.ToList();
-        }
+        //internal static List<Database> GetAllDatabases()
+        //{
+        //    return DatabaseProviders.Values.ToList();
+        //}
 
-        internal static void RemoveDatabase(string databaseName)
-        {
-            DatabaseProviders.Remove(databaseName);
-        }
+        //internal static void RemoveDatabase(string databaseName)
+        //{
+        //    DatabaseProviders.Remove(databaseName);
+        //}
 
-        internal static void RemoveAllDatabases()
-        {
-            DatabaseProviders.Clear();
-        }
+        //internal static void RemoveAllDatabases()
+        //{
+        //    DatabaseProviders.Clear();
+        //}
 
         //public static IDbConnection GetConnection(string databaseName)
         //{

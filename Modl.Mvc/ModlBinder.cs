@@ -25,21 +25,21 @@ using System.Reflection;
 
 namespace Modl.Mvc
 {
-    public class DbModlBinder<M> : DefaultModelBinder where M : IDbModl, new()
+    public class DbModlBinder<M> : DefaultModelBinder where M : IModl, new()
     {
         //public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, System.Type modelType)
         {
 
-            var id = bindingContext.ValueProvider.GetValue(bindingContext.ModelName + "." + DbModl<M>.IdName);
+            var id = bindingContext.ValueProvider.GetValue(bindingContext.ModelName + "." + Modl<M>.Metadata.IdName);
 
             if (id == null)
-                id = bindingContext.ValueProvider.GetValue(DbModl<M>.IdName);
+                id = bindingContext.ValueProvider.GetValue(Modl<M>.Metadata.IdName);
 
             if (id != null)
-                return DbModl<M>.Get(id.AttemptedValue);
+                return Modl<M>.Get(id.AttemptedValue);
 
-            return DbModl<M>.New();
+            return Modl<M>.New();
 
             //if (bindingContext.ModelType.GetInterface("IModl") != null && value != null)
             //{
