@@ -16,32 +16,21 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
-//using Modl.DataAccess;
-using Modl.Cache;
 using Modl.Structure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-//using Modl.Linq;
-//using Modl.Query;
 
 namespace Modl
 {
-    
+
 
     public class Modl<M>
         where M : IModl, new()
     {
-        //public static string IdName { get { return ModlInternal<M>.Metadata.IdName; } }
-
         public static ModlSettings Settings { get { return ModlInternal<M>.Settings; } }
 
         public static ModlMetadata<M> Metadata { get { return ModlInternal<M>.Metadata; } }
 
         static Modl()
         {
-            //ModlInternal<M>.Initialize();
         }
 
         public static M New()
@@ -62,8 +51,6 @@ namespace Modl
 
         public static M Get(object id)
         {
-            //var settings = ModlInstances<M>.Settings;
-
             var identity = new ModlIdentity
             {
                 Id = id.ToString(),

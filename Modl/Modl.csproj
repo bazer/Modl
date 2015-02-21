@@ -47,7 +47,6 @@
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
     <Compile Include="Structure\ModlLayer.cs" />
-    <Compile Include="Helper.cs" />
     <Compile Include="Interfaces\IModl.cs" />
     <Compile Include="Interfaces\IModlExtensions.cs" />
     <Compile Include="Interfaces\IModlPipeline.cs" />
@@ -60,7 +59,7 @@
     <Compile Include="Plugins\FileModl.cs" />
     <Compile Include="Cache\CacheConfig.cs" />
     <Compile Include="Cache\StaticCache.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Structure\ModlConfig.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
     <Compile Include="Structure\ModlProperty.cs" />

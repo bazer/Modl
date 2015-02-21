@@ -1,4 +1,5 @@
-﻿using Modl.Interfaces;
+﻿using Modl.Cache;
+using Modl.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,9 @@ namespace Modl.Structure
 {
     public class ModlSettings
     {
+        public CacheLevel CacheLevel;
+        public int CacheTimeout;
+
         private IModlEndpoint endpoint;
         public IModlEndpoint Endpoint
         {
@@ -47,6 +51,12 @@ namespace Modl.Structure
             }
         }
 
+
+        public ModlSettings()
+        {
+            CacheLevel = CacheConfig.DefaultCacheLevel;
+            CacheTimeout = CacheConfig.DefaultCacheTimeout;
+        }
 
 
 

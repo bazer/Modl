@@ -47,8 +47,8 @@ namespace Modl
 
     public class ModlConfig
     {
-        public static CacheLevel DefaultCacheLevel { get { return CacheConfig.DefaultCacheLevel; } set { CacheConfig.DefaultCacheLevel = value; } }
-        public static int DefaultCacheTimeout { get { return CacheConfig.DefaultCacheTimeout; } set { CacheConfig.DefaultCacheTimeout = value; } }
+        //public static CacheLevel DefaultCacheLevel { get { return CacheConfig.DefaultCacheLevel; } set { CacheConfig.DefaultCacheLevel = value; } }
+        //public static int DefaultCacheTimeout { get { return CacheConfig.DefaultCacheTimeout; } set { CacheConfig.DefaultCacheTimeout = value; } }
 
         public static ModlSettings GlobalSettings { get; private set; }
 
@@ -79,8 +79,8 @@ namespace Modl
         {
             GlobalSettings = new ModlSettings();
 
-            DefaultCacheLevel = CacheLevel.On;
-            DefaultCacheTimeout = 20;
+            //DefaultCacheLevel = CacheLevel.On;
+            //DefaultCacheTimeout = 20;
 
             //foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
             //    if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
