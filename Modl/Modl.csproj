@@ -64,9 +64,10 @@
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
     <Compile Include="Structure\ModlProperty.cs" />
     <Compile Include="Structure\ModlInstances.cs" />
-    <Compile Include="Structure\ModlData.cs" />
+    <Compile Include="Structure\ModlInstance.cs" />
     <Compile Include="Modl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structure\ModlStorage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

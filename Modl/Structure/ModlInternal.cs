@@ -14,107 +14,59 @@ namespace Modl.Structure
     {
         public static ModlSettings Settings { get; private set; }
         public static ModlMetadata<M> Metadata { get; private set; }
+        private static Dictionary<int, ModlInstance<M>> Instances { get; set; }
 
         static ModlInternal()
         {
             Settings = new ModlSettings();
             Metadata = new ModlMetadata<M>();
+            Instances = new Dictionary<int, ModlInstance<M>>();
         }
 
-        public static ModlData AddInstance(IModl instance)
+        internal static ModlInstance<M> GetInstance(M m)
         {
-            //var content = GetContents(instance);
-            ModlData content;
+            if (m == null)
+                throw new NullReferenceException("Modl object is null");
 
-            if (!ModlData.HasInstance(instance))
-            {
-                content = ModlData.AddInstance(instance);
-                FillFields(content);
-            }
-            else
-                content = ModlData.GetContents(instance);
-
-
+            ModlInstance<M> content;
+            if (!Instances.TryGetValue(m.GetHashCode(), out content))
+                throw new Exception("The instance hasn't been attached");
 
             return content;
         }
 
-        internal static bool IsModified(IModl instance)
+        internal static bool HasInstance(M m)
         {
-            ReadFromEmptyProperties(instance);
-            return GetData(instance).IsModified;
+            return Instances.ContainsKey(m.GetHashCode());
         }
 
-        internal static ModlData GetData(IModl instance)
+        internal static void AddInstance(M m)
         {
-            var content = ModlData.GetContents(instance);
-
-            if (content == null)
-                content = AddInstance(instance);
-
-            return content;
+            if (!HasInstance(m))
+                Instances.Add(m.GetHashCode(), new ModlInstance<M>(m));
         }
 
-        internal static void SetId(IModl instance, object value)
+        internal static ModlInstance<M> AddFromStorage(ModlStorage storage)
         {
-            var content = GetData(instance);
-            content.SetValue<object>(Metadata.IdName, value);
-            content.AutomaticId = false;
+            var instance = new M().Modl().GetInstance();
+            instance.SetValuesFromStorage(storage);
 
-            WriteToEmptyProperties(instance, Metadata.IdName);
+            return instance;
         }
 
-        internal static object GetId(IModl instance)
+        internal static bool Delete(M m)
         {
-            return GetData(instance).GetValue<object>(Metadata.IdName);
+            throw new NotImplementedException();
         }
 
-        internal static ModlIdentity GetIdentity(IModl instance)
+        internal static bool Save(M m)
         {
-            return new ModlIdentity
-            {
-                Id = GetData(instance).GetValue<object>(Metadata.IdName).ToString(),
-                ModlName = Metadata.ModlName
-            };
-        }
+            var instance = m.GetInstance();
 
-        
-
-        
-
-       
-
-        internal static void FillFields(ModlData content)
-        {
-            foreach (var field in Metadata.Types)
-                content.SetValue(field.Key, GetDefault(field.Value));
-        }
-
-
-        internal static void ReadFromEmptyProperties(IModl instance)
-        {
-            foreach (var property in Metadata.EmptyProperties)
-                GetData(instance).SetValue(Metadata.Properties[property.Item1.Name], property.Item2((M)instance));
-        }
-
-        internal static void WriteToEmptyProperties(IModl instance, string propertyName = null)
-        {
-            foreach (var property in Metadata.EmptyProperties)
-                if (propertyName == null || property.Item1.Name == propertyName)
-                    property.Item3((M)instance, GetData(instance).GetValue<object>(Metadata.Properties[property.Item1.Name]));
-        }
-
-        
-
-        public static bool Save(M m)
-        {
-            var content = m.GetContent();
-            ReadFromEmptyProperties(m);
-
-            if (content.IsDeleted)
+            if (instance.IsDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", typeof(M), m.GetId()));
 
-            if (!IsModified(m))
+            if (!instance.IsModified)
                 return false;
 
             object keyValue = null;
@@ -127,7 +79,7 @@ namespace Modl.Structure
                     var fk = t.ForeignKeys.Where(x => x.Value == parentType).Select(x => x.Key).SingleOrDefault();
 
                     if (fk != null)
-                        content.SetValue(fk, keyValue);
+                        instance.SetValue(fk, keyValue);
                 }
 
                 //Change query;
@@ -137,29 +89,29 @@ namespace Modl.Structure
                 //else
                 //    query = new Update(content.Database, t).Where(t.PrimaryKeyName).EqualTo(content.GetValue<object>(t.PrimaryKeyName));
 
-                foreach (var f in t.Fields)
-                {
-                    var field = content.Fields[f.Key];
+                //foreach (var f in t.Fields)
+                //{
+                //    var field = instance.Properties[f.Key];
 
-                    if (f.Value.GetInterface("IModl") != null && field.Value != null)
-                    {
-                        var related = field.Value as IModl;
+                //    if (f.Value.GetInterface("IModl") != null && field.Value != null)
+                //    {
+                //        var related = field.Value as IModl;
 
-                        if (related.GetContent().IsModified || related.IsNew())// && saveRelated)
-                        {
-                            var method = typeof(IModlExtensions).GetMethod("Save");
-                            var generic = method.MakeGenericMethod(f.Value);
-                            generic.Invoke(null, new object[] { related });
+                //        if (related.GetInstance().IsModified || related.IsNew())// && saveRelated)
+                //        {
+                //            var method = typeof(IModlExtensions).GetMethod("Save");
+                //            var generic = method.MakeGenericMethod(f.Value);
+                //            generic.Invoke(null, new object[] { related });
 
-                            //related.Save();
-                        }
+                //            //related.Save();
+                //        }
 
-                        //if (!related.IsNew() && !related.IsDeleted())
-                        //    query.With(f.Key, related.GetId());
-                    }
-                    //else if (field.IsDirty && (!content.AutomaticId || !t.HasKey || f.Key != t.PrimaryKeyName))
-                    //    query.With(f.Key, field.Value);
-                }
+                //        //if (!related.IsNew() && !related.IsDeleted())
+                //        //    query.With(f.Key, related.GetId());
+                //    }
+                //    //else if (field.IsDirty && (!content.AutomaticId || !t.HasKey || f.Key != t.PrimaryKeyName))
+                //    //    query.With(f.Key, field.Value);
+                //}
 
 
 
@@ -174,34 +126,20 @@ namespace Modl.Structure
                 parentType = t.Type;
             }
 
-
-
-
-
-            var settings = Modl<M>.Settings;
-
-            var stream = settings.Serializer.ConvertTo(m);
+            
+            var stream = Modl<M>.Settings.Serializer.Serialize(instance.GetStorage());
             stream.Position = 0;
 
-            settings.Endpoint.Save(GetIdentity(m), stream);
+            Modl<M>.Settings.Endpoint.Save(instance.GetIdentity(), stream);
 
             stream.Dispose();
 
 
-            content.IsNew = false;
-            content.ResetFields();
-
-            WriteToEmptyProperties(m);
+            instance.IsNew = false;
+            instance.ResetFields();
+            instance.WriteToEmptyProperties();
 
             return true;
-        }
-
-        private static object GetDefault(Type type)
-        {
-            if (!type.IsValueType)
-                return null;
-            else
-                return Activator.CreateInstance(type);
         }
     }
 }

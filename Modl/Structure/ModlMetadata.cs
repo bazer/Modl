@@ -56,7 +56,7 @@ namespace Modl.Structure
             if (type.BaseType != null && type.BaseType != typeof(object))
                 ParseClassHierarchy(type.BaseType);
 
-            ModlLayer layer = new Structure.ModlLayer();
+            ModlLayer layer = new ModlLayer();
             layer.Name = type.Name;
             layer.Type = type;
 
@@ -96,8 +96,16 @@ namespace Modl.Structure
 
                     //content.SetValue(fieldName, Helper.GetDefault(property.PropertyType));
 
-                    var getDelegate = (Func<M, object>)typeof(ModlMetadata<M>).GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetGetMethod(true) });
-                    var setDelegate = (Action<M, object>)typeof(ModlMetadata<M>).GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property.GetSetMethod(true) });
+                    var getDelegate = (Func<M, object>)typeof(ModlMetadata<M>)
+                        .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType)
+                        .Invoke(null, new object[] { property.GetGetMethod(true) });
+
+                    var setDelegate = (Action<M, object>)typeof(ModlMetadata<M>)
+                        .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType)
+                        .Invoke(null, new object[] { property.GetSetMethod(true) });
+
                     EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
 
                     SetFieldName(property.Name, fieldName);
@@ -126,7 +134,7 @@ namespace Modl.Structure
         private static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
         {
             var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
-            return (m, t) => f(m, (T)t);
+            return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         }
     }
 }

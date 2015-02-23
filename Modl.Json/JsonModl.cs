@@ -10,33 +10,29 @@ using System.IO;
 namespace Modl.Json
 {
     public class JsonModl: IModlSerializer
-        //<M> : IModlSerializer<M>
-        //where M : IModl
     {
-        public M ConvertFrom<M>(Stream stream) where M : IModl, new()
+        MemoryStream IModlSerializer.Serialize(ModlStorage storage)
+        {
+            var stream = new MemoryStream();
+            var jsonTextWriter = new JsonTextWriter(new StreamWriter(stream));
+
+            new JsonSerializer().Serialize(jsonTextWriter, storage);
+            //new JsonSerializer().Serialize(jsonTextWriter, storage.Values);
+            jsonTextWriter.Flush();
+
+            return stream;
+        }
+
+        ModlStorage IModlSerializer.Deserialize(Stream stream)
         {
             var serializer = new JsonSerializer();
 
             using (var sr = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(sr))
             {
-                return serializer.Deserialize<M>(jsonTextReader);
+                return serializer.Deserialize<ModlStorage>(jsonTextReader);
+                //return new ModlStorage(serializer.Deserialize<Dictionary<string, object>>(jsonTextReader));
             }
-        }
-
-        public MemoryStream ConvertTo<M>(M modl) where M : IModl
-        {
-            var serializer = new JsonSerializer();
-
-            var stream = new MemoryStream();
-
-            var sr = new StreamWriter(stream);
-            var jsonTextWriter = new JsonTextWriter(sr);
-
-            serializer.Serialize(jsonTextWriter, modl);
-            jsonTextWriter.Flush();
-
-            return stream;
         }
     }
 }

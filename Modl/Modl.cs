@@ -35,10 +35,7 @@ namespace Modl
 
         public static M New()
         {
-            var m = new M();
-            var content = ModlInternal<M>.AddInstance(m);
-
-            return m;
+            return new M().Modl();
         }
 
         public static M New(object id)
@@ -54,21 +51,22 @@ namespace Modl
             var identity = new ModlIdentity
             {
                 Id = id.ToString(),
-                ModlName = Metadata.ModlName
+                Name = Metadata.ModlName
             };
 
             var stream = Settings.Endpoint.Get(identity);
             stream.Position = 0;
-            var m = Settings.Serializer.ConvertFrom<M>(stream).Modl();
+            var storage = Settings.Serializer.Deserialize(stream);
             stream.Dispose();
 
-            var content = m.GetContent();
-            content.IsNew = false;
-            content.ResetFields();
+            
+            var instance = ModlInternal<M>.AddFromStorage(storage);
+            instance.IsNew = false;
+            instance.ResetFields();
 
             //Statics<M>.WriteToEmptyProperties(m);
 
-            return m;
+            return instance.Instance;
         }
 
 

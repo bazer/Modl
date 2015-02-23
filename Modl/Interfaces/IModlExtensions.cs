@@ -7,70 +7,62 @@ using System.Threading.Tasks;
 
 namespace Modl
 {
-    public static class IModlExtensions
+    public static class ModlExtensions
     {
-        internal static ModlData GetContent(this IModl instance)
+        internal static ModlInstance<M> GetInstance<M>(this M m) where M : IModl, new()
         {
-            if (instance == null)
-                throw new NullReferenceException("Modl object is null");
-
-            var content = ModlData.GetContents(instance);
-
-            if (content == null)
-                throw new Exception("The instance hasn't been attached");
-
-
-
-
-            //if (content == null)
-            //    content = AddInstance(instance);
-
-            return content;
+            return ModlInternal<M>.GetInstance(m);
         }
-
-        //internal static Content GetContent<M>(this M m) where M : IModl, new()
-        //{
-        //    if (m == null)
-        //        throw new NullReferenceException("Modl object is null");
-
-        //    return Statics<M>.GetContents(m);
-        //    //throw new NotImplementedException();
-        //}
 
         public static M Modl<M>(this M m) where M : IModl, new()
         {
-            var content = ModlInternal<M>.AddInstance(m);
+            ModlInternal<M>.AddInstance(m);
             return m;
         }
 
-        public static bool IsNew(this IModl m)// where M : IModl, new()
+        public static bool IsNew<M>(this M m) where M : IModl, new()
         {
-            return m.GetContent().IsNew;
+            return m.GetInstance().IsNew;
         }
 
-        public static bool IsDeleted(this IModl m)// where M : IModl, new()
+        public static bool IsDeleted<M>(this M m) where M : IModl, new()
         {
-            return m.GetContent().IsDeleted;
+            return m.GetInstance().IsDeleted;
         }
 
         public static bool IsModified<M>(this M m) where M : IModl, new()
         {
-            return ModlInternal<M>.IsModified(m);
+            return m.GetInstance().IsModified;
         }
 
         public static void SetId<M>(this M m, object value) where M : IModl, new()
         {
-            ModlInternal<M>.SetId(m, value);
+            m.GetInstance().SetId(value);
         }
 
         public static object GetId<M>(this M m) where M : IModl, new()
         {
-            return ModlInternal<M>.GetId(m);
+            return m.GetInstance().GetId();
+        }
+
+        public static ModlIdentity GetIdentity<M>(this M m) where M : IModl, new()
+        {
+            return m.GetInstance().GetIdentity();
+        }
+
+        public static Dictionary<string, object> GetValues<M>(this M m) where M : IModl, new()
+        {
+            return m.GetInstance().GetValues();
         }
 
         public static bool Save<M>(this M m) where M : IModl, new()
         {
             return ModlInternal<M>.Save(m);
+        }
+
+        public static bool Delete<M>(this M m) where M : IModl, new()
+        {
+            return ModlInternal<M>.Delete(m);
         }
     }
 

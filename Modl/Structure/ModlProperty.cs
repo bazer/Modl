@@ -28,7 +28,7 @@ namespace Modl.Structure
         protected object oldValue;
         protected object newValue;
         protected bool isDirty = false;
-        internal bool IsDirty { get { return isDirty; } }
+        internal bool IsModified { get { return isDirty; } }
         internal Type Type { get; set; }
         //protected bool emptyProperty;
 

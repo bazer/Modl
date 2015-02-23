@@ -50,7 +50,7 @@ namespace Modl.Plugins
         private string GetDirectory(ModlIdentity identity)
         {
 
-            return path + identity.ModlName + Path.DirectorySeparatorChar;
+            return path + identity.Name + Path.DirectorySeparatorChar;
         }
 
         private string GetFilename(ModlIdentity identity)
