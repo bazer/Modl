@@ -6,13 +6,11 @@ It's written in C# and has the following core features:
 * Object cache
 * Change tracking with versioning
 * Readers and writers are plugins
-* Models have a unique id, a timestamp and a checksum
 * Keeps track of relations between models, including inheritance
-* Uses interfaces and extension methods to have as clean model classes as possible
-
+* Uses interfaces and extension methods to leave your classes as clean as possible
 
 ##Use cases
-* Memory
+* Memory storage
 * Json
 * Xml
 * Csv
@@ -26,27 +24,27 @@ It's written in C# and has the following core features:
 * Encryption
 * Etc.
 
+##Basic usage
+Class Car implements empty interface IModl.
 
-##Basic usage:
-Class Car implements empty interface IModl:
+    Car car = new Car().Modl();
+    Car car = Modl<Car>.New();
 
-var car = Modl<Car>.New();
-var car = new Car().Modl();
+    Car car = Modl<Car>.Get(id);
+    IEnumerable<Car> cars = Model<Car>.GetWhere(query);
+    IEnumerable<Car> cars = Model<Car>.GetAll();
 
-var car = Modl<Car>.Get(id);
-var cars = Model<Car>.GetWhere(query);
-var cars = Model<Car>.GetAll();
+    bool carExists = Model<Car>.Any(id);
+    bool carExists = Model<Car>.Any(query);
 
-var carExists = Model<Car>.Any(id);
-var carExists = Model<Car>.Any(query);
+    car.Save(withRelations = true);
+    car.Delete(withRelations = true);
 
-car.Save(withRelations = true);
-car.Delete(withRelations = true);
-
+##Current status
+Pre alpha, only some things are working.
 
 ## Requirements
 * .NET 4.5
-
 
 ## License
 Released under the [GNU Lesser General Public License v3.0](http://www.gnu.org/licenses/lgpl.html).
