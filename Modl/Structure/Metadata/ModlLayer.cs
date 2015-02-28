@@ -16,6 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
+using Modl.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace Modl.Structure.Metadata
                     Properties.Add(property);
                 }
             }
-            
+
             if (HasParent)
                 AllProperties = Properties.Concat(Parent.AllProperties).ToList();
             else
@@ -107,7 +108,7 @@ namespace Modl.Structure.Metadata
             get
             {
                 return Properties.Where(x => x.IsForeignKey);
-                    
+
 
                 //if (Keys.Count != 0)
                 //    return Keys.First();
@@ -116,6 +117,51 @@ namespace Modl.Structure.Metadata
 
                 //throw new Exception("Table " + Name + " has no primary key");
             }
+        }
+
+        public IEnumerable<ModlStorage> GetStorage(ModlInstance<M> instance)
+        {
+            yield return new ModlStorage(GetIdentity(instance), GetValues(instance));
+
+            if (HasParent)
+                foreach (var s in Parent.GetStorage(instance))
+                    yield return s;
+        }
+
+        internal ModlIdentity GetIdentity(ModlInstance<M> instance)
+        {
+            return new ModlIdentity
+            {
+                Id = instance.GetValue<object>(PrimaryKey.Name).ToString(),
+                Name = ModlName,
+                Time = DateTime.UtcNow,
+                Version = 0
+            };
+        }
+
+
+        internal Dictionary<string, object> GetValues(ModlInstance<M> instance)
+        {
+            return Properties.Select(x =>
+            {
+                var value = instance.GetValue<object>(x.Name);
+
+                if (value != null)
+                {
+                    if (x.Type.IsAssignableFrom(typeof(IModl)))
+                        value = null;
+                }
+
+                //if (x.IsForeignKey && modlValue)
+                //    outputValue = modlValue.Value;
+
+                return new KeyValuePair<string, object>(x.ModlName, value);
+            })
+            .ToDictionary(x => x.Key, x => x.Value);
+
+            //return Values
+            //    .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value))
+            //    .ToDictionary(x => x.Key, x => x.Value);
         }
 
         //public string PrimaryKeyName

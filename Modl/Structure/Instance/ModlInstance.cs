@@ -65,7 +65,7 @@ namespace Modl.Structure
         {
             get
             {
-                ReadFromEmptyProperties();
+                ReadFromInstance();
                 return Values.Values.Any(x => x.IsModified);
             }
         }
@@ -110,57 +110,71 @@ namespace Modl.Structure
 
         internal void SetId(object value)
         {
-            if (Metadata.IdType == typeof(Guid))
+            if (Metadata.PrimaryKey.Type == typeof(Guid))
                 value = Guid.Parse(value.ToString());
-            else if (Metadata.IdType == typeof(int))
+            else if (Metadata.PrimaryKey.Type == typeof(int))
                 value = int.Parse(value.ToString());
-            else if (Metadata.IdType == typeof(string))
+            else if (Metadata.PrimaryKey.Type == typeof(string))
                 value = value.ToString();
 
-            SetValue<object>(Metadata.IdName, value);
+            SetValue(Metadata.PrimaryKey.Name, value);
             AutomaticId = false;
 
-            WriteToEmptyProperties(Metadata.IdName);
+            WriteToInstance(Metadata.PrimaryKey.Name);
         }
 
         internal object GetId()
         {
-            return GetValue<object>(Metadata.IdName);
+            return GetValue<object>(Metadata.PrimaryKey.Name);
         }
 
-        internal ModlIdentity GetIdentity()
-        {
-            return new ModlIdentity
-            {
-                Id = GetId().ToString(),
-                Name = Metadata.ModlName,
-                Time = DateTime.UtcNow,
-                Version = 0
-            };
-        }
+        //internal ModlIdentity GetIdentity()
+        //{
+        //    return new ModlIdentity
+        //    {
+        //        Id = GetId().ToString(),
+        //        Name = Metadata.ModlName,
+        //        Time = DateTime.UtcNow,
+        //        Version = 0
+        //    };
+        //}
 
         internal string GetValuehash()
         {
             return "";
         }
 
-        internal Dictionary<string, object> GetValues()
-        {
-            return Values
-                .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value))
-                .ToDictionary(x => x.Key, x => x.Value);
-        }
+        //internal Dictionary<string, object> GetValues()
+        //{
+        //    foreach (var property in Metadata.Properties)
+        //    {
 
-        public ModlStorage GetStorage()
+        //    }
+
+        //    Metadata.Properties.Select(x =>
+        //    {
+        //        var modlValue = Values[x.Name];
+        //        object outputValue;
+
+        //        if (x.IsForeignKey && modlValue)
+        //            outputValue = modlValue.Value;
+        //    }
+
+        //    return Values
+        //        .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value))
+        //        .ToDictionary(x => x.Key, x => x.Value);
+        //}
+
+        public IEnumerable<ModlStorage> GetStorage()
         {
-            return new ModlStorage(GetIdentity(), GetValues());
+            return Metadata.FirstLayer.GetStorage(this);
         }
 
         internal void SetValuesFromStorage(ModlStorage storage)
         {
             foreach (var value in storage.Values)
             {
-                if (value.Key == Metadata.IdName)
+                if (value.Key == Metadata.PrimaryKey.Name)
                     SetId(value.Value);
                 else
                     SetValue(value.Key, value.Value);
@@ -175,14 +189,14 @@ namespace Modl.Structure
         }
 
 
-        internal void ReadFromEmptyProperties()
+        internal void ReadFromInstance()
         {
             foreach (var property in Metadata.Properties)
                 SetValue(property.Name, property.GetValue(Instance));
                 
         }
 
-        internal void WriteToEmptyProperties(string propertyName = null)
+        internal void WriteToInstance(string propertyName = null)
         {
             foreach (var property in Metadata.Properties)
                 if (propertyName == null || property.Name == propertyName)

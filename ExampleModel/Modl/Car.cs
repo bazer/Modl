@@ -33,6 +33,7 @@ namespace ExampleModel
         public int Vehicle_fk { get; set; }
         [Name("CarName")]
         public string Name { get; set; }
-        public CarType Type_fk { get; set; }
+        [Name("Type_fk")]
+        public CarType Type { get; set; }
     }
 }

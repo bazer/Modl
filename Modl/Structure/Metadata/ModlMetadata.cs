@@ -18,8 +18,10 @@ namespace Modl.Structure.Metadata
         //public List<Tuple<PropertyInfo, Func<M, object>, Action<M, object>>> EmptyProperties { get; private set; }
         
 
-        public string IdName { get { return FirstLayer.PrimaryKey.Name; } }
-        public Type IdType { get { return FirstLayer.PrimaryKey.Type; } }
+        //public string IdName { get { return FirstLayer.PrimaryKey.Name; } }
+        //public Type IdType { get { return FirstLayer.PrimaryKey.Type; } }
+
+        public ModlProperty<M> PrimaryKey { get { return FirstLayer.PrimaryKey; } }
         public string ModlName { get { return FirstLayer.ModlName; } }
 
         public List<ModlProperty<M>> Properties { get { return FirstLayer.AllProperties; } }

@@ -127,18 +127,19 @@ namespace Modl.Structure
             //    parentType = t.Type;
             //}
 
-            
-            var stream = Modl<M>.Settings.Serializer.Serialize(instance.GetStorage());
-            stream.Position = 0;
+            foreach (var storage in instance.GetStorage())
+            {
+                var stream = Modl<M>.Settings.Serializer.Serialize(storage);
+                stream.Position = 0;
 
-            Modl<M>.Settings.Endpoint.Save(instance.GetIdentity(), stream);
+                Modl<M>.Settings.Endpoint.Save(storage.About, stream);
 
-            stream.Dispose();
-
+                stream.Dispose();
+            }
 
             instance.IsNew = false;
             instance.ResetFields();
-            instance.WriteToEmptyProperties();
+            instance.WriteToInstance();
 
             return true;
         }

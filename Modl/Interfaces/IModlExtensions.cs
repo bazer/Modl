@@ -45,15 +45,15 @@ namespace Modl
             return m.GetInstance().GetId();
         }
 
-        public static ModlIdentity GetIdentity<M>(this M m) where M : IModl, new()
-        {
-            return m.GetInstance().GetIdentity();
-        }
+        //public static ModlIdentity GetIdentity<M>(this M m) where M : IModl, new()
+        //{
+        //    return m.GetInstance().GetIdentity();
+        //}
 
-        public static Dictionary<string, object> GetValues<M>(this M m) where M : IModl, new()
-        {
-            return m.GetInstance().GetValues();
-        }
+        //public static Dictionary<string, object> GetValues<M>(this M m) where M : IModl, new()
+        //{
+        //    return m.GetInstance().GetValues();
+        //}
 
         public static bool Save<M>(this M m) where M : IModl, new()
         {
