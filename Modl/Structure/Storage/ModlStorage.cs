@@ -1,4 +1,5 @@
 ﻿using Modl.Structure;
+using Modl.Structure.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,18 +16,20 @@ namespace Modl
     public class ModlStorage : IModlStorage
     {
         public Dictionary<string, object> Values { get; set; }
-        public ModlIdentity About { get; set; }
+        public ModlAbout About { get; set; }
         public string Hash { get; set; }
+        internal ModlIdentity Identity { get; set; }
 
         public ModlStorage()
         {
-
         }
 
-        public ModlStorage(ModlIdentity identity, Dictionary<string, object> values)
+        public ModlStorage(ModlAbout about, Dictionary<string, object> values)
         {
-            this.About = identity;
+            this.About = about;
             this.Values = values;
         }
+
+        
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Modl.Cache;
 using Modl.Structure;
 using Modl.Structure.Metadata;
+using Modl.Structure.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace Modl.Structure
                 Instances.Add(m.GetHashCode(), new ModlInstance<M>(m));
         }
 
-        internal static ModlInstance<M> AddFromStorage(ModlStorage storage)
+        internal static ModlInstance<M> AddFromStorage(IEnumerable<ModlStorage> storage)
         {
             var instance = new M().Modl().GetInstance();
             instance.SetValuesFromStorage(storage);
@@ -59,6 +60,33 @@ namespace Modl.Structure
         {
             throw new NotImplementedException();
         }
+
+        internal static M Get(object id)
+        {
+            //var identity = new ModlAbout
+            //{
+            //    Id = id.ToString(),
+            //    Name = Metadata.ModlName
+            //};
+
+            //foreach (var identity in Metadata.GetIdentities(id))
+            //{
+
+            //    var stream = Settings.Endpoint.Get(identity);
+            //    stream.Position = 0;
+            //    var storage = Settings.Serializer.Deserialize(stream);
+            //    stream.Dispose();
+            //}
+
+            var instance = ModlInternal<M>.AddFromStorage(ModlMaterializer.Get(Metadata.GetIdentities(id), Settings));
+            instance.IsNew = false;
+            instance.ResetFields();
+
+            //Statics<M>.WriteToEmptyProperties(m);
+
+            return instance.Instance;
+        }
+
 
         internal static bool Save(M m)
         {
@@ -127,19 +155,21 @@ namespace Modl.Structure
             //    parentType = t.Type;
             //}
 
-            foreach (var storage in instance.GetStorage())
-            {
-                var stream = Modl<M>.Settings.Serializer.Serialize(storage);
-                stream.Position = 0;
+            //foreach (var storage in instance.GetStorage())
+            //{
+            //    var stream = Modl<M>.Settings.Serializer.Serialize(storage);
+            //    stream.Position = 0;
 
-                Modl<M>.Settings.Endpoint.Save(storage.About, stream);
+            //    Modl<M>.Settings.Endpoint.Save(storage.About, stream);
 
-                stream.Dispose();
-            }
+            //    stream.Dispose();
+            //}
+
+            ModlMaterializer.Save(instance.GetStorage(), Settings);
 
             instance.IsNew = false;
             instance.ResetFields();
-            instance.WriteToInstance();
+            //instance.WriteToInstance();
 
             return true;
         }

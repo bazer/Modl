@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Modl.Structure
+namespace Modl.Structure.Storage
 {
     public class ModlIdentity
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public long Version { get; set; }
-        public DateTime Time { get; set; }
-        public object ModifiedBy { get; set; }
-        //public string Valuehash { get; set; }
-        //public string Identityhash { get; set; }
+        public Type Type { get; set; }
     }
 }

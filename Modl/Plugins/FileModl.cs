@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Modl.Structure;
+using Modl.Structure.Storage;
 
 namespace Modl.Plugins
 {

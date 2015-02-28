@@ -49,25 +49,26 @@ namespace Modl
 
         public static M Get(object id)
         {
-            var identity = new ModlIdentity
-            {
-                Id = id.ToString(),
-                Name = Metadata.ModlName
-            };
+            return ModlInternal<M>.Get(id);
+            //var identity = new ModlAbout
+            //{
+            //    Id = id.ToString(),
+            //    Name = Metadata.ModlName
+            //};
 
-            var stream = Settings.Endpoint.Get(identity);
-            stream.Position = 0;
-            var storage = Settings.Serializer.Deserialize(stream);
-            stream.Dispose();
+            //var stream = Settings.Endpoint.Get(identity);
+            //stream.Position = 0;
+            //var storage = Settings.Serializer.Deserialize(stream);
+            //stream.Dispose();
 
             
-            var instance = ModlInternal<M>.AddFromStorage(storage);
-            instance.IsNew = false;
-            instance.ResetFields();
+            //var instance = ModlInternal<M>.AddFromStorage(storage);
+            //instance.IsNew = false;
+            //instance.ResetFields();
 
-            //Statics<M>.WriteToEmptyProperties(m);
+            ////Statics<M>.WriteToEmptyProperties(m);
 
-            return instance.Instance;
+            //return instance.Instance;
         }
 
 

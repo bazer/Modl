@@ -167,18 +167,20 @@ namespace Modl.Structure
 
         public IEnumerable<ModlStorage> GetStorage()
         {
-            return Metadata.FirstLayer.GetStorage(this);
+            return Metadata.GetStorage(this);
         }
 
-        internal void SetValuesFromStorage(ModlStorage storage)
+        internal void SetValuesFromStorage(IEnumerable<ModlStorage> storage)
         {
-            foreach (var value in storage.Values)
-            {
-                if (value.Key == Metadata.PrimaryKey.Name)
-                    SetId(value.Value);
-                else
-                    SetValue(value.Key, value.Value);
-            }
+            Metadata.SetValuesFromStorage(this, storage);
+
+            //foreach (var value in storage.SelectMany(x => x).Values)
+            //{
+            //    if (value.Key == Metadata.PrimaryKey.Name)
+            //        SetId(value.Value);
+            //    else
+            //        SetValue(value.Key, value.Value);
+            //}
         }
 
 

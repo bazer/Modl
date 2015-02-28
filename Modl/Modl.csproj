@@ -52,7 +52,7 @@
     <Compile Include="Interfaces\IModlSerializer.cs" />
     <Compile Include="Interfaces\IModlEndpoint.cs" />
     <Compile Include="Structure\Metadata\ModlProperty.cs" />
-    <Compile Include="Structure\Storage\ModlIdentity.cs" />
+    <Compile Include="Structure\Storage\ModlAbout.cs" />
     <Compile Include="Structure\ModlInternal.cs" />
     <Compile Include="Structure\Metadata\ModlMetadata.cs" />
     <Compile Include="Structure\ModlSettings.cs" />
@@ -66,6 +66,8 @@
     <Compile Include="Structure\Instance\ModlInstance.cs" />
     <Compile Include="Modl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structure\Storage\ModlIdentity.cs" />
+    <Compile Include="Structure\Storage\ModlMaterializer.cs" />
     <Compile Include="Structure\Storage\ModlStorage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
 using Modl.Structure;
+using Modl.Structure.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,18 +120,35 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        public IEnumerable<ModlStorage> GetStorage(ModlInstance<M> instance)
+        internal void SetValuesFromStorage(ModlInstance<M> instance, IEnumerable<ModlStorage> storage)
         {
-            yield return new ModlStorage(GetIdentity(instance), GetValues(instance));
-
             if (HasParent)
-                foreach (var s in Parent.GetStorage(instance))
-                    yield return s;
+                SetValuesFromStorage(instance, storage);
+
+            foreach (var value in storage.Single(x => x.About.Name == ModlName).Values)
+            {
+                if (value.Key == PrimaryKey.Name)
+                    instance.SetId(value.Value);
+                else
+                    instance.SetValue(value.Key, value.Value);
+            }
         }
 
-        internal ModlIdentity GetIdentity(ModlInstance<M> instance)
+        public IEnumerable<ModlStorage> GetStorage(ModlInstance<M> instance)
         {
-            return new ModlIdentity
+            yield return new ModlStorage(GetAbout(instance), GetValues(instance))
+            {
+                Identity = GetIdentity(instance.GetValue<object>(PrimaryKey.Name))
+            };
+
+            if (HasParent)
+                foreach (var x in Parent.GetStorage(instance))
+                    yield return x;
+        }
+
+        internal ModlAbout GetAbout(ModlInstance<M> instance)
+        {
+            return new ModlAbout
             {
                 Id = instance.GetValue<object>(PrimaryKey.Name).ToString(),
                 Name = ModlName,
@@ -139,8 +157,27 @@ namespace Modl.Structure.Metadata
             };
         }
 
+        internal ModlIdentity GetIdentity(object id)
+        {
+            return new ModlIdentity
+            {
+                Id = id.ToString(),
+                Name = ModlName,
+                Type = Type
+            };
+        }
 
-        internal Dictionary<string, object> GetValues(ModlInstance<M> instance)
+        internal IEnumerable<ModlIdentity> GetIdentities(object id)
+        {
+            yield return GetIdentity(id);
+
+            if (HasParent)
+                foreach (var x in Parent.GetIdentities(id))
+                    yield return x;
+        }
+
+
+        private Dictionary<string, object> GetValues(ModlInstance<M> instance)
         {
             return Properties.Select(x =>
             {
