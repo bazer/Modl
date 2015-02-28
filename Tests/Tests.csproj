@@ -84,10 +84,6 @@
       <Project>{33323481-00D5-4BF2-AE51-CAA91193695A}</Project>
       <Name>ExampleModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Modl.Db\Modl.Db.csproj">
-      <Project>{eb4952d3-b693-4f68-8f0e-21fb55a8a1dd}</Project>
-      <Name>Modl.Db</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Modl.Json\Modl.Json.csproj">
       <Project>{1b739f00-e082-4736-9884-b2de32dd6f34}</Project>
       <Name>Modl.Json</Name>

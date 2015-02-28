@@ -14,8 +14,9 @@ namespace Modl
 
     public class ModlStorage : IModlStorage
     {
-        public ModlIdentity Identity { get; set; }
         public Dictionary<string, object> Values { get; set; }
+        public ModlIdentity About { get; set; }
+        public string Hash { get; set; }
 
         public ModlStorage()
         {
@@ -24,7 +25,7 @@ namespace Modl
 
         public ModlStorage(ModlIdentity identity, Dictionary<string, object> values)
         {
-            this.Identity = identity;
+            this.About = identity;
             this.Values = values;
         }
     }

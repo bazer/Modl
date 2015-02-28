@@ -16,6 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
+using Modl.Structure.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace Modl.Structure
         public bool IsDeleted { get; set; }
         public bool AutomaticId { get; set; }
         //public Database Database { get; set; }
-        public Dictionary<string, ModlProperty> Properties { get; set; }
+        public Dictionary<string, ModlValue> Values { get; set; }
 
         public ModlMetadata<M> Metadata { get { return ModlInternal<M>.Metadata; } }
 
@@ -52,12 +53,12 @@ namespace Modl.Structure
         public ModlInstance(M instance)
         {
             this.Instance = instance;
-            Properties = new Dictionary<string, ModlProperty>();
+            Values = new Dictionary<string, ModlValue>();
 
             IsNew = true;
             AutomaticId = true;
 
-            FillFields();
+            SetDefaultValues();
         }
 
         public bool IsModified
@@ -65,7 +66,7 @@ namespace Modl.Structure
             get
             {
                 ReadFromEmptyProperties();
-                return Properties.Values.Any(x => x.IsModified);
+                return Values.Values.Any(x => x.IsModified);
             }
         }
 
@@ -80,20 +81,20 @@ namespace Modl.Structure
             //LastInsertedMemberName = name;
         }
 
-        public ModlProperty GetField<T>(string name)
+        public ModlValue GetField<T>(string name)
         {
-            if (!Properties.ContainsKey(name))
-                Properties[name] = new ModlProperty(default(T), typeof(T));
+            if (!Values.ContainsKey(name))
+                Values[name] = new ModlValue(default(T), typeof(T));
 
-            return (ModlProperty)Properties[name];
+            return (ModlValue)Values[name];
         }
 
         protected void SetField<T>(string name, T value)
         {
-            if (!Properties.ContainsKey(name))
-                Properties[name] = new ModlProperty(value, typeof(T));
+            if (!Values.ContainsKey(name))
+                Values[name] = new ModlValue(value, typeof(T));
             else
-                Properties[name].Value = value;
+                Values[name].Value = value;
         }
 
         
@@ -102,7 +103,7 @@ namespace Modl.Structure
 
         internal void ResetFields()
         {
-            foreach (var field in Properties.Values)
+            foreach (var field in Values.Values)
                 field.Reset();
         }
 
@@ -133,9 +134,8 @@ namespace Modl.Structure
             {
                 Id = GetId().ToString(),
                 Name = Metadata.ModlName,
-                Timestamp = DateTime.UtcNow,
-                Version = 0,
-                Valuehash = GetValuehash()
+                Time = DateTime.UtcNow,
+                Version = 0
             };
         }
 
@@ -146,7 +146,7 @@ namespace Modl.Structure
 
         internal Dictionary<string, object> GetValues()
         {
-            return Properties
+            return Values
                 .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value))
                 .ToDictionary(x => x.Key, x => x.Value);
         }
@@ -168,24 +168,25 @@ namespace Modl.Structure
         }
 
 
-        internal void FillFields()
+        internal void SetDefaultValues()
         {
-            foreach (var field in Metadata.Types)
-                SetValue(field.Key, GetDefault(field.Value));
+            foreach (var property in Metadata.Properties)
+                SetValue(property.Name, GetDefault(property.Type));
         }
 
 
         internal void ReadFromEmptyProperties()
         {
-            foreach (var property in Metadata.EmptyProperties)
-                SetValue(Metadata.Properties[property.Item1.Name], property.Item2(Instance));
+            foreach (var property in Metadata.Properties)
+                SetValue(property.Name, property.GetValue(Instance));
+                
         }
 
         internal void WriteToEmptyProperties(string propertyName = null)
         {
-            foreach (var property in Metadata.EmptyProperties)
-                if (propertyName == null || property.Item1.Name == propertyName)
-                    property.Item3(Instance, GetValue<object>(Metadata.Properties[property.Item1.Name]));
+            foreach (var property in Metadata.Properties)
+                if (propertyName == null || property.Name == propertyName)
+                    property.SetValue(Instance, GetValue<object>(property.Name));
         }
 
         private object GetDefault(Type type)

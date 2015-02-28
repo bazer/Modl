@@ -15,6 +15,7 @@ namespace Modl.Json
         {
             var stream = new MemoryStream();
             var jsonTextWriter = new JsonTextWriter(new StreamWriter(stream));
+            jsonTextWriter.Formatting = Formatting.Indented;
 
             new JsonSerializer().Serialize(jsonTextWriter, storage);
             //new JsonSerializer().Serialize(jsonTextWriter, storage.Values);

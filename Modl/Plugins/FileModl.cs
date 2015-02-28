@@ -24,10 +24,12 @@ namespace Modl.Plugins
 
         public Stream Get(ModlIdentity identity)
         {
-            if (!File.Exists(GetPath(identity)))
+            var path = GetPath(identity);
+
+            if (!File.Exists(path))
                 throw new FileNotFoundException();
 
-            return File.OpenRead(GetPath(identity));
+            return File.OpenRead(path);
         }
 
         public void Save(ModlIdentity identity, MemoryStream stream)
@@ -35,7 +37,12 @@ namespace Modl.Plugins
             if (!Directory.Exists(GetDirectory(identity)))
                 Directory.CreateDirectory(GetDirectory(identity));
 
-            using (var fs = File.OpenWrite(GetPath(identity)))
+            var path = GetPath(identity);
+
+            if (File.Exists(path))
+                File.Delete(path);
+
+            using (var fs = File.OpenWrite(path))
             {
                 stream.WriteTo(fs);
             }

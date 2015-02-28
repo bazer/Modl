@@ -74,10 +74,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Modl.Db\Modl.Db.csproj">
-      <Project>{eb4952d3-b693-4f68-8f0e-21fb55a8a1dd}</Project>
-      <Name>Modl.Db</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Modl.Mvc\Modl.Mvc.csproj">
       <Project>{9C38B8A9-8D10-4342-8AC0-CED9FC861ED0}</Project>
       <Name>Modl.Mvc</Name>

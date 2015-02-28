@@ -3,28 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Modl;
-using Modl.Db;
+//using Modl.Db;
 
 namespace ExampleModel
 {
     public class ModlContext
     {
-        Database db;
+        //Database db;
 
-        public ModlContext(Database database)
-        {
-            this.db = database;
-        }
+        //public ModlContext(Database database)
+        //{
+        //    this.db = database;
+        //}
 
-        public ModlContext(string databaseName)
-        {
-            this.db = Database.Get(databaseName);
-        }
+        //public ModlContext(string databaseName)
+        //{
+        //    this.db = Database.Get(databaseName);
+        //}
 
-        public Vehicle GetVehicle(int id)
-        {
-            return Modl<Vehicle>.New();
-        }
+        //public Vehicle GetVehicle(int id)
+        //{
+        //    return Modl<Vehicle>.New();
+        //}
 
         //public bool GetCar(int id)
         //{

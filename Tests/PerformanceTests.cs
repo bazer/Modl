@@ -1,32 +1,25 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Modl;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Modl.Db;
 
 namespace Tests
 {
     [TestClass]
     public class PerformanceTests
     {
-        List<Database> databases;
-        Basics basics = new Basics();
+        //List<Database> databases;
+        //Basics basics = new Basics();
         
-        public PerformanceTests()
-        {
-            //Config.CacheLevel = CacheLevel.Off;
+        //public PerformanceTests()
+        //{
+        //    //Config.CacheLevel = CacheLevel.Off;
 
-            databases = new List<Database>
-            {
-                //Database.Get("SqlServerCeDb"),
-                //Database.Get("MySQLDb"),
-                Database.Get("SqlServerDb")
-            };
-        }
+        //    databases = new List<Database>
+        //    {
+        //        //Database.Get("SqlServerCeDb"),
+        //        //Database.Get("MySQLDb"),
+        //        Database.Get("SqlServerDb")
+        //    };
+        //}
         
         ////[TestMethod]
         //public void RunAllTest()

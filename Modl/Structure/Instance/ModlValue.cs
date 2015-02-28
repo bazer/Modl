@@ -23,50 +23,43 @@ using System.Text;
 
 namespace Modl.Structure
 {
-    public class ModlLayer
+    public class ModlValue
     {
-        public string Name { get; set; }
+        protected object oldValue;
+        protected object newValue;
+        protected bool isDirty = false;
+        internal bool IsModified { get { return isDirty; } }
         internal Type Type { get; set; }
+        //protected bool emptyProperty;
 
-        internal Dictionary<string, Type> Fields = new Dictionary<string, Type>();
-        internal Dictionary<string, Type> Keys = new Dictionary<string, Type>();
-        internal Dictionary<string, Type> ForeignKeys = new Dictionary<string, Type>();
+        internal ModlValue(object value, Type type)
+        {
+            oldValue = value;
+            newValue = value;
 
-        internal bool HasKey
+            Type = type;
+            //this.emptyProperty = emptyProperty;
+        }
+
+        internal object Value
         {
             get
             {
-                return Keys.Count != 0;
+                return newValue;
+            }
+            set
+            {
+                newValue = value;
+                isDirty = !object.Equals(oldValue, newValue);
+                //isDirty = oldValue != newValue;
+                //isDirty = !EqualityComparer<T>.Default.Equals(oldValue, newValue);
             }
         }
 
-        internal KeyValuePair<string, Type> PrimaryKey
+        internal void Reset()
         {
-            get
-            {
-                if (Keys.Count != 0)
-                    return Keys.First();
-                else if (ForeignKeys.Count != 0)
-                    return ForeignKeys.First();
-
-                throw new Exception("Table " + Name + " has no primary key");
-            }
-        }
-
-        public string PrimaryKeyName
-        {
-            get
-            {
-                return PrimaryKey.Key;
-            }
-        }
-
-        internal Type PrimaryKeyType
-        {
-            get
-            {
-                return PrimaryKey.Value;
-            }
+            oldValue = newValue;
+            isDirty = false;
         }
     }
 }

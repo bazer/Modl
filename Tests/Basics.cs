@@ -19,17 +19,9 @@ along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 using ExampleModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
-using Modl.Mvc;
-using Modl.Db.DatabaseProviders;
-using System.Linq;
-using System.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
-using Modl.Db;
 using Modl.Json;
 using Modl.Plugins;
+using System;
 
 namespace Tests
 {

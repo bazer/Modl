@@ -7,9 +7,9 @@ namespace Modl.Structure
         public string Id { get; set; }
         public string Name { get; set; }
         public long Version { get; set; }
-        public DateTime Timestamp { get; set; }
-        public object Modifier { get; set; }
-        public string Valuehash { get; set; }
-        public string Identityhash { get; set; }
+        public DateTime Time { get; set; }
+        public object ModifiedBy { get; set; }
+        //public string Valuehash { get; set; }
+        //public string Identityhash { get; set; }
     }
 }
