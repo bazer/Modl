@@ -8,7 +8,7 @@ namespace Modl.Structure.Storage
 {
     public class ModlMaterializer
     {
-        internal static IEnumerable<ModlStorage> Get(IEnumerable<ModlIdentity> identities, ModlSettings settings)
+        internal static IEnumerable<ModlStorage> Read(IEnumerable<ModlIdentity> identities, ModlSettings settings)
         {
             foreach (var identity in identities)
             {
@@ -21,7 +21,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static void Save(IEnumerable<ModlStorage> storages, ModlSettings settings)
+        internal static void Write(IEnumerable<ModlStorage> storages, ModlSettings settings)
         {
             foreach (var storage in storages)
             {
@@ -32,6 +32,11 @@ namespace Modl.Structure.Storage
 
                 stream.Dispose();
             }
+        }
+
+        internal static object DeserializeObject(object obj, Type toType, ModlSettings settings)
+        {
+            return settings.Serializer.DeserializeObject(obj, toType);
         }
     }
 }

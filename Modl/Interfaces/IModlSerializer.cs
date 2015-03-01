@@ -11,5 +11,6 @@ namespace Modl.Interfaces
     {
         MemoryStream Serialize(ModlStorage storage);
         ModlStorage Deserialize(Stream stream);
+        object DeserializeObject(object obj, Type toType);
     }
 }

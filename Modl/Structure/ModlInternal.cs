@@ -78,9 +78,10 @@ namespace Modl.Structure
             //    stream.Dispose();
             //}
 
-            var instance = ModlInternal<M>.AddFromStorage(ModlMaterializer.Get(Metadata.GetIdentities(id), Settings));
+            var instance = ModlInternal<M>.AddFromStorage(ModlMaterializer.Read(Metadata.GetIdentities(id), Settings).ToList());
             instance.IsNew = false;
             instance.ResetFields();
+            instance.WriteToInstance();
 
             //Statics<M>.WriteToEmptyProperties(m);
 
@@ -165,7 +166,7 @@ namespace Modl.Structure
             //    stream.Dispose();
             //}
 
-            ModlMaterializer.Save(instance.GetStorage(), Settings);
+            ModlMaterializer.Write(instance.GetStorage(), Settings);
 
             instance.IsNew = false;
             instance.ResetFields();

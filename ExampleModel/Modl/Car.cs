@@ -35,5 +35,6 @@ namespace ExampleModel
         public string Name { get; set; }
         [Name("Type_fk")]
         public CarType Type { get; set; }
+        public List<string> Tags { get; set; }
     }
 }

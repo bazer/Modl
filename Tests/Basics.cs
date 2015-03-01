@@ -22,6 +22,7 @@ using Modl;
 using Modl.Json;
 using Modl.Plugins;
 using System;
+using System.Collections.Generic;
 
 namespace Tests
 {
@@ -109,6 +110,13 @@ namespace Tests
             Assert.AreEqual(false, car.IsModified());
             car.Name = "M3";
             car.Manufacturer = new Manufacturer("BMW");
+            //car.Type = new CarType();
+            //car.Type.Description = "Fast car";
+            car.Tags = new List<string>();
+            car.Tags.Add("Nice");
+            car.Tags.Add("Fast");
+            car.Tags.Add("Blue");
+            car.Tags.Add("Awful");
             Assert.AreEqual(true, car.IsModified());
             car.Save();
             Assert.IsTrue(!car.IsNew());
@@ -347,6 +355,9 @@ namespace Tests
             //Assert.AreEqual(car1.Database(), car2.Database());
             //Assert.AreEqual(car1.Database().Name, car2.Database().Name);
             Assert.AreEqual(car1.Id, car2.Id);
+            Assert.AreEqual(car1.Tags.Count, car2.Tags.Count);
+            Assert.AreEqual(car1.Tags[0], car2.Tags[0]);
+            //Assert.AreEqual(car1.Type.Description, car2.Type.Description);
             AssertEqual(car1.Manufacturer, car2.Manufacturer);
             //Assert.AreEqual(car1.Manufacturer, car2.Manufacturer);
             Assert.AreEqual(car1.Name, car2.Name);

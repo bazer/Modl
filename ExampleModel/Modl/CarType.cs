@@ -24,11 +24,11 @@ using Modl;
 
 namespace ExampleModel
 {
-    [Name("CarType")]
+    //[Name("CarType")]
     public class CarType : IModl
     {
-        [Key]
-        public int TypeID { get; set; }
+        //[Key]
+        //public int TypeID { get; set; }
         public string Description { get; set; }
     }
 }

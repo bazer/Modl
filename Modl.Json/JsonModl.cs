@@ -35,5 +35,10 @@ namespace Modl.Json
                 //return new ModlStorage(serializer.Deserialize<Dictionary<string, object>>(jsonTextReader));
             }
         }
+
+        object IModlSerializer.DeserializeObject(object obj, Type toType)
+        {
+            return JsonConvert.DeserializeObject(obj.ToString(), toType);
+        }
     }
 }

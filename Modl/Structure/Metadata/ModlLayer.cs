@@ -123,14 +123,22 @@ namespace Modl.Structure.Metadata
         internal void SetValuesFromStorage(ModlInstance<M> instance, IEnumerable<ModlStorage> storage)
         {
             if (HasParent)
-                SetValuesFromStorage(instance, storage);
+                Parent.SetValuesFromStorage(instance, storage);
 
             foreach (var value in storage.Single(x => x.About.Name == ModlName).Values)
             {
-                if (value.Key == PrimaryKey.Name)
-                    instance.SetId(value.Value);
+                var property = GetPropertyFromModlName(value.Key);
+                var newValue = value.Value;
+
+                if (property.Name == PrimaryKey.Name)
+                    instance.SetId(newValue);
                 else
-                    instance.SetValue(value.Key, value.Value);
+                {
+                    if (value.Value != null && !property.Type.IsInstanceOfType(value.Value))
+                        newValue = ModlMaterializer.DeserializeObject(value.Value, property.Type, ModlInternal<M>.Settings);
+
+                    instance.SetValue(property.Name, newValue);
+                }
             }
         }
 
@@ -185,7 +193,7 @@ namespace Modl.Structure.Metadata
 
                 if (value != null)
                 {
-                    if (x.Type.IsAssignableFrom(typeof(IModl)))
+                    if (typeof(IModl).IsAssignableFrom(x.Type))
                         value = null;
                 }
 
@@ -201,6 +209,15 @@ namespace Modl.Structure.Metadata
             //    .ToDictionary(x => x.Key, x => x.Value);
         }
 
+        private string GetPropertyModlName(string name)
+        {
+            return Properties.Single(x => x.Name == name).ModlName;
+        }
+
+        private ModlProperty<M> GetPropertyFromModlName(string modlName)
+        {
+            return Properties.Single(x => x.ModlName == modlName);
+        }
         //public string PrimaryKeyName
         //{
         //    get
