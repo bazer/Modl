@@ -35,9 +35,10 @@ namespace Modl
             return m.GetInstance().IsModified;
         }
 
-        public static void SetId<M>(this M m, object value) where M : IModl, new()
+        public static M SetId<M>(this M m, object value) where M : IModl, new()
         {
             m.GetInstance().SetId(value);
+            return m;
         }
 
         public static object GetId<M>(this M m) where M : IModl, new()

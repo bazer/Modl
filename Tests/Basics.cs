@@ -119,8 +119,8 @@ namespace Tests
             car.Tags.Add("Awful");
             Assert.AreEqual(true, car.IsModified());
             car.Save();
-            Assert.IsTrue(!car.IsNew());
-            Assert.AreEqual(false, car.IsModified());
+            Assert.IsFalse(car.IsNew());
+            Assert.IsFalse(car.IsModified());
 
             Car car2 = GetModl<Car>(car.Id); // Car.Get(car.Id);
             AssertEqual(car, car2);
@@ -209,7 +209,7 @@ namespace Tests
             T modl = Modl<T>.Get(id);
 
             if (modl != null)
-                Assert.IsTrue(!modl.IsNew());
+                Assert.IsFalse(modl.IsNew());
 
             return modl;
         }

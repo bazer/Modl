@@ -41,10 +41,7 @@ namespace Modl
 
         public static M New(object id)
         {
-            var m = New();
-            m.SetId(id);
-
-            return m;
+            return New().SetId(id);
         }
 
         public static M Get(object id)
