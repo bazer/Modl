@@ -25,10 +25,6 @@ namespace Modl.Structure.Metadata
             ModlName = property.Name;
             Type = property.PropertyType;
 
-            //string fieldName = property.Name;
-            ////bool key = false;
-            //Type foreignKey = null;
-
             foreach (var attribute in property.GetCustomAttributes(false))
             {
                 if (attribute is NameAttribute)
@@ -49,8 +45,6 @@ namespace Modl.Structure.Metadata
                 //}
             }
 
-            //content.SetValue(fieldName, Helper.GetDefault(property.PropertyType));
-
             Getter = (Func<M, object>)typeof(ModlProperty<M>)
                 .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(property.PropertyType)
@@ -60,31 +54,6 @@ namespace Modl.Structure.Metadata
                 .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(property.PropertyType)
                 .Invoke(null, new object[] { property.GetSetMethod(true) });
-
-            //var modlProperty = new ModlProperty<M>
-            //{
-            //    Type = property.PropertyType,
-            //    Name = property.Name,
-            //    ModlName = fieldName,
-            //    Getter = getDelegate,
-            //    Setter = setDelegate
-            //};
-
-            //layer.Properties.Add(modlProperty.Name, modlProperty);
-
-            //EmptyProperties.Add(new Tuple<PropertyInfo, Func<M, object>, Action<M, object>>(property, getDelegate, setDelegate));
-
-            //SetFieldName(property.Name, fieldName);
-            //SetFieldType(fieldName, property.PropertyType);
-
-
-            //layer.Fields.Add(fieldName, property.PropertyType);
-
-            //if (key)
-            //    layer.Keys.Add(fieldName, property.PropertyType);
-
-            //if (foreignKey != null)
-            //    layer.ForeignKeys.Add(fieldName, foreignKey);
         }
 
         public object GetValue(M instance)

@@ -59,7 +59,6 @@
     <Compile Include="Structure\ModlSettings.cs" />
     <Compile Include="Plugins\FileModl.cs" />
     <Compile Include="Cache\CacheConfig.cs" />
-    <Compile Include="Cache\StaticCache.cs" />
     <Compile Include="Structure\ModlConfig.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />

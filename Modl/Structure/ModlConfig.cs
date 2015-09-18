@@ -72,74 +72,9 @@ namespace Modl
         //    }
         //}
 
-
-        //protected static Dictionary<string, Database> DatabaseProviders = new Dictionary<string, Database>();
-
         static ModlConfig()
         {
             GlobalSettings = new ModlSettings();
-
-            //DefaultCacheLevel = CacheLevel.On;
-            //DefaultCacheTimeout = 20;
-
-            //foreach (ConnectionStringSettings connString in ConfigurationManager.ConnectionStrings)
-            //    if (!string.IsNullOrWhiteSpace(connString.ConnectionString) && !string.IsNullOrWhiteSpace(connString.Name) && !string.IsNullOrWhiteSpace(connString.ProviderName))
-            //        Database.AddFromConnectionString(connString);
-
-            //if (ConfigurationManager.ConnectionStrings.Count > 1)
-            //    AddDatabaseProvider(ConfigurationManager.ConnectionStrings[ConfigurationManager.ConnectionStrings.Count - 1]);
         }
-
-        
-
-        //private static Database defaultDbProvider = null;
-        //internal static Database DefaultDatabase
-        //{
-        //    get
-        //    {
-        //        if (defaultDbProvider == null)
-        //            defaultDbProvider = Config.DatabaseProviders.Last().Value;
-
-        //        return defaultDbProvider;
-        //    }
-        //    set
-        //    {
-        //        defaultDbProvider = value;
-        //    }
-        //}
-
-        //internal static Database AddDatabase(Database database)
-        //{
-        //    DatabaseProviders[database.Name] = database;
-
-        //    return database;
-        //}
-
-        //internal static Database GetDatabase(string databaseName)
-        //{
-        //    return DatabaseProviders[databaseName];
-        //}
-
-        //internal static List<Database> GetAllDatabases()
-        //{
-        //    return DatabaseProviders.Values.ToList();
-        //}
-
-        //internal static void RemoveDatabase(string databaseName)
-        //{
-        //    DatabaseProviders.Remove(databaseName);
-        //}
-
-        //internal static void RemoveAllDatabases()
-        //{
-        //    DatabaseProviders.Clear();
-        //}
-
-        //public static IDbConnection GetConnection(string databaseName)
-        //{
-        //    return DatabaseProviders[databaseName].GetConnection();
-        //}
-
-        
     }
 }

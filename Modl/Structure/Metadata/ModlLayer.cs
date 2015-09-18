@@ -39,16 +39,10 @@ namespace Modl.Structure.Metadata
         internal List<ModlProperty<M>> Properties { get; private set; }
         internal List<ModlProperty<M>> AllProperties { get; private set; }
 
-        //internal Dictionary<string, Type> Fields = new Dictionary<string, Type>();
-        //internal Dictionary<string, Type> Keys = new Dictionary<string, Type>();
-        //internal Dictionary<string, Type> ForeignKeys = new Dictionary<string, Type>();
-
         public ModlLayer(Type type)
         {
             if (type.BaseType != null && type.BaseType != typeof(object))
                 Parent = new ModlLayer<M>(type.BaseType);
-
-            //Layers.Insert(0, new ModlLayer<M>(type));
 
             Properties = new List<ModlProperty<M>>();
 
@@ -82,26 +76,11 @@ namespace Modl.Structure.Metadata
                 AllProperties = Properties;
         }
 
-        //internal bool HasKey
-        //{
-        //    get
-        //    {
-        //        return Keys.Count != 0;
-        //    }
-        //}
-
         internal ModlProperty<M> PrimaryKey
         {
             get
             {
                 return Properties.Single(x => x.IsPrimaryKey);
-
-                //if (Keys.Count != 0)
-                //    return Keys.First();
-                //else if (ForeignKeys.Count != 0)
-                //    return ForeignKeys.First();
-
-                //throw new Exception("Table " + Name + " has no primary key");
             }
         }
 
@@ -110,14 +89,6 @@ namespace Modl.Structure.Metadata
             get
             {
                 return Properties.Where(x => x.IsForeignKey);
-
-
-                //if (Keys.Count != 0)
-                //    return Keys.First();
-                //else if (ForeignKeys.Count != 0)
-                //    return ForeignKeys.First();
-
-                //throw new Exception("Table " + Name + " has no primary key");
             }
         }
 
@@ -161,8 +132,7 @@ namespace Modl.Structure.Metadata
             {
                 Id = instance.GetValue<object>(PrimaryKey.Name).ToString(),
                 Type = ModlName,
-                Time = DateTime.UtcNow,
-                //Version = 0
+                Time = DateTime.UtcNow
             };
         }
 
@@ -198,16 +168,9 @@ namespace Modl.Structure.Metadata
                         value = null;
                 }
 
-                //if (x.IsForeignKey && modlValue)
-                //    outputValue = modlValue.Value;
-
                 return new KeyValuePair<string, object>(x.ModlName, value);
             })
             .ToDictionary(x => x.Key, x => x.Value);
-
-            //return Values
-            //    .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value))
-            //    .ToDictionary(x => x.Key, x => x.Value);
         }
 
         private string GetPropertyModlName(string name)
@@ -219,20 +182,5 @@ namespace Modl.Structure.Metadata
         {
             return Properties.Single(x => x.ModlName == modlName);
         }
-        //public string PrimaryKeyName
-        //{
-        //    get
-        //    {
-        //        return PrimaryKey.Key;
-        //    }
-        //}
-
-        //internal Type PrimaryKeyType
-        //{
-        //    get
-        //    {
-        //        return PrimaryKey.Value;
-        //    }
-        //}
     }
 }

@@ -30,7 +30,6 @@ namespace Modl.Structure
         protected bool isDirty = false;
         internal bool IsModified { get { return isDirty; } }
         internal Type Type { get; set; }
-        //protected bool emptyProperty;
 
         internal ModlValue(object value, Type type)
         {
@@ -38,7 +37,6 @@ namespace Modl.Structure
             newValue = value;
 
             Type = type;
-            //this.emptyProperty = emptyProperty;
         }
 
         internal object Value
@@ -51,8 +49,6 @@ namespace Modl.Structure
             {
                 newValue = value;
                 isDirty = !object.Equals(oldValue, newValue);
-                //isDirty = oldValue != newValue;
-                //isDirty = !EqualityComparer<T>.Default.Equals(oldValue, newValue);
             }
         }
 

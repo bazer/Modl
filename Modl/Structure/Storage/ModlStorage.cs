@@ -29,7 +29,5 @@ namespace Modl
             this.About = about;
             this.Values = values;
         }
-
-        
     }
 }

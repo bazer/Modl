@@ -131,7 +131,7 @@ namespace Tests
 
             Car car3 = GetModl<Car>(car.Id);
             Assert.AreEqual("Mercedes", car3.Manufacturer.Name);
-            //car3.DeleteFromDb();
+            car3.Delete();
             Assert.IsTrue(car3.IsDeleted());
             Assert.AreEqual(null, GetModl<Car>(car.Id));
 
@@ -374,8 +374,8 @@ namespace Tests
         [TestMethod]
         public void SetIdExplicit()
         {
-            var id = Guid.NewGuid();
-            Manufacturer m1 = Modl<Manufacturer>.New(id.ToString());
+            var id = Guid.NewGuid().ToString();
+            Manufacturer m1 = Modl<Manufacturer>.New(id);
             m1.Name = "Audi";
             Assert.AreEqual(id, m1.Id);
             m1.Save();

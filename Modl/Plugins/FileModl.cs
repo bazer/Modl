@@ -11,8 +11,6 @@ using Modl.Structure.Storage;
 namespace Modl.Plugins
 {
     public class FileModl : IModlEndpoint
-        //<M> : IModlEndpoint<M>
-        //where M : IModl
     {
         string path = "test" + Path.DirectorySeparatorChar;
         string fileEnding = "json";

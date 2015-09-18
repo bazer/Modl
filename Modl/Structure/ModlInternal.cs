@@ -69,21 +69,6 @@ namespace Modl.Structure
 
         internal static M Get(string id)
         {
-            //var identity = new ModlAbout
-            //{
-            //    Id = id.ToString(),
-            //    Name = Metadata.ModlName
-            //};
-
-            //foreach (var identity in Metadata.GetIdentities(id))
-            //{
-
-            //    var stream = Settings.Endpoint.Get(identity);
-            //    stream.Position = 0;
-            //    var storage = Settings.Serializer.Deserialize(stream);
-            //    stream.Dispose();
-            //}
-            
             if (Instances.ContainsKey(id))
                 return Instances[id].Instance;
 
@@ -91,8 +76,6 @@ namespace Modl.Structure
             modlInstance.IsNew = false;
             modlInstance.ResetFields();
             modlInstance.WriteToInstance();
-
-            //Statics<M>.WriteToEmptyProperties(m);
 
             return modlInstance.Instance;
         }
@@ -108,78 +91,10 @@ namespace Modl.Structure
             if (!instance.IsModified)
                 return false;
 
-            //object keyValue = null;
-            //Type parentType = null;
-
-            //foreach (var t in Metadata.FirstLayer)
-            //{
-            //    //if (keyValue != null && parentType != null && t.ForeignKeys.Count() != 0)
-            //    //{
-            //    //    var fk = t.ForeignKeys.Where(x => x.Type == parentType).Select(x => x.Key).SingleOrDefault();
-
-            //    //    if (fk != null)
-            //    //        instance.SetValue(fk, keyValue);
-            //    //}
-
-            //    //Change query;
-
-            //    //if (content.IsNew)
-            //    //    query = new Insert(content.Database, t);
-            //    //else
-            //    //    query = new Update(content.Database, t).Where(t.PrimaryKeyName).EqualTo(content.GetValue<object>(t.PrimaryKeyName));
-
-            //    //foreach (var f in t.Fields)
-            //    //{
-            //    //    var field = instance.Properties[f.Key];
-
-            //    //    if (f.Value.GetInterface("IModl") != null && field.Value != null)
-            //    //    {
-            //    //        var related = field.Value as IModl;
-
-            //    //        if (related.GetInstance().IsModified || related.IsNew())// && saveRelated)
-            //    //        {
-            //    //            var method = typeof(IModlExtensions).GetMethod("Save");
-            //    //            var generic = method.MakeGenericMethod(f.Value);
-            //    //            generic.Invoke(null, new object[] { related });
-
-            //    //            //related.Save();
-            //    //        }
-
-            //    //        //if (!related.IsNew() && !related.IsDeleted())
-            //    //        //    query.With(f.Key, related.GetId());
-            //    //    }
-            //    //    //else if (field.IsDirty && (!content.AutomaticId || !t.HasKey || f.Key != t.PrimaryKeyName))
-            //    //    //    query.With(f.Key, field.Value);
-            //    //}
-
-
-
-            //    //if (content.IsNew && content.AutomaticId && t.HasKey)
-            //    //    keyValue = DbAccess.ExecuteScalar(t.PrimaryKeyType, query, content.Database.GetLastIdQuery());
-            //    //else
-            //    //    DbAccess.ExecuteScalar(typeof(object), query);
-
-            //    //if (keyValue != null && t.Keys.Count != 0)
-            //    //    content.SetValue(t.PrimaryKeyName, keyValue);
-
-            //    parentType = t.Type;
-            //}
-
-            //foreach (var storage in instance.GetStorage())
-            //{
-            //    var stream = Modl<M>.Settings.Serializer.Serialize(storage);
-            //    stream.Position = 0;
-
-            //    Modl<M>.Settings.Endpoint.Save(storage.About, stream);
-
-            //    stream.Dispose();
-            //}
-
             ModlMaterializer.Write(instance.GetStorage(), Settings);
 
             instance.IsNew = false;
             instance.ResetFields();
-            //instance.WriteToInstance();
 
             return true;
         }

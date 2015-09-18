@@ -21,33 +21,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-//using Modl.Query;
 
 namespace Modl.Structure
 {
-    //interface IModlInstance
-    //{
-    //    T GetValue<T>(string name);
-    //    void SetValue<T>(string name, T value);
-    //}
-
-    public class ModlInstance<M> //: IModlInstance
+    public class ModlInstance<M>
         where M : IModl, new()
     {
-        //protected IModl instance;
-
-        //protected object id;
-        //internal object Id { get { return id; } set { id = value; } }
-
         public M Instance { get; set; }
 
         public bool IsNew { get; set; }
         public bool IsDeleted { get; set; }
         public bool AutomaticId { get; set; }
         public string InternalId { get; set; }
-        //public Database Database { get; set; }
         public Dictionary<string, ModlValue> Values { get; set; }
-
         public ModlMetadata<M> Metadata { get { return ModlInternal<M>.Metadata; } }
 
 
@@ -79,7 +65,6 @@ namespace Modl.Structure
         public void SetValue<T>(string name, T value)
         {
             SetField<T>(name, value);
-            //LastInsertedMemberName = name;
         }
 
         public ModlValue GetField<T>(string name)
@@ -97,10 +82,6 @@ namespace Modl.Structure
             else
                 Values[name].Value = value;
         }
-
-        
-
-        //internal string LastInsertedMemberName { get; set; }
 
         internal void ResetFields()
         {
@@ -141,42 +122,10 @@ namespace Modl.Structure
                 return InternalId;
         }
 
-        //internal ModlIdentity GetIdentity()
-        //{
-        //    return new ModlIdentity
-        //    {
-        //        Id = GetId().ToString(),
-        //        Name = Metadata.ModlName,
-        //        Time = DateTime.UtcNow,
-        //        Version = 0
-        //    };
-        //}
-
         internal string GetValuehash()
         {
             return "";
         }
-
-        //internal Dictionary<string, object> GetValues()
-        //{
-        //    foreach (var property in Metadata.Properties)
-        //    {
-
-        //    }
-
-        //    Metadata.Properties.Select(x =>
-        //    {
-        //        var modlValue = Values[x.Name];
-        //        object outputValue;
-
-        //        if (x.IsForeignKey && modlValue)
-        //            outputValue = modlValue.Value;
-        //    }
-
-        //    return Values
-        //        .Select(x => new KeyValuePair<string, object>(x.Key, x.Value.Value))
-        //        .ToDictionary(x => x.Key, x => x.Value);
-        //}
 
         public IEnumerable<ModlStorage> GetStorage()
         {
@@ -186,14 +135,6 @@ namespace Modl.Structure
         internal void SetValuesFromStorage(IEnumerable<ModlStorage> storage)
         {
             Metadata.SetValuesFromStorage(this, storage);
-
-            //foreach (var value in storage.SelectMany(x => x).Values)
-            //{
-            //    if (value.Key == Metadata.PrimaryKey.Name)
-            //        SetId(value.Value);
-            //    else
-            //        SetValue(value.Key, value.Value);
-            //}
         }
 
 
