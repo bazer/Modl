@@ -134,6 +134,9 @@ namespace Tests
             Assert.AreEqual("Mercedes", car3.Manufacturer.Name);
             car3.Delete();
             Assert.IsTrue(car3.IsDeleted());
+            Assert.IsFalse(car3.Manufacturer.IsDeleted());
+            car3.Manufacturer.Delete();
+            Assert.IsTrue(car3.Manufacturer.IsDeleted());
             Assert.AreEqual(null, GetModl<Car>(car.Id));
 
         }
