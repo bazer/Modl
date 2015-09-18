@@ -26,7 +26,7 @@ using System.Configuration;
 using Modl.Cache;
 using Modl.Structure;
 
-namespace Modl
+namespace Modl.Structure
 {
     public enum CacheLevel
     {
@@ -35,7 +35,7 @@ namespace Modl
         All
     }
 
-    public enum Timeout
+    public enum CacheTimeout
     {
         Never = 0,
         TenMinutes = 10,
@@ -45,12 +45,12 @@ namespace Modl
         OneDay = 1440
     }
 
-    public class ModlConfig
+    public class Config
     {
         //public static CacheLevel DefaultCacheLevel { get { return CacheConfig.DefaultCacheLevel; } set { CacheConfig.DefaultCacheLevel = value; } }
         //public static int DefaultCacheTimeout { get { return CacheConfig.DefaultCacheTimeout; } set { CacheConfig.DefaultCacheTimeout = value; } }
 
-        public static ModlSettings GlobalSettings { get; private set; }
+        public static Settings GlobalSettings { get; private set; }
 
 
         //private static CacheLevel cacheLevel;
@@ -72,9 +72,9 @@ namespace Modl
         //    }
         //}
 
-        static ModlConfig()
+        static Config()
         {
-            GlobalSettings = new ModlSettings();
+            GlobalSettings = new Settings();
         }
     }
 }

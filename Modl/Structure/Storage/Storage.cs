@@ -6,25 +6,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Modl
+namespace Modl.Structure.Storage
 {
-    public interface IModlStorage
-    {
+    //public interface IModlStorage
+    //{
 
-    }
+    //}
 
-    public class ModlStorage : IModlStorage
+    public class Storage// : IModlStorage
     {
         public Dictionary<string, object> Values { get; set; }
-        public ModlAbout About { get; set; }
+        public About About { get; set; }
         public string Hash { get; set; }
-        internal ModlIdentity Identity { get; set; }
+        internal Identity Identity { get; set; }
 
-        public ModlStorage()
+        public Storage()
         {
         }
 
-        public ModlStorage(ModlAbout about, Dictionary<string, object> values)
+        public Storage(About about, Dictionary<string, object> values)
         {
             this.About = about;
             this.Values = values;

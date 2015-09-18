@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Modl.Structure.Instance;
 
 namespace Modl
 {
-    public static class ModlExtensions
+    public static class Extensions
     {
-        internal static ModlInstance<M> GetInstance<M>(this M m) where M : IModl, new()
+        internal static Instance<M> GetInstance<M>(this M m) where M : IModl, new()
         {
-            return ModlInternal<M>.GetInstance(m);
+            return Internal<M>.GetInstance(m);
         }
 
         public static M Modl<M>(this M m) where M : IModl, new()
@@ -19,7 +20,7 @@ namespace Modl
             if (string.IsNullOrWhiteSpace(m.Id))
                 m.Id = Guid.NewGuid().ToString();
 
-            ModlInternal<M>.AddInstance(m);
+            Internal<M>.AddInstance(m);
             return m;
         }
 
@@ -65,7 +66,7 @@ namespace Modl
             if (id == null)
                 return default(T);
 
-            return ModlInternal<T>.Get(id);
+            return Internal<T>.Get(id);
         }
 
         public static void SetRelation<M, T>(this M m, string name, T value)
@@ -90,12 +91,12 @@ namespace Modl
 
         public static bool Save<M>(this M m) where M : IModl, new()
         {
-            return ModlInternal<M>.Save(m);
+            return Internal<M>.Save(m);
         }
 
         public static bool Delete<M>(this M m) where M : IModl, new()
         {
-            return ModlInternal<M>.Delete(m);
+            return Internal<M>.Delete(m);
         }
     }
 

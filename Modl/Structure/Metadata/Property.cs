@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Modl.Structure.Metadata
 {
-    public class ModlProperty<M>
+    public class Property<M>
          where M : IModl, new()
     {
         public string Name { get; private set; }
@@ -19,7 +19,7 @@ namespace Modl.Structure.Metadata
         private Func<M, object> Getter { get; set; }
         private Action<M, object> Setter { get; set; }
 
-        public ModlProperty(PropertyInfo property, ModlLayer<M> layer)
+        public Property(PropertyInfo property, Layer<M> layer)
         {
             Name = property.Name;
             ModlName = property.Name;
@@ -45,12 +45,12 @@ namespace Modl.Structure.Metadata
                 //}
             }
 
-            Getter = (Func<M, object>)typeof(ModlProperty<M>)
+            Getter = (Func<M, object>)typeof(Property<M>)
                 .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(property.PropertyType)
                 .Invoke(null, new object[] { property.GetGetMethod(true) });
 
-            Setter = (Action<M, object>)typeof(ModlProperty<M>)
+            Setter = (Action<M, object>)typeof(Property<M>)
                 .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                 .MakeGenericMethod(property.PropertyType)
                 .Invoke(null, new object[] { property.GetSetMethod(true) });

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Modl.Structure.Storage
 {
-    public class ModlMaterializer
+    public class Materializer
     {
-        internal static IEnumerable<ModlStorage> Read(IEnumerable<ModlIdentity> identities, ModlSettings settings)
+        internal static IEnumerable<Storage> Read(IEnumerable<Identity> identities, Settings settings)
         {
             foreach (var identity in identities)
             {
@@ -21,7 +21,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static void Write(IEnumerable<ModlStorage> storages, ModlSettings settings)
+        internal static void Write(IEnumerable<Storage> storages, Settings settings)
         {
             foreach (var storage in storages)
             {
@@ -34,7 +34,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static object DeserializeObject(object obj, Type toType, ModlSettings settings)
+        internal static object DeserializeObject(object obj, Type toType, Settings settings)
         {
             return settings.Serializer.DeserializeObject(obj, toType);
         }

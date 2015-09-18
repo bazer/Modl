@@ -23,6 +23,7 @@ using Modl.Json;
 using Modl.Plugins;
 using System;
 using System.Collections.Generic;
+using Modl.Structure;
 
 namespace Tests
 {
@@ -32,8 +33,8 @@ namespace Tests
         [TestInitialize]
         public void Initialize()
         {
-            ModlConfig.GlobalSettings.Serializer = new JsonModl();
-            ModlConfig.GlobalSettings.Endpoint = new FileModl();
+            Config.GlobalSettings.Serializer = new JsonModl();
+            Config.GlobalSettings.Endpoint = new FileModl();
         }
 
 

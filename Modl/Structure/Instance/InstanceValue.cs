@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Modl.Structure
+namespace Modl.Structure.Instance
 {
-    public class ModlValue
+    public class InstanceValue
     {
         protected object oldValue;
         protected object newValue;
@@ -31,7 +31,7 @@ namespace Modl.Structure
         internal bool IsModified { get { return isDirty; } }
         internal Type Type { get; set; }
 
-        internal ModlValue(object value, Type type)
+        internal InstanceValue(object value, Type type)
         {
             oldValue = value;
             newValue = value;

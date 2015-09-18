@@ -6,33 +6,34 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Modl.Structure.Instance;
 
 namespace Modl.Structure.Metadata
 {
-    public class ModlMetadata<M>
+    public class Metadata<M>
         where M : IModl, new()
     {
-        private ModlLayer<M> FirstLayer { get; set; }
+        private Layer<M> FirstLayer { get; set; }
         public bool HasPrimaryKey => FirstLayer.HasPrimaryKey;
-        public ModlProperty<M> PrimaryKey => FirstLayer.PrimaryKey;
-        public List<ModlProperty<M>> Properties => FirstLayer.AllProperties;
+        public Property<M> PrimaryKey => FirstLayer.PrimaryKey;
+        public List<Property<M>> Properties => FirstLayer.AllProperties;
 
-        public ModlMetadata()
+        public Metadata()
         {
-            FirstLayer = new ModlLayer<M>(typeof(M));
+            FirstLayer = new Layer<M>(typeof(M));
         }
 
-        internal IEnumerable<ModlIdentity> GetIdentities(object id)
+        internal IEnumerable<Identity> GetIdentities(object id)
         {
             return FirstLayer.GetIdentities(id);
         }
 
-        internal IEnumerable<ModlStorage> GetStorage(ModlInstance<M> instance)
+        internal IEnumerable<Storage.Storage> GetStorage(Instance<M> instance)
         {
             return FirstLayer.GetStorage(instance);
         }
 
-        internal void SetValuesFromStorage(ModlInstance<M> instance, IEnumerable<ModlStorage> storage)
+        internal void SetValuesFromStorage(Instance<M> instance, IEnumerable<Storage.Storage> storage)
         {
             FirstLayer.SetValuesFromStorage(instance, storage);
         }

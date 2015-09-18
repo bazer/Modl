@@ -10,7 +10,7 @@ using Modl.Structure.Storage;
 
 namespace Modl.Plugins
 {
-    public class FileModl : IModlEndpoint
+    public class FileModl : IEndpoint
     {
         string path = "test" + Path.DirectorySeparatorChar;
         string fileEnding = "json";
@@ -21,7 +21,7 @@ namespace Modl.Plugins
                 Directory.CreateDirectory(path);
         }
 
-        public Stream Get(ModlIdentity identity)
+        public Stream Get(Identity identity)
         {
             var path = GetPath(identity);
 
@@ -31,7 +31,7 @@ namespace Modl.Plugins
             return File.OpenRead(path);
         }
 
-        public void Save(ModlIdentity identity, MemoryStream stream)
+        public void Save(Identity identity, MemoryStream stream)
         {
             if (!Directory.Exists(GetDirectory(identity)))
                 Directory.CreateDirectory(GetDirectory(identity));
@@ -47,19 +47,19 @@ namespace Modl.Plugins
             }
         }
 
-        private string GetPath(ModlIdentity identity)
+        private string GetPath(Identity identity)
         {
 
             return GetDirectory(identity) + GetFilename(identity);
         }
 
-        private string GetDirectory(ModlIdentity identity)
+        private string GetDirectory(Identity identity)
         {
 
             return path + identity.Name + Path.DirectorySeparatorChar;
         }
 
-        private string GetFilename(ModlIdentity identity)
+        private string GetFilename(Identity identity)
         {
             
             return identity.Id + "." + fileEnding;

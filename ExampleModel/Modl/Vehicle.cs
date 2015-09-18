@@ -21,11 +21,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Modl;
+using Modl.Structure;
 
 namespace ExampleModel
 {
     [Name("Vehicles")]
-    [Cache(CacheLevel.Off, Timeout.Never)]
+    [Cache(CacheLevel.Off, CacheTimeout.Never)]
     public class Vehicle : IModl
     {
         [Key]

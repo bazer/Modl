@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Modl.Structure;
 
 namespace Modl
 {
@@ -31,7 +32,7 @@ namespace Modl
 
         public CacheAttribute(CacheLevel cacheLevel)
         {
-            CacheTimeout = ModlConfig.GlobalSettings.CacheTimeout;
+            CacheTimeout = Config.GlobalSettings.CacheTimeout;
             CacheLevel = cacheLevel;
         }
 
@@ -42,7 +43,7 @@ namespace Modl
 
         }
 
-        public CacheAttribute(CacheLevel cacheLevel, Timeout timeout)
+        public CacheAttribute(CacheLevel cacheLevel, CacheTimeout timeout)
         {
             CacheTimeout = (int)timeout;
             CacheLevel = cacheLevel;

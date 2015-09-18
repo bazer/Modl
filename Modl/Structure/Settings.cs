@@ -6,21 +6,21 @@ using System.Linq;
 
 namespace Modl.Structure
 {
-    public class ModlSettings
+    public class Settings
     {
         public CacheLevel CacheLevel;
         public int CacheTimeout;
 
-        private IModlEndpoint endpoint;
-        public IModlEndpoint Endpoint
+        private IEndpoint endpoint;
+        public IEndpoint Endpoint
         {
             get
             {
                 if (endpoint != null)
                     return endpoint;
 
-                if (ModlConfig.GlobalSettings.endpoint != null)
-                    return ModlConfig.GlobalSettings.endpoint;
+                if (Config.GlobalSettings.endpoint != null)
+                    return Config.GlobalSettings.endpoint;
 
                 throw new Exception("No endpoint configured.");
             }
@@ -31,16 +31,16 @@ namespace Modl.Structure
             }
         }
 
-        private IModlSerializer serializer;
-        public IModlSerializer Serializer
+        private ISerializer serializer;
+        public ISerializer Serializer
         {
             get
             {
                 if (serializer != null)
                     return serializer;
 
-                if (ModlConfig.GlobalSettings.serializer != null)
-                    return ModlConfig.GlobalSettings.serializer;
+                if (Config.GlobalSettings.serializer != null)
+                    return Config.GlobalSettings.serializer;
 
                 throw new Exception("No serializer configured.");
             }
@@ -52,7 +52,7 @@ namespace Modl.Structure
         }
 
 
-        public ModlSettings()
+        public Settings()
         {
             CacheLevel = CacheConfig.DefaultCacheLevel;
             CacheTimeout = CacheConfig.DefaultCacheTimeout;

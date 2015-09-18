@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Modl.Structure.Storage
 {
-    public class ModlIdentity
+    public class Identity
     {
         public string Id { get; set; }
         public string Name { get; set; }

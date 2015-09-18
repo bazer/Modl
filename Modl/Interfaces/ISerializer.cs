@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Modl.Structure.Storage;
 
 namespace Modl.Interfaces
 {
-    public interface IModlSerializer: IModlPipeline
+    public interface ISerializer: IPipeline
     {
-        MemoryStream Serialize(ModlStorage storage);
-        ModlStorage Deserialize(Stream stream);
+        MemoryStream Serialize(Storage storage);
+        Storage Deserialize(Stream stream);
         object DeserializeObject(object obj, Type toType);
     }
 }

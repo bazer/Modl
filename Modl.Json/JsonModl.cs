@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using Modl.Interfaces;
 using Newtonsoft.Json;
 using System.IO;
+using Modl.Structure.Storage;
 
 namespace Modl.Json
 {
-    public class JsonModl: IModlSerializer
+    public class JsonModl: ISerializer
     {
-        MemoryStream IModlSerializer.Serialize(ModlStorage storage)
+        MemoryStream ISerializer.Serialize(Storage storage)
         {
             var stream = new MemoryStream();
             var jsonTextWriter = new JsonTextWriter(new StreamWriter(stream));
@@ -24,19 +25,19 @@ namespace Modl.Json
             return stream;
         }
 
-        ModlStorage IModlSerializer.Deserialize(Stream stream)
+        Storage ISerializer.Deserialize(Stream stream)
         {
             var serializer = new JsonSerializer();
 
             using (var sr = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(sr))
             {
-                return serializer.Deserialize<ModlStorage>(jsonTextReader);
+                return serializer.Deserialize<Storage>(jsonTextReader);
                 //return new ModlStorage(serializer.Deserialize<Dictionary<string, object>>(jsonTextReader));
             }
         }
 
-        object IModlSerializer.DeserializeObject(object obj, Type toType)
+        object ISerializer.DeserializeObject(object obj, Type toType)
         {
             return JsonConvert.DeserializeObject(obj.ToString(), toType);
         }

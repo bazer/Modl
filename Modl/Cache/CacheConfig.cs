@@ -19,6 +19,7 @@ along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Modl.Structure;
 
 namespace Modl.Cache
 {
@@ -29,7 +30,7 @@ namespace Modl.Cache
 
         private static HashSet<Action> cacheList = new HashSet<Action>();
 
-        public static void SetDefaultCacheTimeout(Timeout timeout)
+        public static void SetDefaultCacheTimeout(CacheTimeout timeout)
         {
             DefaultCacheTimeout = (int)timeout;
         }

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Modl.Structure
+namespace Modl.Structure.Storage
 {
-    public class ModlAbout
+    public class About
     {
         public string Id { get; set; }
         public string Type { get; set; }

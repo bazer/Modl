@@ -21,10 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Modl.Structure.Storage;
 
-namespace Modl.Structure
+namespace Modl.Structure.Instance
 {
-    public class ModlInstance<M>
+    public class Instance<M>
         where M : IModl, new()
     {
         public M Instance { get; set; }
@@ -33,14 +34,14 @@ namespace Modl.Structure
         public bool IsDeleted { get; set; }
         public bool AutomaticId { get; set; }
         public string InternalId { get; set; }
-        public Dictionary<string, ModlValue> Values { get; set; }
-        public ModlMetadata<M> Metadata { get { return ModlInternal<M>.Metadata; } }
+        public Dictionary<string, InstanceValue> Values { get; set; }
+        public Metadata<M> Metadata { get { return Internal<M>.Metadata; } }
 
 
-        public ModlInstance(M instance)
+        public Instance(M instance)
         {
             this.Instance = instance;
-            Values = new Dictionary<string, ModlValue>();
+            Values = new Dictionary<string, InstanceValue>();
 
             IsNew = true;
             AutomaticId = true;
@@ -67,18 +68,18 @@ namespace Modl.Structure
             SetField<T>(name, value);
         }
 
-        public ModlValue GetField<T>(string name)
+        public InstanceValue GetField<T>(string name)
         {
             if (!Values.ContainsKey(name))
-                Values[name] = new ModlValue(default(T), typeof(T));
+                Values[name] = new InstanceValue(default(T), typeof(T));
 
-            return (ModlValue)Values[name];
+            return (InstanceValue)Values[name];
         }
 
         protected void SetField<T>(string name, T value)
         {
             if (!Values.ContainsKey(name))
-                Values[name] = new ModlValue(value, typeof(T));
+                Values[name] = new InstanceValue(value, typeof(T));
             else
                 Values[name].Value = value;
         }
@@ -127,12 +128,12 @@ namespace Modl.Structure
             return "";
         }
 
-        public IEnumerable<ModlStorage> GetStorage()
+        public IEnumerable<Storage.Storage> GetStorage()
         {
             return Metadata.GetStorage(this);
         }
 
-        internal void SetValuesFromStorage(IEnumerable<ModlStorage> storage)
+        internal void SetValuesFromStorage(IEnumerable<Storage.Storage> storage)
         {
             Metadata.SetValuesFromStorage(this, storage);
         }

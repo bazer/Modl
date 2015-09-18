@@ -8,29 +8,30 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Modl.Structure.Instance;
 
 namespace Modl.Structure
 {
-    internal class ModlInternal<M>
+    internal class Internal<M>
         where M : IModl, new()
     {
-        public static ModlSettings Settings { get; private set; }
-        public static ModlMetadata<M> Metadata { get; private set; }
-        private static Dictionary<string, ModlInstance<M>> Instances { get; set; }
+        public static Settings Settings { get; private set; }
+        public static Metadata<M> Metadata { get; private set; }
+        private static Dictionary<string, Instance<M>> Instances { get; set; }
 
-        static ModlInternal()
+        static Internal()
         {
-            Settings = new ModlSettings();
-            Metadata = new ModlMetadata<M>();
-            Instances = new Dictionary<string, ModlInstance<M>>();
+            Settings = new Settings();
+            Metadata = new Metadata<M>();
+            Instances = new Dictionary<string, Instance<M>>();
         }
 
-        internal static ModlInstance<M> GetInstance(M m)
+        internal static Instance<M> GetInstance(M m)
         {
             if (m == null)
                 throw new NullReferenceException("Modl object is null");
 
-            ModlInstance<M> content;
+            Instance<M> content;
             if (!Instances.TryGetValue(m.Id, out content))
                 throw new Exception("The instance hasn't been attached");
 
@@ -51,10 +52,10 @@ namespace Modl.Structure
                 throw new Exception("The instance doesn't have a ModlId");
 
             if (!HasInstance(m))
-                Instances.Add(m.Id, new ModlInstance<M>(m));
+                Instances.Add(m.Id, new Instance<M>(m));
         }
 
-        internal static ModlInstance<M> AddFromStorage(IEnumerable<ModlStorage> storage)
+        internal static Instance<M> AddFromStorage(IEnumerable<Storage.Storage> storage)
         {
             var instance = new M().Modl().GetInstance();
             instance.SetValuesFromStorage(storage);
@@ -72,7 +73,7 @@ namespace Modl.Structure
             if (Instances.ContainsKey(id))
                 return Instances[id].Instance;
 
-            var modlInstance = ModlInternal<M>.AddFromStorage(ModlMaterializer.Read(Metadata.GetIdentities(id), Settings).ToList());
+            var modlInstance = Internal<M>.AddFromStorage(Materializer.Read(Metadata.GetIdentities(id), Settings).ToList());
             modlInstance.IsNew = false;
             modlInstance.ResetFields();
             modlInstance.WriteToInstance();
@@ -91,7 +92,7 @@ namespace Modl.Structure
             if (!instance.IsModified)
                 return false;
 
-            ModlMaterializer.Write(instance.GetStorage(), Settings);
+            Materializer.Write(instance.GetStorage(), Settings);
 
             instance.IsNew = false;
             instance.ResetFields();

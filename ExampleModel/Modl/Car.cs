@@ -22,11 +22,12 @@ using System.Linq;
 using System.Text;
 using Modl;
 using Modl.Mvc;
+using Modl.Structure;
 
 namespace ExampleModel
 {
     [Name("Cars")]
-    [Cache(CacheLevel.Off, Timeout.Never)]
+    [Cache(CacheLevel.Off, CacheTimeout.Never)]
     public class Car: IModl //: Vehicle
     {
         //[ForeignKey(typeof(Vehicle))]

@@ -27,9 +27,9 @@ namespace Modl
     public class Modl<M>
         where M : IModl, new()
     {
-        public static ModlSettings Settings { get { return ModlInternal<M>.Settings; } }
+        public static Settings Settings { get { return Internal<M>.Settings; } }
 
-        public static ModlMetadata<M> Metadata { get { return ModlInternal<M>.Metadata; } }
+        public static Metadata<M> Metadata { get { return Internal<M>.Metadata; } }
 
         static Modl()
         {
@@ -51,7 +51,7 @@ namespace Modl
 
         public static M Get(string id)
         {
-            return ModlInternal<M>.Get(id);
+            return Internal<M>.Get(id);
         }
     }
 }

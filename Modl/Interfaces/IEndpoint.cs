@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Modl.Interfaces
 {
-    public interface IModlEndpoint //<M> : IModlPipeline<M>
+    public interface IEndpoint //<M> : IModlPipeline<M>
         //where M : IModl
     {
-        Stream Get(ModlIdentity identity);
-        void Save(ModlIdentity identity, MemoryStream stream);
+        Stream Get(Identity identity);
+        void Save(Identity identity, MemoryStream stream);
          
     }
 }
