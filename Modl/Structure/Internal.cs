@@ -38,6 +38,14 @@ namespace Modl.Structure
             return content;
         }
 
+        internal static void RemoveInstance(M m)
+        {
+            if (m == null)
+                throw new NullReferenceException("Modl object is null");
+
+            Instances.Remove(m.Id);
+        }
+
         internal static bool HasInstance(M m)
         {
             if (string.IsNullOrWhiteSpace(m.Id))
@@ -63,22 +71,17 @@ namespace Modl.Structure
             return instance;
         }
 
-        internal static bool Delete(M m)
-        {
-            throw new NotImplementedException();
-        }
-
         internal static M Get(string id)
         {
             if (Instances.ContainsKey(id))
-                return Instances[id].Instance;
+                return Instances[id].ConnectedObject;
 
             var modlInstance = Internal<M>.AddFromStorage(Materializer.Read(Metadata.GetIdentities(id), Settings).ToList());
             modlInstance.IsNew = false;
             modlInstance.ResetFields();
             modlInstance.WriteToInstance();
 
-            return modlInstance.Instance;
+            return modlInstance.ConnectedObject;
         }
 
 
@@ -96,6 +99,23 @@ namespace Modl.Structure
 
             instance.IsNew = false;
             instance.ResetFields();
+
+            return true;
+        }
+
+        internal static bool Delete(M m)
+        {
+            var instance = m.GetInstance();
+
+            if (instance.IsNew)
+                throw new Exception(string.Format("Trying to delete a new object. Class: {0}, Id: {1}", typeof(M), m.Id));
+
+            if (instance.IsDeleted)
+                throw new Exception(string.Format("Trying to delete a deleted object. Class: {0}, Id: {1}", typeof(M), m.Id));
+
+            Materializer.Delete(instance.GetStorage(), Settings);
+            instance.IsDeleted = true;
+            //m.RemoveInstance();
 
             return true;
         }

@@ -47,6 +47,16 @@ namespace Modl.Plugins
             }
         }
 
+        public void Delete(Identity identity)
+        {
+            var path = GetPath(identity);
+
+            if (!File.Exists(path))
+                throw new FileNotFoundException();
+
+            File.Delete(path);
+        }
+
         private string GetPath(Identity identity)
         {
 
@@ -64,5 +74,7 @@ namespace Modl.Plugins
             
             return identity.Id + "." + fileEnding;
         }
+
+        
     }
 }

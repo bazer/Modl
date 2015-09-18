@@ -34,6 +34,14 @@ namespace Modl.Structure.Storage
             }
         }
 
+        internal static void Delete(IEnumerable<Storage> storages, Settings settings)
+        {
+            foreach (var storage in storages)
+            {
+                settings.Endpoint.Delete(storage.Identity);
+            }
+        }
+
         internal static object DeserializeObject(object obj, Type toType, Settings settings)
         {
             return settings.Serializer.DeserializeObject(obj, toType);

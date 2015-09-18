@@ -14,6 +14,7 @@ namespace Modl.Interfaces
     {
         Stream Get(Identity identity);
         void Save(Identity identity, MemoryStream stream);
-         
+        void Delete(Identity identity);
+
     }
 }

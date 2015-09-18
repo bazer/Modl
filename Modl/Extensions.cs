@@ -15,6 +15,11 @@ namespace Modl
             return Internal<M>.GetInstance(m);
         }
 
+        internal static void RemoveInstance<M>(this M m) where M : IModl, new()
+        {
+            Internal<M>.RemoveInstance(m);
+        }
+
         public static M Modl<M>(this M m) where M : IModl, new()
         {
             if (string.IsNullOrWhiteSpace(m.Id))

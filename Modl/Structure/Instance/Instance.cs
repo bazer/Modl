@@ -28,7 +28,7 @@ namespace Modl.Structure.Instance
     public class Instance<M>
         where M : IModl, new()
     {
-        public M Instance { get; set; }
+        public M ConnectedObject { get; set; }
 
         public bool IsNew { get; set; }
         public bool IsDeleted { get; set; }
@@ -40,7 +40,7 @@ namespace Modl.Structure.Instance
 
         public Instance(M instance)
         {
-            this.Instance = instance;
+            this.ConnectedObject = instance;
             Values = new Dictionary<string, InstanceValue>();
 
             IsNew = true;
@@ -149,7 +149,7 @@ namespace Modl.Structure.Instance
         internal void ReadFromInstance()
         {
             foreach (var property in Metadata.Properties)
-                SetValue(property.Name, property.GetValue(Instance));
+                SetValue(property.Name, property.GetValue(ConnectedObject));
                 
         }
 
@@ -157,7 +157,7 @@ namespace Modl.Structure.Instance
         {
             foreach (var property in Metadata.Properties)
                 if (propertyName == null || property.Name == propertyName)
-                    property.SetValue(Instance, GetValue<object>(property.Name));
+                    property.SetValue(ConnectedObject, GetValue<object>(property.Name));
         }
 
         private object GetDefault(Type type)
