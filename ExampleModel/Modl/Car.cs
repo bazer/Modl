@@ -27,14 +27,21 @@ namespace ExampleModel
 {
     [Name("Cars")]
     [Cache(CacheLevel.Off, Timeout.Never)]
-    public class Car : Vehicle, IMvcModl
+    public class Car: IModl //: Vehicle
     {
-        [ForeignKey(typeof(Vehicle))]
-        public int Vehicle_fk { get; set; }
+        //[ForeignKey(typeof(Vehicle))]
+        //public int Vehicle_fk { get; set; }
+        [Key]
+        public string Id { get; set; }
         [Name("CarName")]
         public string Name { get; set; }
         [Name("Type_fk")]
         public CarType Type { get; set; }
         public List<string> Tags { get; set; }
+
+        public Manufacturer Manufacturer { get { return this.GetRelation<Car, Manufacturer>("Manufacturer_fk"); } set { this.SetRelation("Manufacturer_fk", value); } }
+
+        //public string GetId() => Id.ToString();
+        //public void SetId(string id) => Id = int.Parse(id);
     }
 }

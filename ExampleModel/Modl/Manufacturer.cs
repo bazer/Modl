@@ -27,6 +27,18 @@ namespace ExampleModel
     [Name("Manufacturers")]
     public class Manufacturer : IModl
     {
+        public string Id
+        {
+            get
+            {
+                return ManufacturerID.ToString();
+            }
+            set
+            {
+                ManufacturerID = Guid.Parse(value);
+            }
+        }
+
         [Key]
         public Guid ManufacturerID { get; set; }
         public string Name { get; set; }
@@ -34,14 +46,14 @@ namespace ExampleModel
         [ForeignKey(typeof(Vehicle), "Manufacturer_fk")]
         public List<Vehicle> Vehicles { get; set; }
         //public List<Vehicle> Vehicles { get { return this.GetFk("Manufacturer"); } set { SetFk(value); } }
-        
+
 
         public Manufacturer() { }
         public Manufacturer(string name)
         {
-            this.Modl();
             Name = name;
             ManufacturerID = Guid.NewGuid();
+            this.Modl();
         }
     }
 }

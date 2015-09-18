@@ -33,7 +33,8 @@ namespace Modl.Structure.Metadata
         public string ModlName { get; private set; }
         internal Type Type { get; set; }
         internal ModlLayer<M> Parent { get; set; }
-        internal bool HasParent { get { return Parent != null; } }
+        internal bool HasParent => Parent != null;
+        internal bool HasPrimaryKey => Properties.Any(x => x.IsPrimaryKey);
 
         internal List<ModlProperty<M>> Properties { get; private set; }
         internal List<ModlProperty<M>> AllProperties { get; private set; }
@@ -125,7 +126,7 @@ namespace Modl.Structure.Metadata
             if (HasParent)
                 Parent.SetValuesFromStorage(instance, storage);
 
-            foreach (var value in storage.Single(x => x.About.Name == ModlName).Values)
+            foreach (var value in storage.Single(x => x.About.Type == ModlName).Values)
             {
                 var property = GetPropertyFromModlName(value.Key);
                 var newValue = value.Value;
@@ -159,9 +160,9 @@ namespace Modl.Structure.Metadata
             return new ModlAbout
             {
                 Id = instance.GetValue<object>(PrimaryKey.Name).ToString(),
-                Name = ModlName,
+                Type = ModlName,
                 Time = DateTime.UtcNow,
-                Version = 0
+                //Version = 0
             };
         }
 

@@ -8,5 +8,8 @@ namespace Modl
 {
     public interface IModl
     {
+        string Id { get; set; }
+        //string GetId();
+        //void SetId(string id);
     }
 }

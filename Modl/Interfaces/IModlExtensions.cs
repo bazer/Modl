@@ -16,9 +16,19 @@ namespace Modl
 
         public static M Modl<M>(this M m) where M : IModl, new()
         {
+            if (string.IsNullOrWhiteSpace(m.Id))
+                m.Id = Guid.NewGuid().ToString();
+
             ModlInternal<M>.AddInstance(m);
             return m;
         }
+
+        //internal static M Modl<M>(this M m, string modlId) where M : IModl, new()
+        //{
+        //    m.ModlId = modlId;
+        //    ModlInternal<M>.AddInstance(m);
+        //    return m;
+        //}
 
         public static bool IsNew<M>(this M m) where M : IModl, new()
         {
@@ -35,15 +45,37 @@ namespace Modl
             return m.GetInstance().IsModified;
         }
 
-        public static M SetId<M>(this M m, object value) where M : IModl, new()
-        {
-            m.GetInstance().SetId(value);
-            return m;
-        }
+        //public static M SetId<M>(this M m, object value) where M : IModl, new()
+        //{
+        //    m.GetInstance().SetId(value);
+        //    return m;
+        //}
 
         public static object GetId<M>(this M m) where M : IModl, new()
         {
             return m.GetInstance().GetId();
+        }
+
+        public static T GetRelation<M, T>(this M m, string name) 
+            where M: IModl, new()
+            where T: IModl, new()
+        {
+            var id = m.GetInstance().GetValue<string>(name);
+
+            if (id == null)
+                return default(T);
+
+            return ModlInternal<T>.Get(id);
+        }
+
+        public static void SetRelation<M, T>(this M m, string name, T value)
+            where M : IModl, new()
+            where T : IModl, new()
+        {
+            m.GetInstance().SetValue(name, value.Id);
+            //var t = ModlInternal<T>.Get(id);
+
+            //return t;
         }
 
         //public static ModlIdentity GetIdentity<M>(this M m) where M : IModl, new()

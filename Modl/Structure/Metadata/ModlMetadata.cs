@@ -13,9 +13,10 @@ namespace Modl.Structure.Metadata
         where M : IModl, new()
     {
         private ModlLayer<M> FirstLayer { get; set; }
-        public ModlProperty<M> PrimaryKey { get { return FirstLayer.PrimaryKey; } }
+        public bool HasPrimaryKey => FirstLayer.HasPrimaryKey;
+        public ModlProperty<M> PrimaryKey => FirstLayer.PrimaryKey;
         //public string ModlName { get { return FirstLayer.ModlName; } }
-        public List<ModlProperty<M>> Properties { get { return FirstLayer.AllProperties; } }
+        public List<ModlProperty<M>> Properties => FirstLayer.AllProperties;
 
         public ModlMetadata()
         {

@@ -16,13 +16,13 @@ namespace Modl.Structure
     {
         public static ModlSettings Settings { get; private set; }
         public static ModlMetadata<M> Metadata { get; private set; }
-        private static Dictionary<int, ModlInstance<M>> Instances { get; set; }
+        private static Dictionary<string, ModlInstance<M>> Instances { get; set; }
 
         static ModlInternal()
         {
             Settings = new ModlSettings();
             Metadata = new ModlMetadata<M>();
-            Instances = new Dictionary<int, ModlInstance<M>>();
+            Instances = new Dictionary<string, ModlInstance<M>>();
         }
 
         internal static ModlInstance<M> GetInstance(M m)
@@ -31,7 +31,7 @@ namespace Modl.Structure
                 throw new NullReferenceException("Modl object is null");
 
             ModlInstance<M> content;
-            if (!Instances.TryGetValue(m.GetHashCode(), out content))
+            if (!Instances.TryGetValue(m.Id, out content))
                 throw new Exception("The instance hasn't been attached");
 
             return content;
@@ -39,13 +39,19 @@ namespace Modl.Structure
 
         internal static bool HasInstance(M m)
         {
-            return Instances.ContainsKey(m.GetHashCode());
+            if (string.IsNullOrWhiteSpace(m.Id))
+                throw new Exception("The instance doesn't have a ModlId");
+
+            return Instances.ContainsKey(m.Id);
         }
 
         internal static void AddInstance(M m)
         {
+            if (string.IsNullOrWhiteSpace(m.Id))
+                throw new Exception("The instance doesn't have a ModlId");
+
             if (!HasInstance(m))
-                Instances.Add(m.GetHashCode(), new ModlInstance<M>(m));
+                Instances.Add(m.Id, new ModlInstance<M>(m));
         }
 
         internal static ModlInstance<M> AddFromStorage(IEnumerable<ModlStorage> storage)
@@ -61,7 +67,7 @@ namespace Modl.Structure
             throw new NotImplementedException();
         }
 
-        internal static M Get(object id)
+        internal static M Get(string id)
         {
             //var identity = new ModlAbout
             //{
@@ -77,15 +83,18 @@ namespace Modl.Structure
             //    var storage = Settings.Serializer.Deserialize(stream);
             //    stream.Dispose();
             //}
+            
+            if (Instances.ContainsKey(id))
+                return Instances[id].Instance;
 
-            var instance = ModlInternal<M>.AddFromStorage(ModlMaterializer.Read(Metadata.GetIdentities(id), Settings).ToList());
-            instance.IsNew = false;
-            instance.ResetFields();
-            instance.WriteToInstance();
+            var modlInstance = ModlInternal<M>.AddFromStorage(ModlMaterializer.Read(Metadata.GetIdentities(id), Settings).ToList());
+            modlInstance.IsNew = false;
+            modlInstance.ResetFields();
+            modlInstance.WriteToInstance();
 
             //Statics<M>.WriteToEmptyProperties(m);
 
-            return instance.Instance;
+            return modlInstance.Instance;
         }
 
 
@@ -94,7 +103,7 @@ namespace Modl.Structure
             var instance = m.GetInstance();
 
             if (instance.IsDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", typeof(M), m.GetId()));
+                throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", typeof(M), m.Id));
 
             if (!instance.IsModified)
                 return false;

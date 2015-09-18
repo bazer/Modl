@@ -29,20 +29,18 @@ namespace ExampleModel
     public class Vehicle : IModl
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [Name("Manufacturer_fk")]
-        public Manufacturer Manufacturer { get; set; }
+        //public Manufacturer Manufacturer { get; set; }
 
         //[Name("Manufacturer_fk")]
-        //public Manufacturer Manufacturer { get { return this.GetFk<Manufacturer>(); } set { this.SetFk(value); } }
+        public Manufacturer Manufacturer { get { return this.GetRelation<Vehicle, Manufacturer>("Manufacturer_fk"); } set { this.SetRelation("Manufacturer_fk", value); } }
 
-        
-        
-        
+
         //public Manufacturer Manufacturer { get { return GetFk("Manufacturer_fk", id => DbModl<Manufacturer>.Get(id)); } }
 
 
         //public Manufacturer Manufacturer { get { return GetLazy<Manufacturer>("Manufacturer", x => x. set; }
-            
+
     }
 }

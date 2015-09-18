@@ -41,25 +41,25 @@ namespace Tests
         [TestMethod]
         public void CoreStuff()
         {
-            Assert.AreEqual("Vehicle_fk", Modl<Car>.Metadata.PrimaryKey.Name);
+            Assert.AreEqual("Id", Modl<Car>.Metadata.PrimaryKey.Name);
 
             var car = Modl<Car>.New();
             Assert.IsTrue(car.IsNew());
-            Assert.IsFalse(car.IsModified());
+            Assert.IsTrue(car.IsModified());
             car.Name = "Audi";
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
 
             car = new Car().Modl();
             Assert.IsTrue(car.IsNew());
-            Assert.IsFalse(car.IsModified());
+            Assert.IsTrue(car.IsModified());
             car.Name = "Audi";
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
 
             car = new Car().Modl().Modl().Modl().Modl();
             Assert.IsTrue(car.IsNew());
-            Assert.IsFalse(car.IsModified());
+            Assert.IsTrue(car.IsModified());
             car.Name = "Audi";
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
@@ -107,11 +107,11 @@ namespace Tests
 
             Car car = Modl<Car>.New();
 
-            Assert.AreEqual(false, car.IsModified());
+            Assert.AreEqual(true, car.IsModified());
             car.Name = "M3";
             car.Manufacturer = new Manufacturer("BMW");
-            //car.Type = new CarType();
-            //car.Type.Description = "Fast car";
+            car.Type = new CarType().Modl();
+            car.Type.Description = "Fast car";
             car.Tags = new List<string>();
             car.Tags.Add("Nice");
             car.Tags.Add("Fast");
@@ -140,7 +140,7 @@ namespace Tests
         [TestMethod]
         public void CRUDExplicitId()
         {
-            Manufacturer m1 = Modl<Manufacturer>.New(Guid.NewGuid());
+            Manufacturer m1 = Modl<Manufacturer>.New(Guid.NewGuid().ToString());
             Assert.AreEqual(true, m1.IsModified());
             m1.Name = "BMW";
             Assert.AreEqual(true, m1.IsModified());
@@ -148,18 +148,18 @@ namespace Tests
             Assert.IsTrue(!m1.IsNew());
             Assert.AreEqual(false, m1.IsModified());
 
-            Manufacturer m2 = Modl<Manufacturer>.Get(m1.ManufacturerID);
+            Manufacturer m2 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
             AssertEqual(m1, m2);
 
             m2.Name = "Mercedes";
             Assert.AreEqual("Mercedes", m2.Name);
             m2.Save();
 
-            Manufacturer m3 = Modl<Manufacturer>.Get(m1.GetId());
+            Manufacturer m3 = Modl<Manufacturer>.Get(m1.Id);
             Assert.AreEqual("Mercedes", m3.Name);
             m3.Delete();
             Assert.IsTrue(m3.IsDeleted());
-            Assert.AreEqual(null, Modl<Manufacturer>.Get(m1.ManufacturerID));
+            Assert.AreEqual(null, Modl<Manufacturer>.Get(m1.ManufacturerID.ToString()));
         }
 
         ////public void CRUDTransaction(Database database = null)
@@ -204,7 +204,7 @@ namespace Tests
             return modl;
         }
 
-        public T GetModl<T>(object id) where T : IModl, new()
+        public T GetModl<T>(string id) where T : IModl, new()
         {
             T modl = Modl<T>.Get(id);
 
@@ -367,7 +367,7 @@ namespace Tests
         {
             //Assert.AreEqual(m1.Database(), m2.Database());
             //Assert.AreEqual(m1.Database().Name, m2.Database().Name);
-            Assert.AreEqual(m1.GetId(), m2.GetId());
+            Assert.AreEqual(m1.Id, m2.Id);
             Assert.AreEqual(m1.Name, m2.Name);
         }
 
@@ -375,17 +375,17 @@ namespace Tests
         public void SetIdExplicit()
         {
             var id = Guid.NewGuid();
-            Manufacturer m1 = Modl<Manufacturer>.New(id);
+            Manufacturer m1 = Modl<Manufacturer>.New(id.ToString());
             m1.Name = "Audi";
-            Assert.AreEqual(id, m1.GetId());
+            Assert.AreEqual(id, m1.Id);
             m1.Save();
-            Assert.AreEqual(id, m1.GetId());
+            Assert.AreEqual(id, m1.Id);
 
-            var m2 = Modl<Manufacturer>.Get(m1.GetId());
+            var m2 = Modl<Manufacturer>.Get(m1.Id);
             AssertEqual(m1, m2);
 
             m2.Save();
-            Assert.AreEqual(id, m2.GetId());
+            Assert.AreEqual(id, m2.Id);
 
             m2.Delete();
         }

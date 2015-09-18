@@ -44,6 +44,7 @@ namespace Modl.Structure
         public bool IsNew { get; set; }
         public bool IsDeleted { get; set; }
         public bool AutomaticId { get; set; }
+        public string InternalId { get; set; }
         //public Database Database { get; set; }
         public Dictionary<string, ModlValue> Values { get; set; }
 
@@ -110,22 +111,34 @@ namespace Modl.Structure
 
         internal void SetId(object value)
         {
-            if (Metadata.PrimaryKey.Type == typeof(Guid))
-                value = Guid.Parse(value.ToString());
-            else if (Metadata.PrimaryKey.Type == typeof(int))
-                value = int.Parse(value.ToString());
-            else if (Metadata.PrimaryKey.Type == typeof(string))
-                value = value.ToString();
+            if (Metadata.HasPrimaryKey)
+            {
+                if (Metadata.PrimaryKey.Type == typeof(Guid))
+                    value = Guid.Parse(value.ToString());
+                else if (Metadata.PrimaryKey.Type == typeof(int))
+                    value = int.Parse(value.ToString());
+                else if (Metadata.PrimaryKey.Type == typeof(string))
+                    value = value.ToString();
+                else
+                    throw new NotSupportedException("Unsupported Id type");
 
-            SetValue(Metadata.PrimaryKey.Name, value);
-            AutomaticId = false;
+                SetValue(Metadata.PrimaryKey.Name, value);
+                AutomaticId = false;
 
-            WriteToInstance(Metadata.PrimaryKey.Name);
+                WriteToInstance(Metadata.PrimaryKey.Name);
+            }
+            else
+            {
+                InternalId = Guid.NewGuid().ToString();
+            }
         }
 
         internal object GetId()
         {
-            return GetValue<object>(Metadata.PrimaryKey.Name);
+            if (Metadata.HasPrimaryKey)
+                return GetValue<object>(Metadata.PrimaryKey.Name);
+            else
+                return InternalId;
         }
 
         //internal ModlIdentity GetIdentity()

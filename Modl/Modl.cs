@@ -16,6 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
+using System;
 using Modl.Structure;
 using Modl.Structure.Metadata;
 
@@ -39,12 +40,16 @@ namespace Modl
             return new M().Modl();
         }
 
-        public static M New(object id)
+        public static M New(string id)
         {
-            return New().SetId(id);
+            return new M()
+            {
+                Id = id
+            }
+            .Modl(); 
         }
 
-        public static M Get(object id)
+        public static M Get(string id)
         {
             return ModlInternal<M>.Get(id);
             //var identity = new ModlAbout
