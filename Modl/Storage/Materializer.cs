@@ -8,7 +8,7 @@ namespace Modl.Structure.Storage
 {
     public class Materializer
     {
-        internal static IEnumerable<Storage> Read(IEnumerable<Identity> identities, Settings settings)
+        internal static IEnumerable<Container> Read(IEnumerable<Identity> identities, Settings settings)
         {
             foreach (var identity in identities)
             {
@@ -21,7 +21,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static void Write(IEnumerable<Storage> storages, Settings settings)
+        internal static void Write(IEnumerable<Container> storages, Settings settings)
         {
             foreach (var storage in storages)
             {
@@ -34,7 +34,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static void Delete(IEnumerable<Storage> storages, Settings settings)
+        internal static void Delete(IEnumerable<Container> storages, Settings settings)
         {
             foreach (var storage in storages)
             {

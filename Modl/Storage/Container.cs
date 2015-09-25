@@ -13,18 +13,18 @@ namespace Modl.Structure.Storage
 
     //}
 
-    public class Storage// : IModlStorage
+    public class Container// : IModlStorage
     {
         public Dictionary<string, object> Values { get; set; }
         public About About { get; set; }
         public string Hash { get; set; }
         internal Identity Identity { get; set; }
 
-        public Storage()
+        public Container()
         {
         }
 
-        public Storage(About about, Dictionary<string, object> values)
+        public Container(About about, Dictionary<string, object> values)
         {
             this.About = about;
             this.Values = values;

@@ -4,10 +4,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Modl.Structure
+namespace Modl
 {
+    public enum CacheLevel
+    {
+        On,
+        Off,
+        All
+    }
+
+    public enum CacheTimeout
+    {
+        Never = 0,
+        TenMinutes = 10,
+        TwentyMinutes = 20,
+        ThirtyMinutes = 30,
+        OneHour = 60,
+        OneDay = 1440
+    }
+
     public class Settings
     {
+        public static Settings GlobalSettings { get; private set; } = new Settings();
         static Dictionary<Type, Settings> AllSettings = new Dictionary<Type, Settings>();
 
         //public Type Type { get; set; }
@@ -22,8 +40,8 @@ namespace Modl.Structure
                 if (endpoint != null)
                     return endpoint;
 
-                if (Config.GlobalSettings.endpoint != null)
-                    return Config.GlobalSettings.endpoint;
+                if (GlobalSettings.endpoint != null)
+                    return GlobalSettings.endpoint;
 
                 throw new Exception("No endpoint configured.");
             }
@@ -42,8 +60,8 @@ namespace Modl.Structure
                 if (serializer != null)
                     return serializer;
 
-                if (Config.GlobalSettings.serializer != null)
-                    return Config.GlobalSettings.serializer;
+                if (GlobalSettings.serializer != null)
+                    return GlobalSettings.serializer;
 
                 throw new Exception("No serializer configured.");
             }

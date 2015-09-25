@@ -7,10 +7,13 @@ using Modl.Structure.Instance;
 
 namespace Modl
 {
-    public class ModlData : IModlData
-        //where M : IModl, new()
+    public interface IModlData
     {
-        //public string Id { get; set; }
-        public InstanceData Instance { get; set; }
+        PropertyValues PropertyValues { get; set; }
+    }
+
+    public class ModlData : IModlData
+    {
+        public PropertyValues PropertyValues { get; set; }
     }
 }

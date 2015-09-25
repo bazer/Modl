@@ -20,7 +20,7 @@ namespace Modl.Structure.Metadata
         public Type ForeignKeyType { get; private set; }
         //private GetDelegate<IModl> Getter { get; set; }
         //private Func<IModl, object> Getter { get; set; }
-        private SetDelegate<IModl, object> Setter { get; set; }
+        //private SetDelegate<IModl, object> Setter { get; set; }
         //private Action<IModl, object> Setter { get; set; }
 
         public Property(PropertyInfo property, Layer layer)
@@ -58,10 +58,10 @@ namespace Modl.Structure.Metadata
             //    .MakeGenericMethod(layer.Type, property.PropertyType)
             //    .Invoke(null, new object[] { property.GetGetMethod(true) });
 
-            Setter = (SetDelegate<IModl, object>)typeof(Property)
-                .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
-                .MakeGenericMethod(layer.Type, property.PropertyType)
-                .Invoke(null, new object[] { property.GetSetMethod(true) });
+            //Setter = (SetDelegate<IModl, object>)typeof(Property)
+            //    .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
+            //    .MakeGenericMethod(layer.Type, property.PropertyType)
+            //    .Invoke(null, new object[] { property.GetSetMethod(true) });
         }
 
         object getter = null;
@@ -76,12 +76,19 @@ namespace Modl.Structure.Metadata
             return (getter as Func<M, object>)(instance);
         }
 
+        object setter = null;
         public void SetValue<M>(M instance, object value) where M : IModl
         {
-            Setter(instance, value);
+            if (setter == null)
+                setter = (Action<IModl, object>)typeof(Property)
+                    .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
+                    .MakeGenericMethod(ModlType, PropertyType)
+                    .Invoke(null, new object[] { PropertyInfo.GetSetMethod(true) });
+
+            (setter as Action<IModl, object>)(instance, value);
         }
 
-        delegate object GetDelegate<IModl>(IModl m);// where M : IModl;
+        //delegate object GetDelegate<IModl>(IModl m);// where M : IModl;
 
         //private static GetDelegate<M> MakeGetDelegate<M>(MethodInfo method) where M: IModl
         //{
@@ -101,18 +108,18 @@ namespace Modl.Structure.Metadata
             return m => f(m);
         }
 
-        delegate void SetDelegate<IModl, T>(IModl m, T value);// where M : IModl;
-        private static SetDelegate<IModl, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
-        {
-            var f = Delegate.CreateDelegate(typeof(SetDelegate<M, T>), null, method) as SetDelegate<IModl, object>;
-            return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
-        }
-
-        //private static Action<M, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
+        //delegate void SetDelegate<IModl, T>(IModl m, T value);// where M : IModl;
+        //private static SetDelegate<IModl, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
         //{
-        //    var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<IModl, T>), null, method);
+        //    var f = Delegate.CreateDelegate(typeof(SetDelegate<M, T>), null, method) as SetDelegate<IModl, object>;
         //    return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         //}
+
+        private static Action<M, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
+        {
+            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<IModl, T>), null, method);
+            return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
+        }
     }
 
     //public static class PropertyReader<M> where M : IModl

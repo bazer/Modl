@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Modl.Structure.Instance
 {
-    public class InstanceValue
+    public class Value
     {
         protected object oldValue;
         protected object newValue;
@@ -31,7 +31,7 @@ namespace Modl.Structure.Instance
         internal bool IsModified { get { return isDirty; } }
         internal Type Type { get; set; }
 
-        internal InstanceValue(object value, Type type)
+        internal Value(object value, Type type)
         {
             oldValue = value;
             newValue = value;
@@ -39,7 +39,7 @@ namespace Modl.Structure.Instance
             Type = type;
         }
 
-        internal object Value
+        internal object Val
         {
             get
             {

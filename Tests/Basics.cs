@@ -34,11 +34,9 @@ namespace Tests
         [TestInitialize]
         public void Initialize()
         {
-            Config.GlobalSettings.Serializer = new JsonModl();
-            Config.GlobalSettings.Endpoint = new FileModl();
+            Settings.GlobalSettings.Serializer = new JsonModl();
+            Settings.GlobalSettings.Endpoint = new FileModl();
         }
-
-
 
         [TestMethod]
         public void CoreStuff()

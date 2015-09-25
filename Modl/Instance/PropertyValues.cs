@@ -25,26 +25,21 @@ using Modl.Structure.Storage;
 
 namespace Modl.Structure.Instance
 {
-    public class InstanceData
-        //where M : IModl, new()
+    public class PropertyValues
     {
-        //public IModl ModlObject { get; set; }
-
         public bool IsNew { get; set; }
         public bool IsDeleted { get; set; }
         public bool AutomaticId { get; set; }
         public object InternalId { get; set; }
-        public Dictionary<string, InstanceValue> Values { get; set; }
-        //public Metadata.Metadata Metadata { get { return Internal.Metadata; } }
-        public Metadata.Metadata Metadata { get; set; }
+        public Dictionary<string, Value> Values { get; set; }
+        public Metadata.Definitions Metadata { get; set; }
 
 
-        public InstanceData(Metadata.Metadata metadata)
+        public PropertyValues(Metadata.Definitions metadata)
         {
-            //this.ModlObject = modlObject;
             this.Metadata = metadata;
 
-            Values = new Dictionary<string, InstanceValue>();
+            Values = new Dictionary<string, Value>();
 
             IsNew = true;
             AutomaticId = true;
@@ -60,7 +55,7 @@ namespace Modl.Structure.Instance
 
         public T GetValue<T>(string name)
         {
-            return (T)GetField<T>(name).Value;
+            return (T)GetField<T>(name).Val;
         }
 
         public void SetValue<T>(string name, T value)
@@ -68,20 +63,20 @@ namespace Modl.Structure.Instance
             SetField<T>(name, value);
         }
 
-        public InstanceValue GetField<T>(string name)
+        public Value GetField<T>(string name)
         {
             if (!Values.ContainsKey(name))
-                Values[name] = new InstanceValue(default(T), typeof(T));
+                Values[name] = new Value(default(T), typeof(T));
 
-            return (InstanceValue)Values[name];
+            return (Value)Values[name];
         }
 
         protected void SetField<T>(string name, T value)
         {
             if (!Values.ContainsKey(name))
-                Values[name] = new InstanceValue(value, typeof(T));
+                Values[name] = new Value(value, typeof(T));
             else
-                Values[name].Value = value;
+                Values[name].Val = value;
         }
 
         internal void ResetFields()
@@ -128,12 +123,12 @@ namespace Modl.Structure.Instance
             return "";
         }
 
-        public IEnumerable<Storage.Storage> GetStorage()
+        public IEnumerable<Storage.Container> GetStorage()
         {
             return Metadata.GetStorage(this);
         }
 
-        internal void SetValuesFromStorage(IEnumerable<Storage.Storage> storage)
+        internal void SetValuesFromStorage(IEnumerable<Storage.Container> storage)
         {
             Metadata.SetValuesFromStorage(this, storage);
         }

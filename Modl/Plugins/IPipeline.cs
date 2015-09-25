@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Modl.Interfaces
 {
-    public interface IPipeline //<M> where M : IModl
+    public interface IPipeline
     {
     }
 }

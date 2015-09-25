@@ -28,7 +28,6 @@ using Modl.Structure.Instance;
 namespace Modl.Structure.Metadata
 {
     public class Layer
-        //where M : IModl, new()
     {
         public string Name { get; set; }
         public string ModlName { get; private set; }
@@ -93,7 +92,7 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        internal void SetValuesFromStorage(Instance.InstanceData instance, IEnumerable<Storage.Storage> storage)
+        internal void SetValuesFromStorage(Instance.PropertyValues instance, IEnumerable<Storage.Container> storage)
         {
             if (HasParent)
                 Parent.SetValuesFromStorage(instance, storage);
@@ -115,9 +114,9 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        public IEnumerable<Storage.Storage> GetStorage(Instance.InstanceData instance)
+        public IEnumerable<Storage.Container> GetStorage(Instance.PropertyValues instance)
         {
-            yield return new Storage.Storage(GetAbout(instance), GetValues(instance))
+            yield return new Storage.Container(GetAbout(instance), GetValues(instance))
             {
                 Identity = GetIdentity(instance.GetValue<object>(PrimaryKey.Name))
             };
@@ -127,7 +126,7 @@ namespace Modl.Structure.Metadata
                     yield return x;
         }
 
-        internal About GetAbout(Instance.InstanceData instance)
+        internal About GetAbout(Instance.PropertyValues instance)
         {
             return new About
             {
@@ -157,7 +156,7 @@ namespace Modl.Structure.Metadata
         }
 
 
-        private Dictionary<string, object> GetValues(Instance.InstanceData instance)
+        private Dictionary<string, object> GetValues(Instance.PropertyValues instance)
         {
             return Properties.Select(x =>
             {

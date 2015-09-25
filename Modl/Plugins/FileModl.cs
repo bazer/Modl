@@ -74,7 +74,5 @@ namespace Modl.Plugins
             
             return identity.Id + "." + fileEnding;
         }
-
-        
     }
 }

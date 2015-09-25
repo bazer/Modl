@@ -10,25 +10,25 @@ using Modl.Structure.Instance;
 
 namespace Modl.Structure.Metadata
 {
-    public class Metadata//<M>
+    public class Definitions//<M>
         //where M : IModl, new()
     {
-        static Dictionary<Type, Metadata> AllMetadata = new Dictionary<Type, Metadata>();
+        static Dictionary<Type, Definitions> AllDefinitions = new Dictionary<Type, Definitions>();
 
         private Layer FirstLayer { get; set; }// = new Layer(typeof(M));
         public bool HasPrimaryKey => FirstLayer.HasPrimaryKey;
         public Property PrimaryKey => FirstLayer.PrimaryKey;
         public List<Property> Properties => FirstLayer.AllProperties;
 
-        public static Metadata Get(Type type)
+        public static Definitions Get(Type type)
         {
-            if (!AllMetadata.ContainsKey(type))
-                AllMetadata.Add(type, new Metadata(type));
+            if (!AllDefinitions.ContainsKey(type))
+                AllDefinitions.Add(type, new Definitions(type));
 
-            return AllMetadata[type];
+            return AllDefinitions[type];
         }
 
-        public Metadata(Type type)
+        public Definitions(Type type)
         {
             FirstLayer = new Layer(type);
         }
@@ -43,12 +43,12 @@ namespace Modl.Structure.Metadata
             return FirstLayer.GetIdentities(id);
         }
 
-        internal IEnumerable<Storage.Storage> GetStorage(InstanceData instance)
+        internal IEnumerable<Storage.Container> GetStorage(PropertyValues instance)
         {
             return FirstLayer.GetStorage(instance);
         }
 
-        internal void SetValuesFromStorage(InstanceData instance, IEnumerable<Storage.Storage> storage)
+        internal void SetValuesFromStorage(PropertyValues instance, IEnumerable<Storage.Container> storage)
         {
             FirstLayer.SetValuesFromStorage(instance, storage);
         }

@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 
 namespace Modl.Interfaces
 {
-    public interface IEndpoint //<M> : IModlPipeline<M>
-        //where M : IModl
+    public interface IEndpoint
     {
         Stream Get(Identity identity);
         void Save(Identity identity, MemoryStream stream);
         void Delete(Identity identity);
-
     }
 }

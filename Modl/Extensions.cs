@@ -11,41 +11,15 @@ namespace Modl
 {
     public static class Extensions
     {
-        internal static InstanceData GetInstance<M>(this M m) where M : IModl, new()
+        internal static PropertyValues GetInstance<M>(this M m) where M : IModl, new()
         {
-            return m.ModlData.Instance;
-            //return Internal.GetInstance(m);
+            return Handler<M>.InitializeModl(m).ModlData.PropertyValues;
         }
-
-        //internal static void RemoveInstance<M>(this M m) where M : IModl, new()
-        //{
-        //    Internal.RemoveInstance(m);
-        //}
 
         public static M Modl<M>(this M m) where M : IModl, new()
         {
-            if (m.ModlData == null)
-            {
-                m.ModlData = new ModlData
-                {
-                    //Id = Guid.NewGuid().ToString(),
-                    Instance = new InstanceData(Metadata.Get(typeof(M)))
-                };
-            }
-
-            //if (string.IsNullOrWhiteSpace(m.ModlData.Id))
-            //    m.ModlData.Id = Guid.NewGuid().ToString();
-
-            //Internal.AddInstance(m);
-            return m;
+            return Handler<M>.InitializeModl(m);
         }
-
-        //internal static M Modl<M>(this M m, string modlId) where M : IModl, new()
-        //{
-        //    m.ModlId = modlId;
-        //    ModlInternal<M>.AddInstance(m);
-        //    return m;
-        //}
 
         public static bool IsNew<M>(this M m) where M : IModl, new()
         {
@@ -82,7 +56,7 @@ namespace Modl
             if (id == null)
                 return default(T);
 
-            return Internal.Get<T>(id);
+            return Handler<M>.Get<T>(id);
         }
 
         public static void SetRelation<M, T>(this M m, string name, T value)
@@ -90,30 +64,16 @@ namespace Modl
             where T : IModl, new()
         {
             m.GetInstance().SetValue(name, value.GetId());
-            //var t = ModlInternal<T>.Get(id);
-
-            //return t;
         }
-
-        //public static ModlIdentity GetIdentity<M>(this M m) where M : IModl, new()
-        //{
-        //    return m.GetInstance().GetIdentity();
-        //}
-
-        //public static Dictionary<string, object> GetValues<M>(this M m) where M : IModl, new()
-        //{
-        //    return m.GetInstance().GetValues();
-        //}
 
         public static bool Save<M>(this M m) where M : IModl, new()
         {
-            return Internal.Save<M>(m);
+            return Handler<M>.Save<M>(m);
         }
 
         public static bool Delete<M>(this M m) where M : IModl, new()
         {
-            return Internal.Delete<M>(m);
+            return Handler<M>.Delete<M>(m);
         }
     }
-
 }
