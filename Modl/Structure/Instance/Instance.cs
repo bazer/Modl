@@ -25,22 +25,25 @@ using Modl.Structure.Storage;
 
 namespace Modl.Structure.Instance
 {
-    public class Instance<M>
-        where M : IModl, new()
+    public class InstanceData
+        //where M : IModl, new()
     {
-        public M ConnectedObject { get; set; }
+        //public IModl ModlObject { get; set; }
 
         public bool IsNew { get; set; }
         public bool IsDeleted { get; set; }
         public bool AutomaticId { get; set; }
-        public string InternalId { get; set; }
+        public object InternalId { get; set; }
         public Dictionary<string, InstanceValue> Values { get; set; }
-        public Metadata<M> Metadata { get { return Internal<M>.Metadata; } }
+        //public Metadata.Metadata Metadata { get { return Internal.Metadata; } }
+        public Metadata.Metadata Metadata { get; set; }
 
 
-        public Instance(M instance)
+        public InstanceData(Metadata.Metadata metadata)
         {
-            this.ConnectedObject = instance;
+            //this.ModlObject = modlObject;
+            this.Metadata = metadata;
+
             Values = new Dictionary<string, InstanceValue>();
 
             IsNew = true;
@@ -49,13 +52,10 @@ namespace Modl.Structure.Instance
             SetDefaultValues();
         }
 
-        public bool IsModified
+        public bool IsModified<M>(M m) where M: IModl
         {
-            get
-            {
-                ReadFromInstance();
-                return Values.Values.Any(x => x.IsModified);
-            }
+            ReadFromInstance(m);
+            return Values.Values.Any(x => x.IsModified);
         }
 
         public T GetValue<T>(string name)
@@ -95,11 +95,11 @@ namespace Modl.Structure.Instance
         {
             if (Metadata.HasPrimaryKey)
             {
-                if (Metadata.PrimaryKey.Type == typeof(Guid))
+                if (Metadata.PrimaryKey.PropertyType == typeof(Guid))
                     value = Guid.Parse(value.ToString());
-                else if (Metadata.PrimaryKey.Type == typeof(int))
+                else if (Metadata.PrimaryKey.PropertyType == typeof(int))
                     value = int.Parse(value.ToString());
-                else if (Metadata.PrimaryKey.Type == typeof(string))
+                else if (Metadata.PrimaryKey.PropertyType == typeof(string))
                     value = value.ToString();
                 else
                     throw new NotSupportedException("Unsupported Id type");
@@ -107,11 +107,11 @@ namespace Modl.Structure.Instance
                 SetValue(Metadata.PrimaryKey.Name, value);
                 AutomaticId = false;
 
-                WriteToInstance(Metadata.PrimaryKey.Name);
+                //WriteToInstance(Metadata.PrimaryKey.Name);
             }
             else
             {
-                InternalId = Guid.NewGuid().ToString();
+                InternalId = value;
             }
         }
 
@@ -142,22 +142,22 @@ namespace Modl.Structure.Instance
         internal void SetDefaultValues()
         {
             foreach (var property in Metadata.Properties)
-                SetValue(property.Name, GetDefault(property.Type));
+                SetValue(property.Name, GetDefault(property.PropertyType));
         }
 
 
-        internal void ReadFromInstance()
+        internal void ReadFromInstance<M>(M m) where M: IModl
         {
             foreach (var property in Metadata.Properties)
-                SetValue(property.Name, property.GetValue(ConnectedObject));
+                SetValue(property.Name, property.GetValue(m));
                 
         }
 
-        internal void WriteToInstance(string propertyName = null)
+        internal void WriteToInstance<M>(M m, string propertyName = null) where M : IModl
         {
             foreach (var property in Metadata.Properties)
                 if (propertyName == null || property.Name == propertyName)
-                    property.SetValue(ConnectedObject, GetValue<object>(property.Name));
+                    property.SetValue(m, GetValue<object>(property.Name));
         }
 
         private object GetDefault(Type type)

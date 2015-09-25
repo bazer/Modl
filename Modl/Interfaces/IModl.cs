@@ -8,8 +8,14 @@ namespace Modl
 {
     public interface IModl
     {
-        string Id { get; set; }
-        //string GetId();
-        //void SetId(string id);
+        IModlData ModlData { get; set; }
     }
+
+    //public interface IModl<M>
+    //    where M : object, new()
+    //{
+    //    IModlData<M> ModlData { get; set; }
+    //    //string GetId();
+    //    //void SetId(string id);
+    //}
 }

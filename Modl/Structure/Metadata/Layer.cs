@@ -27,25 +27,25 @@ using Modl.Structure.Instance;
 
 namespace Modl.Structure.Metadata
 {
-    public class Layer<M>
-        where M : IModl, new()
+    public class Layer
+        //where M : IModl, new()
     {
         public string Name { get; set; }
         public string ModlName { get; private set; }
         internal Type Type { get; set; }
-        internal Layer<M> Parent { get; set; }
+        internal Layer Parent { get; set; }
         internal bool HasParent => Parent != null;
         internal bool HasPrimaryKey => Properties.Any(x => x.IsPrimaryKey);
 
-        internal List<Property<M>> Properties { get; private set; }
-        internal List<Property<M>> AllProperties { get; private set; }
+        internal List<Property> Properties { get; private set; }
+        internal List<Property> AllProperties { get; private set; }
 
         public Layer(Type type)
         {
             if (type.BaseType != null && type.BaseType != typeof(object))
-                Parent = new Layer<M>(type.BaseType);
+                Parent = new Layer(type.BaseType);
 
-            Properties = new List<Property<M>>();
+            Properties = new List<Property>();
 
             Name = type.Name;
             ModlName = type.Name;
@@ -66,7 +66,7 @@ namespace Modl.Structure.Metadata
             {
                 if (info.CanWrite)
                 {
-                    var property = new Property<M>(info, this);
+                    var property = new Property(info, this);
                     Properties.Add(property);
                 }
             }
@@ -77,7 +77,7 @@ namespace Modl.Structure.Metadata
                 AllProperties = Properties;
         }
 
-        internal Property<M> PrimaryKey
+        internal Property PrimaryKey
         {
             get
             {
@@ -85,7 +85,7 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        internal IEnumerable<Property<M>> ForeignKeys
+        internal IEnumerable<Property> ForeignKeys
         {
             get
             {
@@ -93,7 +93,7 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        internal void SetValuesFromStorage(Instance<M> instance, IEnumerable<Storage.Storage> storage)
+        internal void SetValuesFromStorage(Instance.InstanceData instance, IEnumerable<Storage.Storage> storage)
         {
             if (HasParent)
                 Parent.SetValuesFromStorage(instance, storage);
@@ -107,15 +107,15 @@ namespace Modl.Structure.Metadata
                     instance.SetId(newValue);
                 else
                 {
-                    if (value.Value != null && !property.Type.IsInstanceOfType(value.Value))
-                        newValue = Materializer.DeserializeObject(value.Value, property.Type, Internal<M>.Settings);
+                    if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
+                        newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
 
                     instance.SetValue(property.Name, newValue);
                 }
             }
         }
 
-        public IEnumerable<Storage.Storage> GetStorage(Instance<M> instance)
+        public IEnumerable<Storage.Storage> GetStorage(Instance.InstanceData instance)
         {
             yield return new Storage.Storage(GetAbout(instance), GetValues(instance))
             {
@@ -127,7 +127,7 @@ namespace Modl.Structure.Metadata
                     yield return x;
         }
 
-        internal About GetAbout(Instance<M> instance)
+        internal About GetAbout(Instance.InstanceData instance)
         {
             return new About
             {
@@ -157,7 +157,7 @@ namespace Modl.Structure.Metadata
         }
 
 
-        private Dictionary<string, object> GetValues(Instance<M> instance)
+        private Dictionary<string, object> GetValues(Instance.InstanceData instance)
         {
             return Properties.Select(x =>
             {
@@ -165,7 +165,7 @@ namespace Modl.Structure.Metadata
 
                 if (value != null)
                 {
-                    if (typeof(IModl).IsAssignableFrom(x.Type))
+                    if (typeof(IModl).IsAssignableFrom(x.PropertyType))
                         value = null;
                 }
 
@@ -179,7 +179,7 @@ namespace Modl.Structure.Metadata
             return Properties.Single(x => x.Name == name).ModlName;
         }
 
-        private Property<M> GetPropertyFromModlName(string modlName)
+        private Property GetPropertyFromModlName(string modlName)
         {
             return Properties.Single(x => x.ModlName == modlName);
         }

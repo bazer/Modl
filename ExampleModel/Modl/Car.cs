@@ -32,6 +32,8 @@ namespace ExampleModel
     {
         //[ForeignKey(typeof(Vehicle))]
         //public int Vehicle_fk { get; set; }
+        public IModlData ModlData { get; set; }
+
         [Key]
         public string Id { get; set; }
         [Name("CarName")]

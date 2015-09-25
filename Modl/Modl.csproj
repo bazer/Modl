@@ -45,6 +45,8 @@
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
+    <Compile Include="Interfaces\IModlData.cs" />
+    <Compile Include="ModlData.cs" />
     <Compile Include="Structure\Instance\InstanceStore.cs" />
     <Compile Include="Structure\Metadata\Layer.cs" />
     <Compile Include="Interfaces\IModl.cs" />

@@ -29,6 +29,8 @@ namespace ExampleModel
     [Cache(CacheLevel.Off, CacheTimeout.Never)]
     public class Vehicle : IModl
     {
+        public IModlData ModlData { get; set; }
+
         [Key]
         public string Id { get; set; }
         [Name("Manufacturer_fk")]

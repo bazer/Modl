@@ -5,27 +5,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Modl.Structure.Instance;
+using Modl.Structure.Metadata;
 
 namespace Modl
 {
     public static class Extensions
     {
-        internal static Instance<M> GetInstance<M>(this M m) where M : IModl, new()
+        internal static InstanceData GetInstance<M>(this M m) where M : IModl, new()
         {
-            return Internal<M>.GetInstance(m);
+            return m.ModlData.Instance;
+            //return Internal.GetInstance(m);
         }
 
-        internal static void RemoveInstance<M>(this M m) where M : IModl, new()
-        {
-            Internal<M>.RemoveInstance(m);
-        }
+        //internal static void RemoveInstance<M>(this M m) where M : IModl, new()
+        //{
+        //    Internal.RemoveInstance(m);
+        //}
 
         public static M Modl<M>(this M m) where M : IModl, new()
         {
-            if (string.IsNullOrWhiteSpace(m.Id))
-                m.Id = Guid.NewGuid().ToString();
+            if (m.ModlData == null)
+            {
+                m.ModlData = new ModlData
+                {
+                    //Id = Guid.NewGuid().ToString(),
+                    Instance = new InstanceData(Metadata.Get(typeof(M)))
+                };
+            }
 
-            Internal<M>.AddInstance(m);
+            //if (string.IsNullOrWhiteSpace(m.ModlData.Id))
+            //    m.ModlData.Id = Guid.NewGuid().ToString();
+
+            //Internal.AddInstance(m);
             return m;
         }
 
@@ -48,14 +59,14 @@ namespace Modl
 
         public static bool IsModified<M>(this M m) where M : IModl, new()
         {
-            return m.GetInstance().IsModified;
+            return m.GetInstance().IsModified(m);
         }
 
-        //public static M SetId<M>(this M m, object value) where M : IModl, new()
-        //{
-        //    m.GetInstance().SetId(value);
-        //    return m;
-        //}
+        public static M SetId<M>(this M m, object value) where M : IModl, new()
+        {
+            m.GetInstance().SetId(value);
+            return m;
+        }
 
         public static object GetId<M>(this M m) where M : IModl, new()
         {
@@ -71,14 +82,14 @@ namespace Modl
             if (id == null)
                 return default(T);
 
-            return Internal<T>.Get(id);
+            return Internal.Get<T>(id);
         }
 
         public static void SetRelation<M, T>(this M m, string name, T value)
             where M : IModl, new()
             where T : IModl, new()
         {
-            m.GetInstance().SetValue(name, value.Id);
+            m.GetInstance().SetValue(name, value.GetId());
             //var t = ModlInternal<T>.Get(id);
 
             //return t;
@@ -96,12 +107,12 @@ namespace Modl
 
         public static bool Save<M>(this M m) where M : IModl, new()
         {
-            return Internal<M>.Save(m);
+            return Internal.Save<M>(m);
         }
 
         public static bool Delete<M>(this M m) where M : IModl, new()
         {
-            return Internal<M>.Delete(m);
+            return Internal.Delete<M>(m);
         }
     }
 

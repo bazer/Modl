@@ -24,6 +24,7 @@ using Modl.Plugins;
 using System;
 using System.Collections.Generic;
 using Modl.Structure;
+using Modl.Structure.Metadata;
 
 namespace Tests
 {
@@ -159,7 +160,7 @@ namespace Tests
             Assert.AreEqual("Mercedes", m2.Name);
             m2.Save();
 
-            Manufacturer m3 = Modl<Manufacturer>.Get(m1.Id);
+            Manufacturer m3 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
             Assert.AreEqual("Mercedes", m3.Name);
             m3.Delete();
             Assert.IsTrue(m3.IsDeleted());
@@ -371,25 +372,25 @@ namespace Tests
         {
             //Assert.AreEqual(m1.Database(), m2.Database());
             //Assert.AreEqual(m1.Database().Name, m2.Database().Name);
-            Assert.AreEqual(m1.Id, m2.Id);
+            Assert.AreEqual(m1.ManufacturerID, m2.ManufacturerID);
             Assert.AreEqual(m1.Name, m2.Name);
         }
 
         [TestMethod]
         public void SetIdExplicit()
         {
-            var id = Guid.NewGuid().ToString();
-            Manufacturer m1 = Modl<Manufacturer>.New(id);
+            var id = Guid.NewGuid();
+            Manufacturer m1 = Modl<Manufacturer>.New(id.ToString());
             m1.Name = "Audi";
-            Assert.AreEqual(id, m1.Id);
+            Assert.AreEqual(id, m1.ManufacturerID);
             m1.Save();
-            Assert.AreEqual(id, m1.Id);
+            Assert.AreEqual(id, m1.ManufacturerID);
 
-            var m2 = Modl<Manufacturer>.Get(m1.Id);
+            var m2 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
             AssertEqual(m1, m2);
 
             m2.Save();
-            Assert.AreEqual(id, m2.Id);
+            Assert.AreEqual(id, m2.ManufacturerID);
 
             m2.Delete();
         }

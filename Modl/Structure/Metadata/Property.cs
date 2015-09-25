@@ -7,23 +7,29 @@ using System.Threading.Tasks;
 
 namespace Modl.Structure.Metadata
 {
-    public class Property<M>
-         where M : IModl, new()
+    public class Property
+        //where M : IModl, new()
     {
         public string Name { get; private set; }
         public string ModlName { get; private set; }
-        public Type Type { get; private set; }
+        public Type ModlType { get; private set; }
+        public Type PropertyType { get; private set; }
+        public PropertyInfo PropertyInfo { get; set; }
         public bool IsPrimaryKey { get; private set; }
         public bool IsForeignKey { get { return ForeignKeyType != null; } }
         public Type ForeignKeyType { get; private set; }
-        private Func<M, object> Getter { get; set; }
-        private Action<M, object> Setter { get; set; }
+        //private GetDelegate<IModl> Getter { get; set; }
+        //private Func<IModl, object> Getter { get; set; }
+        private SetDelegate<IModl, object> Setter { get; set; }
+        //private Action<IModl, object> Setter { get; set; }
 
-        public Property(PropertyInfo property, Layer<M> layer)
+        public Property(PropertyInfo property, Layer layer)
         {
+            PropertyInfo = property;
             Name = property.Name;
             ModlName = property.Name;
-            Type = property.PropertyType;
+            PropertyType = property.PropertyType;
+            ModlType = layer.Type;
 
             foreach (var attribute in property.GetCustomAttributes(false))
             {
@@ -45,37 +51,87 @@ namespace Modl.Structure.Metadata
                 //}
             }
 
-            Getter = (Func<M, object>)typeof(Property<M>)
-                .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
-                .MakeGenericMethod(property.PropertyType)
-                .Invoke(null, new object[] { property.GetGetMethod(true) });
+            //Getter = (GetDelegate<IModl>)Delegate.CreateDelegate(typeof(GetDelegate<IModl>), null, property.GetGetMethod(true));
 
-            Setter = (Action<M, object>)typeof(Property<M>)
+            //Getter = (GetDelegate<IModl>)typeof(Property)
+            //    .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
+            //    .MakeGenericMethod(layer.Type, property.PropertyType)
+            //    .Invoke(null, new object[] { property.GetGetMethod(true) });
+
+            Setter = (SetDelegate<IModl, object>)typeof(Property)
                 .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
-                .MakeGenericMethod(property.PropertyType)
+                .MakeGenericMethod(layer.Type, property.PropertyType)
                 .Invoke(null, new object[] { property.GetSetMethod(true) });
         }
 
-        public object GetValue(M instance)
+        object getter = null;
+        public object GetValue<M>(M instance) where M : IModl
         {
-            return Getter(instance);
+            if (getter == null)
+                getter = (Func<M, object>)typeof(Property)
+                    .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
+                    .MakeGenericMethod(ModlType, PropertyType)
+                    .Invoke(null, new object[] { PropertyInfo.GetGetMethod(true) });
+
+            return (getter as Func<M, object>)(instance);
         }
 
-        public void SetValue(M instance, object value)
+        public void SetValue<M>(M instance, object value) where M : IModl
         {
             Setter(instance, value);
         }
 
-        private static Func<M, object> MakeGetDelegate<T>(MethodInfo method)
+        delegate object GetDelegate<IModl>(IModl m);// where M : IModl;
+
+        //private static GetDelegate<M> MakeGetDelegate<M>(MethodInfo method) where M: IModl
+        //{
+        //    var f = (GetDelegate<M>)Delegate.CreateDelegate(typeof(GetDelegate<M>), null, method);
+        //    return m => f(m);
+        //}
+
+        //private static Func<M, object> MakeGetDelegate<M>(MethodInfo method) where M : IModl
+        //{
+        //    var f = (Func<M, object>)Delegate.CreateDelegate(typeof(Func<M, object>), null, method);
+        //    return m => f(m);
+        //}
+
+        private static Func<M, object> MakeGetDelegate<M, T>(MethodInfo method) where M : IModl
         {
             var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, method);
             return m => f(m);
         }
 
-        private static Action<M, object> MakeSetDelegate<T>(MethodInfo method)
+        delegate void SetDelegate<IModl, T>(IModl m, T value);// where M : IModl;
+        private static SetDelegate<IModl, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
         {
-            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
+            var f = Delegate.CreateDelegate(typeof(SetDelegate<M, T>), null, method) as SetDelegate<IModl, object>;
             return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         }
+
+        //private static Action<M, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
+        //{
+        //    var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<IModl, T>), null, method);
+        //    return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
+        //}
     }
+
+    //public static class PropertyReader<M> where M : IModl
+    //{
+    //    public static Func<M, object> Getter { get; set; }
+    //    public static Action<M, object> Setter { get; set; }
+
+
+
+    //    private static Func<M, object> MakeGetDelegate<M, T>(MethodInfo method)
+    //    {
+    //        var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, method);
+    //        return m => f(m);
+    //    }
+
+    //    private static Action<IModl, object> MakeSetDelegate<T>(MethodInfo method)
+    //    {
+    //        var f = (Action<IModl, T>)Delegate.CreateDelegate(typeof(Action<IModl, T>), null, method);
+    //        return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
+    //    }
+    //}
 }

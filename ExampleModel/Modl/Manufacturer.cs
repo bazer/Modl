@@ -27,17 +27,19 @@ namespace ExampleModel
     [Name("Manufacturers")]
     public class Manufacturer : IModl
     {
-        public string Id
-        {
-            get
-            {
-                return ManufacturerID.ToString();
-            }
-            set
-            {
-                ManufacturerID = Guid.Parse(value);
-            }
-        }
+        //public string Id
+        //{
+        //    get
+        //    {
+        //        return ManufacturerID.ToString();
+        //    }
+        //    set
+        //    {
+        //        ManufacturerID = Guid.Parse(value);
+        //    }
+        //}
+
+        public IModlData ModlData { get; set; }
 
         [Key]
         public Guid ManufacturerID { get; set; }
