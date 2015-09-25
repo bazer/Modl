@@ -9,11 +9,11 @@ namespace Modl
 {
     public interface IModlData
     {
-        PropertyValues PropertyValues { get; set; }
+        Backer Backer { get; set; }
     }
 
     public class ModlData : IModlData
     {
-        public PropertyValues PropertyValues { get; set; }
+        public Backer Backer { get; set; }
     }
 }

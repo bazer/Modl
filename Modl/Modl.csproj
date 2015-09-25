@@ -45,6 +45,7 @@
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
+    <Compile Include="Instance\RelationValue.cs" />
     <Compile Include="ModlData.cs" />
     <Compile Include="Metadata\Layer.cs" />
     <Compile Include="Extensions.cs" />
@@ -61,8 +62,8 @@
     <Compile Include="Cache\CacheConfig.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
-    <Compile Include="Instance\Value.cs" />
-    <Compile Include="Instance\PropertyValues.cs" />
+    <Compile Include="Instance\SimpleValue.cs" />
+    <Compile Include="Instance\Backer.cs" />
     <Compile Include="Modl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\Identity.cs" />

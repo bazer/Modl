@@ -23,39 +23,42 @@ using System.Text;
 
 namespace Modl.Structure.Instance
 {
-    public class Value
+    public interface IValue
     {
+        bool IsModified { get; }
+        void Set(object value);
+        object Get();
+        void Reset();
+    }
+
+    public class SimpleValue : IValue
+    {
+        public bool IsModified { get; private set; }
+
         protected object oldValue;
         protected object newValue;
-        protected bool isDirty = false;
-        internal bool IsModified { get { return isDirty; } }
-        internal Type Type { get; set; }
 
-        internal Value(object value, Type type)
+        public SimpleValue(object value)
         {
             oldValue = value;
             newValue = value;
-
-            Type = type;
         }
 
-        internal object Val
+        public void Set(object value)
         {
-            get
-            {
-                return newValue;
-            }
-            set
-            {
-                newValue = value;
-                isDirty = !object.Equals(oldValue, newValue);
-            }
+            newValue = value;
+            IsModified = !object.Equals(oldValue, newValue);
         }
 
-        internal void Reset()
+        public object Get()
+        {
+            return newValue;
+        }
+
+        public void Reset()
         {
             oldValue = newValue;
-            isDirty = false;
+            IsModified = false;
         }
     }
 }

@@ -17,38 +17,20 @@ You should have received a copy of the GNU Lesser General Public License
 along with Modl.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
-using Modl.Structure;
-using Modl.Structure.Metadata;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Modl
+namespace Modl.Structure.Instance
 {
-    public interface IModl
+    public class RelationValue : SimpleValue
     {
-        IModlData ModlData { get; set; }
-    }
+        public object Id { get; set; }
+        public bool HasId { get; set; }
+        public bool IsLoaded { get; set; }
 
-    public class Modl<M> where M : IModl, new()
-    {
-        public static Settings Settings { get { return Settings.Get(typeof(M)); } }
-        public static Definitions Definitions { get { return Definitions.Get(typeof(M)); } }
-
-        static Modl()
+        public RelationValue(object value): base(value)
         {
-        }
-
-        public static M New()
-        {
-            return Handler<M>.New<M>();
-        }
-
-        public static M New(object id)
-        {
-            return Handler<M>.New<M>(id);
-        }
-
-        public static M Get(string id)
-        {
-            return Handler<M>.Get<M>(id);
         }
     }
 }

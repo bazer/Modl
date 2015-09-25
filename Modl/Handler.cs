@@ -26,8 +26,11 @@ namespace Modl
             {
                 m.ModlData = new ModlData
                 {
-                    PropertyValues = new PropertyValues(Definitions.Get(typeof(M)))
+                    Backer = new Backer(typeof(M))
                 };
+
+                if (!Definitions.HasPrimaryKey)
+                    m.ModlData.Backer.SetId(Guid.NewGuid());
             }
 
             return m;
@@ -36,7 +39,7 @@ namespace Modl
         internal static M AddFromStorage<M>(IEnumerable<Container> storage) where M : IModl, new()
         {
             var m = New<M>(storage.First().About.Id);
-            m.ModlData.PropertyValues.SetValuesFromStorage(storage);
+            m.ModlData.Backer.SetValuesFromStorage(storage);
 
             return m;
         }
@@ -54,16 +57,16 @@ namespace Modl
         internal static M Get<M>(object id) where M : IModl, new()
         {
             var m = AddFromStorage<M>(Materializer.Read(Definitions.Get(typeof(M)).GetIdentities(id), Settings.Get(typeof(M))).ToList());
-            m.ModlData.PropertyValues.IsNew = false;
-            m.ModlData.PropertyValues.ResetFields();
-            m.ModlData.PropertyValues.WriteToInstance(m);
+            m.ModlData.Backer.IsNew = false;
+            m.ModlData.Backer.ResetValuesToUnmodified();
+            m.ModlData.Backer.WriteToInstance(m);
 
             return m;
         }
 
         internal static bool Save<M>(M m) where M : IModl, new()
         {
-            var instance = m.ModlData.PropertyValues;
+            var instance = m.ModlData.Backer;
 
             if (instance.IsDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", typeof(M), m.GetId()));
@@ -74,14 +77,14 @@ namespace Modl
             Materializer.Write(instance.GetStorage(), Settings.Get(typeof(M)));
 
             instance.IsNew = false;
-            instance.ResetFields();
+            instance.ResetValuesToUnmodified();
 
             return true;
         }
 
         internal static bool Delete<M>(M m) where M : IModl, new()
         {
-            var instance = m.ModlData.PropertyValues;
+            var instance = m.ModlData.Backer;
 
             if (instance.IsNew)
                 throw new Exception(string.Format("Trying to delete a new object. Class: {0}, Id: {1}", typeof(M), m.GetId()));

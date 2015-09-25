@@ -41,7 +41,7 @@ namespace Tests
         [TestMethod]
         public void CoreStuff()
         {
-            Assert.AreEqual("Id", Modl<Car>.Metadata.PrimaryKey.Name);
+            Assert.AreEqual("Id", Modl<Car>.Definitions.PrimaryKey.PropertyName);
 
             var car = Modl<Car>.New();
             Assert.IsTrue(car.IsNew());
@@ -50,7 +50,7 @@ namespace Tests
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
 
-            car = new Car().Modl();
+            car = new Car();
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
             car.Name = "Audi";

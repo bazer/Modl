@@ -32,10 +32,10 @@ namespace Modl.Mvc
         protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, System.Type modelType)
         {
 
-            var id = bindingContext.ValueProvider.GetValue(bindingContext.ModelName + "." + Modl<M>.Metadata.PrimaryKey.Name);
+            var id = bindingContext.ValueProvider.GetValue(bindingContext.ModelName + "." + Modl<M>.Definitions.PrimaryKey.PropertyName);
 
             if (id == null)
-                id = bindingContext.ValueProvider.GetValue(Modl<M>.Metadata.PrimaryKey.Name);
+                id = bindingContext.ValueProvider.GetValue(Modl<M>.Definitions.PrimaryKey.PropertyName);
 
             if (id != null)
                 return Modl<M>.Get(id.AttemptedValue);

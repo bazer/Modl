@@ -43,12 +43,12 @@ namespace Modl.Structure.Metadata
             return FirstLayer.GetIdentities(id);
         }
 
-        internal IEnumerable<Storage.Container> GetStorage(PropertyValues instance)
+        internal IEnumerable<Storage.Container> GetStorage(Backer instance)
         {
             return FirstLayer.GetStorage(instance);
         }
 
-        internal void SetValuesFromStorage(PropertyValues instance, IEnumerable<Storage.Container> storage)
+        internal void SetValuesFromStorage(Backer instance, IEnumerable<Storage.Container> storage)
         {
             FirstLayer.SetValuesFromStorage(instance, storage);
         }

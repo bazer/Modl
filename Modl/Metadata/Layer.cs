@@ -84,15 +84,15 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        internal IEnumerable<Property> ForeignKeys
-        {
-            get
-            {
-                return Properties.Where(x => x.IsForeignKey);
-            }
-        }
+        //internal IEnumerable<Property> ForeignKeys
+        //{
+        //    get
+        //    {
+        //        return Properties.Where(x => x.IsForeignKey);
+        //    }
+        //}
 
-        internal void SetValuesFromStorage(Instance.PropertyValues instance, IEnumerable<Storage.Container> storage)
+        internal void SetValuesFromStorage(Backer instance, IEnumerable<Container> storage)
         {
             if (HasParent)
                 Parent.SetValuesFromStorage(instance, storage);
@@ -102,23 +102,23 @@ namespace Modl.Structure.Metadata
                 var property = GetPropertyFromModlName(value.Key);
                 var newValue = value.Value;
 
-                if (property.Name == PrimaryKey.Name)
+                if (property.PropertyName == PrimaryKey.PropertyName)
                     instance.SetId(newValue);
                 else
                 {
                     if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
                         newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
 
-                    instance.SetValue(property.Name, newValue);
+                    instance.SetValue(property.PropertyName, newValue);
                 }
             }
         }
 
-        public IEnumerable<Storage.Container> GetStorage(Instance.PropertyValues instance)
+        public IEnumerable<Container> GetStorage(Backer instance)
         {
-            yield return new Storage.Container(GetAbout(instance), GetValues(instance))
+            yield return new Container(GetAbout(instance), GetValues(instance))
             {
-                Identity = GetIdentity(instance.GetValue<object>(PrimaryKey.Name))
+                Identity = GetIdentity(instance.GetValue<object>(PrimaryKey.PropertyName))
             };
 
             if (HasParent)
@@ -126,11 +126,11 @@ namespace Modl.Structure.Metadata
                     yield return x;
         }
 
-        internal About GetAbout(Instance.PropertyValues instance)
+        internal About GetAbout(Backer instance)
         {
             return new About
             {
-                Id = instance.GetValue<object>(PrimaryKey.Name).ToString(),
+                Id = instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
                 Type = ModlName,
                 Time = DateTime.UtcNow
             };
@@ -156,11 +156,11 @@ namespace Modl.Structure.Metadata
         }
 
 
-        private Dictionary<string, object> GetValues(Instance.PropertyValues instance)
+        private Dictionary<string, object> GetValues(Backer instance)
         {
             return Properties.Select(x =>
             {
-                var value = instance.GetValue<object>(x.Name);
+                var value = instance.GetValue<object>(x.PropertyName);
 
                 if (value != null)
                 {
@@ -168,19 +168,19 @@ namespace Modl.Structure.Metadata
                         value = null;
                 }
 
-                return new KeyValuePair<string, object>(x.ModlName, value);
+                return new KeyValuePair<string, object>(x.StorageName, value);
             })
             .ToDictionary(x => x.Key, x => x.Value);
         }
 
         private string GetPropertyModlName(string name)
         {
-            return Properties.Single(x => x.Name == name).ModlName;
+            return Properties.Single(x => x.PropertyName == name).StorageName;
         }
 
         private Property GetPropertyFromModlName(string modlName)
         {
-            return Properties.Single(x => x.ModlName == modlName);
+            return Properties.Single(x => x.StorageName == modlName);
         }
     }
 }
