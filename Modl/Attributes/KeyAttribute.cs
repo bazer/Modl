@@ -35,8 +35,11 @@ namespace Modl
         //public string Name { get; private set; }
         //public IdType Type { get; private set; }
 
-        public KeyAttribute()
+        public bool Automatic { get; set; }
+
+        public KeyAttribute(bool automatic = false)
         {
+            this.Automatic = automatic;
         }
 
         //public KeyAttribute(string name)

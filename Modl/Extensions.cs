@@ -42,9 +42,18 @@ namespace Modl
             return m;
         }
 
+        public static M GenerateId<M>(this M m, object value) where M : IModl, new()
+        {
+            m.GetBacker().GenerateId();
+            return m;
+        }
+
         public static object GetId<M>(this M m) where M : IModl, new()
         {
-            return m.GetBacker().GetId();
+            var backer = m.GetBacker();
+            backer.ReadFromInstance(m);
+
+            return backer.GetId();
         }
 
         public static T GetRelation<M, T>(this M m, string name) 

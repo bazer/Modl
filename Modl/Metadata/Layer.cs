@@ -35,6 +35,7 @@ namespace Modl.Structure.Metadata
         internal Layer Parent { get; set; }
         internal bool HasParent => Parent != null;
         internal bool HasPrimaryKey => Properties.Any(x => x.IsPrimaryKey);
+        internal bool HasAutomaticKey => !HasPrimaryKey || (HasPrimaryKey && PrimaryKey.AutomaticKey);
 
         internal List<Property> Properties { get; private set; }
         internal List<Property> AllProperties { get; private set; }
@@ -63,7 +64,7 @@ namespace Modl.Structure.Metadata
 
             foreach (PropertyInfo info in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (info.CanWrite)
+                if (info.CanWrite && !typeof(IModlData).IsAssignableFrom(info.PropertyType))
                 {
                     var property = new Property(info, this);
                     Properties.Add(property);
@@ -83,6 +84,8 @@ namespace Modl.Structure.Metadata
                 return Properties.Single(x => x.IsPrimaryKey);
             }
         }
+
+        
 
         //internal IEnumerable<Property> ForeignKeys
         //{
@@ -118,7 +121,7 @@ namespace Modl.Structure.Metadata
         {
             yield return new Container(GetAbout(instance), GetValues(instance))
             {
-                Identity = GetIdentity(instance.GetValue<object>(PrimaryKey.PropertyName))
+                Identity = GetIdentity(instance.GetId())
             };
 
             if (HasParent)
@@ -130,7 +133,7 @@ namespace Modl.Structure.Metadata
         {
             return new About
             {
-                Id = instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
+                Id = instance.GetId().ToString(), //instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
                 Type = ModlName,
                 Time = DateTime.UtcNow
             };
@@ -156,17 +159,23 @@ namespace Modl.Structure.Metadata
         }
 
 
-        private Dictionary<string, object> GetValues(Backer instance)
+        private Dictionary<string, object> GetValues(Backer backer)
         {
             return Properties.Select(x =>
             {
-                var value = instance.GetValue<object>(x.PropertyName);
 
-                if (value != null)
-                {
-                    if (typeof(IModl).IsAssignableFrom(x.PropertyType))
-                        value = null;
-                }
+                object value;
+
+                if (x.IsRelation)
+                    value = backer.GetRelationId(x.PropertyName);
+                else
+                    value = backer.GetValue<object>(x.PropertyName);
+
+                //if (value != null)
+                //{
+                //    if (typeof(IModl).IsAssignableFrom(x.PropertyType))
+                //        value = null;
+                //}
 
                 return new KeyValuePair<string, object>(x.StorageName, value);
             })

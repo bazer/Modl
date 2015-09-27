@@ -67,6 +67,9 @@ namespace Modl.Structure.Instance
 
         public void SetValue<T>(string name, T value)
         {
+            //if (Definitions.Properties.Single(x => x.PropertyName == name).IsRelation)
+            //    SetRelationValue(name, value);
+
             if (!Values.ContainsKey(name))
                 Values[name] = new SimpleValue(value);
             else
@@ -92,6 +95,16 @@ namespace Modl.Structure.Instance
             }
             else
                 return default(M);
+        }
+
+        public object GetRelationId(string name)
+        {
+            if (!Values.ContainsKey(name))
+                return null;
+
+            var relationValue = Values[name] as RelationValue;
+
+            return relationValue.Id;
         }
 
         public void SetRelationValue<M>(string name, M value) where M : IModl, new()
@@ -142,6 +155,16 @@ namespace Modl.Structure.Instance
                 return GetValue<object>(Definitions.PrimaryKey.PropertyName);
             else
                 return InternalId;
+        }
+
+        internal bool HasId()
+        {
+            return GetId() != null;
+        }
+
+        internal void GenerateId()
+        {
+            SetId(Guid.NewGuid());
         }
 
         internal string GetValuehash()

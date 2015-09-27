@@ -15,6 +15,7 @@ namespace Modl.Structure.Metadata
         public Type PropertyType { get; private set; }
         public PropertyInfo PropertyInfo { get; set; }
         public bool IsPrimaryKey { get; private set; }
+        public bool AutomaticKey { get; private set; }
         public bool IsRelation { get; set; }
 
         //public bool IsForeignKey { get { return ForeignKeyType != null; } }
@@ -28,7 +29,8 @@ namespace Modl.Structure.Metadata
             PropertyType = property.PropertyType;
             ModlType = layer.Type;
 
-            if (PropertyType is IModl)
+            //if (PropertyType is IModl)
+            if (typeof(IModl).IsAssignableFrom(PropertyType))
                 IsRelation = true;
 
             foreach (var attribute in property.GetCustomAttributes(false))
@@ -36,7 +38,10 @@ namespace Modl.Structure.Metadata
                 if (attribute is NameAttribute)
                     StorageName = ((NameAttribute)attribute).Name;
                 else if (attribute is KeyAttribute)
+                {
                     IsPrimaryKey = true;
+                    AutomaticKey = (attribute as KeyAttribute).Automatic;
+                }
                 //else if (attribute is ForeignKeyAttribute)
                 //{
                 //    ForeignKeyType = ((ForeignKeyAttribute)attribute).Entity;

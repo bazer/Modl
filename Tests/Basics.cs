@@ -45,21 +45,21 @@ namespace Tests
 
             var car = Modl<Car>.New();
             Assert.IsTrue(car.IsNew());
-            Assert.IsTrue(car.IsModified());
+            Assert.IsFalse(car.IsModified());
             car.Name = "Audi";
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
 
             car = new Car();
             Assert.IsTrue(car.IsNew());
-            Assert.IsTrue(car.IsModified());
+            Assert.IsFalse(car.IsModified());
             car.Name = "Audi";
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
 
             car = new Car().Modl().Modl().Modl().Modl();
             Assert.IsTrue(car.IsNew());
-            Assert.IsTrue(car.IsModified());
+            Assert.IsFalse(car.IsModified());
             car.Name = "Audi";
             Assert.IsTrue(car.IsNew());
             Assert.IsTrue(car.IsModified());
@@ -107,7 +107,7 @@ namespace Tests
 
             Car car = Modl<Car>.New();
 
-            Assert.AreEqual(true, car.IsModified());
+            Assert.IsFalse(car.IsModified());
             car.Name = "M3";
             car.Manufacturer = new Manufacturer("BMW");
             car.Type = new CarType().Modl();
@@ -117,7 +117,7 @@ namespace Tests
             car.Tags.Add("Fast");
             car.Tags.Add("Blue");
             car.Tags.Add("Awful");
-            Assert.AreEqual(true, car.IsModified());
+            Assert.IsTrue(car.IsModified());
             car.Save();
             Assert.IsFalse(car.IsNew());
             Assert.IsFalse(car.IsModified());

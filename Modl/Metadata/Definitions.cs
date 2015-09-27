@@ -17,6 +17,7 @@ namespace Modl.Structure.Metadata
 
         private Layer FirstLayer { get; set; }// = new Layer(typeof(M));
         public bool HasPrimaryKey => FirstLayer.HasPrimaryKey;
+        public bool HasAutomaticKey => FirstLayer.HasAutomaticKey;
         public Property PrimaryKey => FirstLayer.PrimaryKey;
         public List<Property> Properties => FirstLayer.AllProperties;
 
@@ -43,7 +44,7 @@ namespace Modl.Structure.Metadata
             return FirstLayer.GetIdentities(id);
         }
 
-        internal IEnumerable<Storage.Container> GetStorage(Backer instance)
+        internal IEnumerable<Container> GetStorage(Backer instance)
         {
             return FirstLayer.GetStorage(instance);
         }

@@ -74,6 +74,11 @@ namespace Modl
             if (!instance.IsModified(m))
                 return false;
 
+            if (!instance.HasId() && Definitions.HasAutomaticKey)
+                instance.GenerateId();
+            else if (!instance.HasId())
+                throw new Exception($"Id not set. Class: {typeof(M)}");
+
             Materializer.Write(instance.GetStorage(), Settings.Get(typeof(M)));
 
             instance.IsNew = false;
