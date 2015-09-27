@@ -69,7 +69,7 @@ namespace Tests
             car = Modl<Car>.New();
             car.Manufacturer = new Manufacturer("BMW");
             Assert.IsTrue(car.IsNew());
-            Assert.IsTrue(car.IsModified());
+            Assert.IsFalse(car.IsModified());
             Assert.AreEqual("BMW", car.Manufacturer.Name);
             Assert.IsTrue(car.Manufacturer.IsNew());
             Assert.IsTrue(car.Manufacturer.IsModified());
@@ -144,12 +144,12 @@ namespace Tests
         public void CRUDExplicitId()
         {
             Manufacturer m1 = Modl<Manufacturer>.New(Guid.NewGuid().ToString());
-            Assert.AreEqual(true, m1.IsModified());
+            Assert.IsFalse(m1.IsModified());
             m1.Name = "BMW";
-            Assert.AreEqual(true, m1.IsModified());
+            Assert.IsTrue(m1.IsModified());
             m1.Save();
-            Assert.IsTrue(!m1.IsNew());
-            Assert.AreEqual(false, m1.IsModified());
+            Assert.IsFalse(m1.IsNew());
+            Assert.IsFalse(m1.IsModified());
 
             Manufacturer m2 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
             AssertEqual(m1, m2);
