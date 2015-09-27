@@ -44,7 +44,15 @@ namespace Modl.Structure.Instance
         public bool IsModified<M>(M m) where M: IModl
         {
             ReadFromInstance(m);
-            return Values.Values.Any(x => x.IsModified);
+
+            if (Definitions.HasPrimaryKey)
+            {
+                return Values
+                    .Where(x => x.Key != Definitions.PrimaryKey.PropertyName)
+                    .Any(x => x.Value.IsModified);
+            }
+            else
+                return Values.Any(x => x.Value.IsModified);
         }
 
         //public T GetValue<T>(string name)
@@ -86,7 +94,7 @@ namespace Modl.Structure.Instance
                 return (M)relationValue.Get();
             else if (relationValue.HasId)
             {
-                var m = Handler<M>.Get<M>(relationValue.Id);
+                var m = Handler<M>.Get(relationValue.Id);
                 relationValue.Set(m);
                 relationValue.IsLoaded = true;
                 relationValue.Reset();
@@ -126,22 +134,23 @@ namespace Modl.Structure.Instance
         }
 
 
-        internal void SetId(object value)
+        internal void SetId<M>(M m, object value) where M: IModl, new()
         {
             if (Definitions.HasPrimaryKey)
             {
-                if (Definitions.PrimaryKey.PropertyType == typeof(Guid))
+                var primaryKey = Definitions.PrimaryKey;
+
+                if (primaryKey.PropertyType == typeof(Guid))
                     value = Guid.Parse(value.ToString());
-                else if (Definitions.PrimaryKey.PropertyType == typeof(int))
+                else if (primaryKey.PropertyType == typeof(int))
                     value = int.Parse(value.ToString());
-                else if (Definitions.PrimaryKey.PropertyType == typeof(string))
+                else if (primaryKey.PropertyType == typeof(string))
                     value = value.ToString();
                 else
                     throw new NotSupportedException("Unsupported Id type");
 
-                SetValue(Definitions.PrimaryKey.PropertyName, value);
-
-                //WriteToInstance(Metadata.PrimaryKey.Name);
+                SetValue(primaryKey.PropertyName, value);
+                WriteToInstance(m, primaryKey.PropertyName);
             }
             else
             {
@@ -162,9 +171,9 @@ namespace Modl.Structure.Instance
             return GetId() != null;
         }
 
-        internal void GenerateId()
+        internal void GenerateId<M>(M m) where M : IModl, new()
         {
-            SetId(Guid.NewGuid());
+            SetId(m, Guid.NewGuid());
         }
 
         internal string GetValuehash()

@@ -38,17 +38,17 @@ namespace Modl
 
         public static M New()
         {
-            return Handler<M>.New<M>();
+            return Handler<M>.New();
         }
 
         public static M New(object id)
         {
-            return Handler<M>.New<M>(id);
+            return Handler<M>.New(id);
         }
 
         public static M Get(string id)
         {
-            return Handler<M>.Get<M>(id);
+            return Handler<M>.Get(id);
         }
     }
 }

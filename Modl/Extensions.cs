@@ -38,13 +38,18 @@ namespace Modl
 
         public static M SetId<M>(this M m, object value) where M : IModl, new()
         {
-            m.GetBacker().SetId(value);
+            var backer = m.GetBacker();
+            backer.SetId(m, value);
+
+            //if (backer.Definitions.HasPrimaryKey)
+            //    m.ModlData.Backer.WriteToInstance(m, backer.Definitions.PrimaryKey.PropertyName);
+
             return m;
         }
 
         public static M GenerateId<M>(this M m, object value) where M : IModl, new()
         {
-            m.GetBacker().GenerateId();
+            m.GetBacker().GenerateId(m);
             return m;
         }
 
@@ -77,12 +82,12 @@ namespace Modl
 
         public static bool Save<M>(this M m) where M : IModl, new()
         {
-            return Handler<M>.Save<M>(m);
+            return Handler<M>.Save(m);
         }
 
         public static bool Delete<M>(this M m) where M : IModl, new()
         {
-            return Handler<M>.Delete<M>(m);
+            return Handler<M>.Delete(m);
         }
     }
 }

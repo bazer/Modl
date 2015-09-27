@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using Modl.Structure;
 using Modl.Structure.Metadata;
+using System.IO;
 
 namespace Tests
 {
@@ -162,7 +163,13 @@ namespace Tests
             Assert.AreEqual("Mercedes", m3.Name);
             m3.Delete();
             Assert.IsTrue(m3.IsDeleted());
-            Assert.AreEqual(null, Modl<Manufacturer>.Get(m1.ManufacturerID.ToString()));
+
+            try
+            {
+                var m4 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
+                Assert.Fail();
+            }
+            catch (FileNotFoundException) { }
         }
 
         ////public void CRUDTransaction(Database database = null)

@@ -20,7 +20,7 @@ namespace Modl
         {
         }
         
-        internal static M InitializeModl<M>(M m) where M: IModl, new()
+        internal static M InitializeModl(M m)
         {
             if (m.ModlData == null)
             {
@@ -29,42 +29,40 @@ namespace Modl
                     Backer = new Backer(typeof(M))
                 };
 
-                if (!Definitions.HasPrimaryKey)
-                    m.ModlData.Backer.SetId(Guid.NewGuid());
+                if (!m.ModlData.Backer.HasId() && Definitions.HasAutomaticKey)
+                    m.ModlData.Backer.GenerateId(m);
             }
 
             return m;
         }
 
-        internal static M AddFromStorage<M>(IEnumerable<Container> storage) where M : IModl, new()
+        internal static M AddFromStorage(IEnumerable<Container> storage)
         {
-            var m = New<M>(storage.First().About.Id);
+            var m = New(storage.First().About.Id);
             m.ModlData.Backer.SetValuesFromStorage(storage);
+            m.ModlData.Backer.ResetValuesToUnmodified();
+            m.ModlData.Backer.WriteToInstance(m);
+            m.ModlData.Backer.IsNew = false;
 
             return m;
         }
 
-        internal static M New<M>() where M : IModl, new()
+        internal static M New()
         {
             return new M().Modl();
         }
 
-        internal static M New<M>(object id) where M : IModl, new()
+        internal static M New(object id)
         {
-            return New<M>().SetId(id);
+            return New().SetId(id);
         }
 
-        internal static M Get<M>(object id) where M : IModl, new()
+        internal static M Get(object id)
         {
-            var m = AddFromStorage<M>(Materializer.Read(Definitions.Get(typeof(M)).GetIdentities(id), Settings.Get(typeof(M))).ToList());
-            m.ModlData.Backer.IsNew = false;
-            m.ModlData.Backer.ResetValuesToUnmodified();
-            m.ModlData.Backer.WriteToInstance(m);
-
-            return m;
+            return AddFromStorage(Materializer.Read(Definitions.GetIdentities(id), Settings).ToList());
         }
 
-        internal static bool Save<M>(M m) where M : IModl, new()
+        internal static bool Save(M m)
         {
             var instance = m.ModlData.Backer;
 
@@ -75,7 +73,7 @@ namespace Modl
                 return false;
 
             if (!instance.HasId() && Definitions.HasAutomaticKey)
-                instance.GenerateId();
+                instance.GenerateId(m);
             else if (!instance.HasId())
                 throw new Exception($"Id not set. Class: {typeof(M)}");
 
@@ -87,7 +85,7 @@ namespace Modl
             return true;
         }
 
-        internal static bool Delete<M>(M m) where M : IModl, new()
+        internal static bool Delete(M m)
         {
             var instance = m.ModlData.Backer;
 

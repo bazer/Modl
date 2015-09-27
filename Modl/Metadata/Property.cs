@@ -83,12 +83,12 @@ namespace Modl.Structure.Metadata
         public void SetValue<M>(M instance, object value) where M : IModl
         {
             if (setter == null)
-                setter = (Action<IModl, object>)typeof(Property)
+                setter = (Action<M, object>)typeof(Property)
                     .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                     .MakeGenericMethod(ModlType, PropertyType)
                     .Invoke(null, new object[] { PropertyInfo.GetSetMethod(true) });
 
-            (setter as Action<IModl, object>)(instance, value);
+            (setter as Action<M, object>)(instance, value);
         }
 
         private static Func<M, object> MakeGetDelegate<M, T>(MethodInfo method) where M : IModl
@@ -99,7 +99,7 @@ namespace Modl.Structure.Metadata
 
         private static Action<M, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
         {
-            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<IModl, T>), null, method);
+            var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
             return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));
         }
     }

@@ -49,7 +49,7 @@ namespace Modl.Structure.Metadata
             return FirstLayer.GetStorage(instance);
         }
 
-        internal void SetValuesFromStorage(Backer instance, IEnumerable<Storage.Container> storage)
+        internal void SetValuesFromStorage(Backer instance, IEnumerable<Container> storage)
         {
             FirstLayer.SetValuesFromStorage(instance, storage);
         }

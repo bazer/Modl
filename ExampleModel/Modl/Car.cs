@@ -42,7 +42,7 @@ namespace ExampleModel
         public CarType Type { get; set; }
         public List<string> Tags { get; set; }
 
-        public Manufacturer Manufacturer { get { return this.GetRelation<Car, Manufacturer>("Manufacturer"); } set { this.SetRelation("Manufacturer", value); } }
+        public Manufacturer Manufacturer { get { return this.GetRelation<Car, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }
 
         //public string GetId() => Id.ToString();
         //public void SetId(string id) => Id = int.Parse(id);
