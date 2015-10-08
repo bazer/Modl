@@ -32,5 +32,13 @@ namespace Modl.Structure.Instance
         public RelationValue(object value): base(value)
         {
         }
+
+        //public override bool IsModified
+        //{
+        //    get
+        //    {
+        //        return base.IsModified;
+        //    }
+        //}
     }
 }

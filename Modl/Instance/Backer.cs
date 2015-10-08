@@ -115,6 +115,18 @@ namespace Modl.Structure.Instance
             return relationValue.Id;
         }
 
+        public bool IsRelationModified<M>(string name) where M : IModl, new()
+        {
+            if (!Values.ContainsKey(name))
+                return false;
+
+            var relationValue = Values[name] as RelationValue;
+            if (!relationValue.IsLoaded)
+                return false;
+
+            return ((M)relationValue.Get()).IsModified();
+        }
+
         public void SetRelationValue<M>(string name, M value) where M : IModl, new()
         {
             if (!Values.ContainsKey(name))
@@ -125,6 +137,17 @@ namespace Modl.Structure.Instance
             var relationValue = Values[name] as RelationValue;
             relationValue.IsLoaded = true;
             relationValue.Id = value.GetId();
+        }
+
+        public void SetRelationId(string name, object id)
+        {
+            if (!Values.ContainsKey(name))
+                Values[name] = new RelationValue(null);
+
+            var relationValue = Values[name] as RelationValue;
+            relationValue.Id = id;
+            relationValue.HasId = true;
+            relationValue.IsLoaded = false;
         }
 
         internal void ResetValuesToUnmodified()
@@ -219,6 +242,12 @@ namespace Modl.Structure.Instance
                 return null;
             else
                 return Activator.CreateInstance(type);
+        }
+
+        internal void SaveRelation<M>(Property property) where M : IModl, new()
+        {
+            if (IsRelationModified<M>(property.PropertyName))
+                GetValue<M>(property.PropertyName).Save();
         }
     }
 }

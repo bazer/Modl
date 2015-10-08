@@ -80,9 +80,9 @@ namespace Modl
             m.GetBacker().SetRelationValue(name, value);
         }
 
-        public static bool Save<M>(this M m) where M : IModl, new()
+        public static bool Save<M>(this M m, bool includeRelations = true) where M : IModl, new()
         {
-            return Handler<M>.Save(m);
+            return Handler<M>.Save(m, includeRelations);
         }
 
         public static bool Delete<M>(this M m) where M : IModl, new()

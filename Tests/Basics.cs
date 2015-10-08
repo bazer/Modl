@@ -137,14 +137,24 @@ namespace Tests
             Assert.IsFalse(car3.Manufacturer.IsDeleted());
             car3.Manufacturer.Delete();
             Assert.IsTrue(car3.Manufacturer.IsDeleted());
-            Assert.AreEqual(null, GetModl<Car>(car.Id));
+
+            try
+            {
+                Modl<Car>.Get(car.Id);
+                Assert.Fail();
+            }
+            catch (FileNotFoundException) { }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
 
         }
 
         [TestMethod]
         public void CRUDExplicitId()
         {
-            Manufacturer m1 = Modl<Manufacturer>.New(Guid.NewGuid().ToString());
+            Manufacturer m1 = Modl<Manufacturer>.New(Guid.NewGuid());
             Assert.IsFalse(m1.IsModified());
             m1.Name = "BMW";
             Assert.IsTrue(m1.IsModified());
@@ -152,24 +162,28 @@ namespace Tests
             Assert.IsFalse(m1.IsNew());
             Assert.IsFalse(m1.IsModified());
 
-            Manufacturer m2 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
+            Manufacturer m2 = Modl<Manufacturer>.Get(m1.ManufacturerID);
             AssertEqual(m1, m2);
 
             m2.Name = "Mercedes";
             Assert.AreEqual("Mercedes", m2.Name);
             m2.Save();
 
-            Manufacturer m3 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
+            Manufacturer m3 = Modl<Manufacturer>.Get(m1.ManufacturerID);
             Assert.AreEqual("Mercedes", m3.Name);
             m3.Delete();
             Assert.IsTrue(m3.IsDeleted());
 
             try
             {
-                var m4 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
+                var m4 = Modl<Manufacturer>.Get(m1.ManufacturerID);
                 Assert.Fail();
             }
             catch (FileNotFoundException) { }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
         }
 
         ////public void CRUDTransaction(Database database = null)

@@ -33,7 +33,7 @@ namespace Modl.Structure.Instance
 
     public class SimpleValue : IValue
     {
-        public bool IsModified { get; private set; }
+        public virtual bool IsModified { get; private set; }
 
         protected object oldValue;
         protected object newValue;

@@ -46,7 +46,7 @@ namespace Modl
             return Handler<M>.New(id);
         }
 
-        public static M Get(string id)
+        public static M Get(object id)
         {
             return Handler<M>.Get(id);
         }

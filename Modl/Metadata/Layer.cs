@@ -105,15 +105,19 @@ namespace Modl.Structure.Metadata
                 var property = GetPropertyFromModlName(value.Key);
                 var newValue = value.Value;
 
-                //if (property.PropertyName == PrimaryKey.PropertyName)
-                //    instance.SetId(newValue);
-                //else
-                //{
+
+                if (property.IsRelation)
+                {
+                    instance.SetRelationId(property.PropertyName, newValue);
+                }
+                else
+                {
                     if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
                         newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
 
                     instance.SetValue(property.PropertyName, newValue);
-                //}
+                }
+                
             }
         }
 

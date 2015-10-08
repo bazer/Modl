@@ -62,28 +62,42 @@ namespace Modl
             return AddFromStorage(Materializer.Read(Definitions.GetIdentities(id), Settings).ToList());
         }
 
-        internal static bool Save(M m)
+        internal static bool Save(M m, bool includeRelations)
         {
-            var instance = m.ModlData.Backer;
+            var backer = m.ModlData.Backer;
 
-            if (instance.IsDeleted)
+            if (backer.IsDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", typeof(M), m.GetId()));
 
-            if (!instance.IsModified(m))
+            if (includeRelations)
+            {
+                foreach (var property in Definitions.Properties.Where(x => x.IsRelation))
+                {
+                    typeof(Backer)
+                        .GetMethod("SaveRelation", BindingFlags.Instance | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType)
+                        .Invoke(backer, new object[] { property });
+                }
+            }
+
+
+            if (!backer.IsModified(m))
                 return false;
 
-            if (!instance.HasId() && Definitions.HasAutomaticKey)
-                instance.GenerateId(m);
-            else if (!instance.HasId())
+            if (!backer.HasId() && Definitions.HasAutomaticKey)
+                backer.GenerateId(m);
+            else if (!backer.HasId())
                 throw new Exception($"Id not set. Class: {typeof(M)}");
 
-            Materializer.Write(instance.GetStorage(), Settings.Get(typeof(M)));
+            Materializer.Write(backer.GetStorage(), Settings.Get(typeof(M)));
 
-            instance.IsNew = false;
-            instance.ResetValuesToUnmodified();
+            backer.IsNew = false;
+            backer.ResetValuesToUnmodified();
 
             return true;
         }
+
+        
 
         internal static bool Delete(M m)
         {
