@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using Modl.Structure.Storage;
+using System.Reflection;
 
 namespace Modl.Structure.Instance
 {
@@ -39,12 +40,12 @@ namespace Modl.Structure.Instance
             ModlType = modlType;
             Definitions = Definitions.Get(modlType);
             SetDefaultValues();
+
+            
         }
 
-        public bool IsModified<M>(M m) where M: IModl
+        public bool IsModified()
         {
-            ReadFromInstance(m);
-
             if (Definitions.HasPrimaryKey)
             {
                 return Values
@@ -54,16 +55,6 @@ namespace Modl.Structure.Instance
             else
                 return Values.Any(x => x.Value.IsModified);
         }
-
-        //public T GetValue<T>(string name)
-        //{
-        //    return (T)GetField<T>(name).Get();
-        //}
-
-        //public void SetValue<T>(string name, T value)
-        //{
-        //    SetField<T>(name, value);
-        //}
 
         public T GetValue<T>(string name)
         {
@@ -75,9 +66,6 @@ namespace Modl.Structure.Instance
 
         public void SetValue<T>(string name, T value)
         {
-            //if (Definitions.Properties.Single(x => x.PropertyName == name).IsRelation)
-            //    SetRelationValue(name, value);
-
             if (!Values.ContainsKey(name))
                 Values[name] = new SimpleValue(value);
             else
@@ -157,8 +145,8 @@ namespace Modl.Structure.Instance
         }
 
 
-        internal void SetId<M>(M m, object value) where M: IModl, new()
-        {
+        internal void SetId(object value)
+        { 
             if (Definitions.HasPrimaryKey)
             {
                 var primaryKey = Definitions.PrimaryKey;
@@ -173,7 +161,6 @@ namespace Modl.Structure.Instance
                     throw new NotSupportedException("Unsupported Id type");
 
                 SetValue(primaryKey.PropertyName, value);
-                WriteToInstance(m, primaryKey.PropertyName);
             }
             else
             {
@@ -194,9 +181,9 @@ namespace Modl.Structure.Instance
             return GetId() != null;
         }
 
-        internal void GenerateId<M>(M m) where M : IModl, new()
+        internal void GenerateId()
         {
-            SetId(m, Guid.NewGuid());
+            SetId(Guid.NewGuid());
         }
 
         internal string GetValuehash()
@@ -236,6 +223,12 @@ namespace Modl.Structure.Instance
                     property.SetValue(m, GetValue<object>(property.PropertyName));
         }
 
+        internal void WriteToInstanceId<M>(M m) where M : IModl
+        {
+            if (Definitions.HasPrimaryKey)
+                WriteToInstance(m, Definitions.PrimaryKey.PropertyName);
+        }
+
         private object GetDefault(Type type)
         {
             if (!type.IsValueType)
@@ -248,6 +241,56 @@ namespace Modl.Structure.Instance
         {
             if (IsRelationModified<M>(property.PropertyName))
                 GetValue<M>(property.PropertyName).Save();
+        }
+
+        internal bool Save<M>(M m, bool includeRelations) where M : IModl, new()
+        {
+            if (IsDeleted)
+                throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
+
+            ReadFromInstance(m);
+
+            if (includeRelations)
+            {
+                foreach (var property in Definitions.Properties.Where(x => x.IsRelation))
+                {
+                    typeof(Backer)
+                        .GetMethod("SaveRelation", BindingFlags.Instance | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType)
+                        .Invoke(this, new object[] { property });
+                }
+            }
+
+
+            if (!IsModified())
+                return false;
+
+            if (!HasId() && Definitions.HasAutomaticKey)
+                GenerateId();
+            else if (!HasId())
+                throw new Exception($"Id not set. Class: {ModlType}");
+
+            Materializer.Write(GetStorage(), Settings.Get(ModlType));
+
+            IsNew = false;
+            ResetValuesToUnmodified();
+            WriteToInstance(m);
+
+            return true;
+        }
+
+        internal bool Delete()
+        {
+            if (IsNew)
+                throw new Exception(string.Format("Trying to delete a new object. Class: {0}, Id: {1}", ModlType, GetId()));
+
+            if (IsDeleted)
+                throw new Exception(string.Format("Trying to delete a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
+
+            Materializer.Delete(GetStorage(), Settings.Get(ModlType));
+            IsDeleted = true;
+
+            return true;
         }
     }
 }

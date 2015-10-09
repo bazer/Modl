@@ -39,7 +39,7 @@ namespace ExampleModel
         //    }
         //}
 
-        public IModlData ModlData { get; set; }
+        public IModlData Modl { get; set; }
 
         [Key]
         public Guid ManufacturerID { get; set; }

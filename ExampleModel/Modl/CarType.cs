@@ -27,7 +27,7 @@ namespace ExampleModel
     //[Name("CarType")]
     public class CarType : IModl
     {
-        public IModlData ModlData { get; set; }
+        public IModlData Modl { get; set; }
         //[Key]
         //public int TypeID { get; set; }
         public string Description { get; set; }

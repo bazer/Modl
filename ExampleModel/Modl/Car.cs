@@ -32,7 +32,7 @@ namespace ExampleModel
     {
         //[ForeignKey(typeof(Vehicle))]
         //public int Vehicle_fk { get; set; }
-        public IModlData ModlData { get; set; }
+        public IModlData Modl { get; set; }
 
         [Key(automatic: true)]
         public string Id { get; set; }

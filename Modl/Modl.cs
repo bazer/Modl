@@ -24,13 +24,13 @@ namespace Modl
 {
     public interface IModl
     {
-        IModlData ModlData { get; set; }
+        IModlData Modl { get; set; }
     }
 
     public class Modl<M> where M : IModl, new()
     {
-        public static Settings Settings { get { return Settings.Get(typeof(M)); } }
-        public static Definitions Definitions { get { return Definitions.Get(typeof(M)); } }
+        public static Settings Settings { get { return Handler<M>.Settings; } }
+        public static Definitions Definitions { get { return Handler<M>.Definitions; } }
 
         static Modl()
         {
