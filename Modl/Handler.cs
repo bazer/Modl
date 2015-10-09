@@ -27,7 +27,7 @@ namespace Modl
                 var backer = new Backer(typeof(M));
                 backer.ReadFromInstance(m);
 
-                if (Definitions.HasAutomaticKey && !backer.HasId())
+                if (Definitions.HasAutomaticId && !backer.HasId())
                 {
                     backer.GenerateId();
                     backer.WriteToInstanceId(m);

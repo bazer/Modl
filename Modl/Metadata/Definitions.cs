@@ -10,15 +10,14 @@ using Modl.Structure.Instance;
 
 namespace Modl.Structure.Metadata
 {
-    public class Definitions//<M>
-        //where M : IModl, new()
+    public class Definitions
     {
         static Dictionary<Type, Definitions> AllDefinitions = new Dictionary<Type, Definitions>();
 
-        private Layer FirstLayer { get; set; }// = new Layer(typeof(M));
-        public bool HasPrimaryKey => FirstLayer.HasPrimaryKey;
-        public bool HasAutomaticKey => FirstLayer.HasAutomaticKey;
-        public Property PrimaryKey => FirstLayer.PrimaryKey;
+        private Layer FirstLayer { get; set; }
+        public bool HasId => FirstLayer.HasId;
+        public bool HasAutomaticId => FirstLayer.HasAutomaticId;
+        public Property IdProperty => FirstLayer.IdProperty;
         public List<Property> Properties => FirstLayer.AllProperties;
 
         public static Definitions Get(Type type)
@@ -33,11 +32,6 @@ namespace Modl.Structure.Metadata
         {
             FirstLayer = new Layer(type);
         }
-
-        //static Metadata()
-        //{
-            
-        //}
 
         internal IEnumerable<Identity> GetIdentities(object id)
         {

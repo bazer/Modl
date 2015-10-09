@@ -14,9 +14,9 @@ namespace Modl.Structure.Metadata
         public Type ModlType { get; private set; }
         public Type PropertyType { get; private set; }
         public PropertyInfo PropertyInfo { get; set; }
-        public bool IsPrimaryKey { get; private set; }
-        public bool AutomaticKey { get; private set; }
-        public bool IsRelation { get; set; }
+        public bool IsId { get; private set; }
+        public bool IsAutomaticId { get; private set; }
+        public bool IsRelation { get; private set; }
 
         //public bool IsForeignKey { get { return ForeignKeyType != null; } }
         //public Type ForeignKeyType { get; private set; }
@@ -29,7 +29,6 @@ namespace Modl.Structure.Metadata
             PropertyType = property.PropertyType;
             ModlType = layer.Type;
 
-            //if (PropertyType is IModl)
             if (typeof(IModl).IsAssignableFrom(PropertyType))
                 IsRelation = true;
 
@@ -37,10 +36,10 @@ namespace Modl.Structure.Metadata
             {
                 if (attribute is NameAttribute)
                     StorageName = ((NameAttribute)attribute).Name;
-                else if (attribute is KeyAttribute)
+                else if (attribute is IdAttribute)
                 {
-                    IsPrimaryKey = true;
-                    AutomaticKey = (attribute as KeyAttribute).Automatic;
+                    IsId = true;
+                    IsAutomaticId = (attribute as IdAttribute).Automatic;
                 }
                 //else if (attribute is ForeignKeyAttribute)
                 //{
@@ -55,20 +54,10 @@ namespace Modl.Structure.Metadata
                 //    Settings.CacheTimeout = ((CacheAttribute)attribute).CacheTimeout;
                 //}
             }
-
-            //Getter = (GetDelegate<IModl>)typeof(Property)
-            //    .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
-            //    .MakeGenericMethod(layer.Type, property.PropertyType)
-            //    .Invoke(null, new object[] { property.GetGetMethod(true) });
-
-            //Setter = (SetDelegate<IModl, object>)typeof(Property)
-            //    .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
-            //    .MakeGenericMethod(layer.Type, property.PropertyType)
-            //    .Invoke(null, new object[] { property.GetSetMethod(true) });
         }
 
         object getter = null;
-        public object GetValue<M>(M instance) where M : IModl
+        public object GetValue<M>(M m) where M : IModl
         {
             if (getter == null)
                 getter = (Func<M, object>)typeof(Property)
@@ -76,11 +65,11 @@ namespace Modl.Structure.Metadata
                     .MakeGenericMethod(ModlType, PropertyType)
                     .Invoke(null, new object[] { PropertyInfo.GetGetMethod(true) });
 
-            return (getter as Func<M, object>)(instance);
+            return (getter as Func<M, object>)(m);
         }
 
         object setter = null;
-        public void SetValue<M>(M instance, object value) where M : IModl
+        public void SetValue<M>(M m, object value) where M : IModl
         {
             if (setter == null)
                 setter = (Action<M, object>)typeof(Property)
@@ -88,7 +77,7 @@ namespace Modl.Structure.Metadata
                     .MakeGenericMethod(ModlType, PropertyType)
                     .Invoke(null, new object[] { PropertyInfo.GetSetMethod(true) });
 
-            (setter as Action<M, object>)(instance, value);
+            (setter as Action<M, object>)(m, value);
         }
 
         private static Func<M, object> MakeGetDelegate<M, T>(MethodInfo method) where M : IModl

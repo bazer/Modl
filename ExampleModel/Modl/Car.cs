@@ -34,7 +34,7 @@ namespace ExampleModel
         //public int Vehicle_fk { get; set; }
         public IModlData Modl { get; set; }
 
-        [Key(automatic: true)]
+        [Id(automatic: true)]
         public string Id { get; set; }
         [Name("CarName")]
         public string Name { get; set; }
@@ -43,8 +43,5 @@ namespace ExampleModel
         public List<string> Tags { get; set; }
 
         public Manufacturer Manufacturer { get { return this.GetRelation<Car, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }
-
-        //public string GetId() => Id.ToString();
-        //public void SetId(string id) => Id = int.Parse(id);
     }
 }

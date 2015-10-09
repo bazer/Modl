@@ -42,7 +42,7 @@ namespace Tests
         [TestMethod]
         public void CoreStuff()
         {
-            Assert.AreEqual("Id", Modl<Car>.Definitions.PrimaryKey.PropertyName);
+            Assert.AreEqual("Id", Modl<Car>.Definitions.IdProperty.PropertyName);
 
             var car = Modl<Car>.New();
             Assert.IsTrue(car.IsNew());
@@ -100,32 +100,35 @@ namespace Tests
         public void CRUD()
         {
             //Modl<Car>.Settings.ConfigurePipeline(new JsonModl<Car>(), new FileModl<Car>());
-            
+
             //ModlConfig.GlobalSettings.Serializer = new JsonModl();
             //ModlConfig.GlobalSettings.Endpoint = new FileModl();
             //Modl<Manufacturer>.Settings.Serializer = new JsonModl();
             //Modl<Manufacturer>.Settings.Endpoint = new FileModl();
 
-            Car car = Modl<Car>.New();
+            //Car car = Modl<Car>.New();
 
+            var car = new Car();
             Assert.IsFalse(car.IsModified());
             car.Name = "M3";
             car.Manufacturer = new Manufacturer("BMW");
-            car.Type = new CarType().Modl();
-            car.Type.Description = "Fast car";
+            car.Type = new CarType();
+            car.Type.Description = "Sedan";
             car.Tags = new List<string>();
             car.Tags.Add("Nice");
             car.Tags.Add("Fast");
             car.Tags.Add("Blue");
             car.Tags.Add("Awful");
+
+            Assert.AreEqual("Sedan", car.Type.Description);
             Assert.IsTrue(car.IsModified());
             car.Save();
             Assert.IsFalse(car.IsNew());
             Assert.IsFalse(car.IsModified());
 
-            Car car2 = GetModl<Car>(car.Id); // Car.Get(car.Id);
+            Car car2 = GetModl<Car>(car.Id);
             AssertEqual(car, car2);
-
+            Assert.AreEqual("Sedan", car2.Type.Description);
             car2.Manufacturer.Name = "Mercedes";
             Assert.AreEqual("Mercedes", car2.Manufacturer.Name);
             car2.Manufacturer.Save();
@@ -381,9 +384,8 @@ namespace Tests
             Assert.AreEqual(car1.Id, car2.Id);
             Assert.AreEqual(car1.Tags.Count, car2.Tags.Count);
             Assert.AreEqual(car1.Tags[0], car2.Tags[0]);
-            //Assert.AreEqual(car1.Type.Description, car2.Type.Description);
+            Assert.AreEqual(car1.Type.Description, car2.Type.Description);
             AssertEqual(car1.Manufacturer, car2.Manufacturer);
-            //Assert.AreEqual(car1.Manufacturer, car2.Manufacturer);
             Assert.AreEqual(car1.Name, car2.Name);
         }
 

@@ -40,16 +40,14 @@ namespace Modl.Structure.Instance
             ModlType = modlType;
             Definitions = Definitions.Get(modlType);
             SetDefaultValues();
-
-            
         }
 
         public bool IsModified()
         {
-            if (Definitions.HasPrimaryKey)
+            if (Definitions.HasId)
             {
                 return Values
-                    .Where(x => x.Key != Definitions.PrimaryKey.PropertyName)
+                    .Where(x => x.Key != Definitions.IdProperty.PropertyName)
                     .Any(x => x.Value.IsModified);
             }
             else
@@ -147,20 +145,20 @@ namespace Modl.Structure.Instance
 
         internal void SetId(object value)
         { 
-            if (Definitions.HasPrimaryKey)
+            if (Definitions.HasId)
             {
-                var primaryKey = Definitions.PrimaryKey;
+                var id = Definitions.IdProperty;
 
-                if (primaryKey.PropertyType == typeof(Guid))
+                if (id.PropertyType == typeof(Guid))
                     value = Guid.Parse(value.ToString());
-                else if (primaryKey.PropertyType == typeof(int))
+                else if (id.PropertyType == typeof(int))
                     value = int.Parse(value.ToString());
-                else if (primaryKey.PropertyType == typeof(string))
+                else if (id.PropertyType == typeof(string))
                     value = value.ToString();
                 else
                     throw new NotSupportedException("Unsupported Id type");
 
-                SetValue(primaryKey.PropertyName, value);
+                SetValue(id.PropertyName, value);
             }
             else
             {
@@ -170,8 +168,8 @@ namespace Modl.Structure.Instance
 
         internal object GetId()
         {
-            if (Definitions.HasPrimaryKey)
-                return GetValue<object>(Definitions.PrimaryKey.PropertyName);
+            if (Definitions.HasId)
+                return GetValue<object>(Definitions.IdProperty.PropertyName);
             else
                 return InternalId;
         }
@@ -225,8 +223,8 @@ namespace Modl.Structure.Instance
 
         internal void WriteToInstanceId<M>(M m) where M : IModl
         {
-            if (Definitions.HasPrimaryKey)
-                WriteToInstance(m, Definitions.PrimaryKey.PropertyName);
+            if (Definitions.HasId)
+                WriteToInstance(m, Definitions.IdProperty.PropertyName);
         }
 
         private object GetDefault(Type type)
@@ -265,7 +263,7 @@ namespace Modl.Structure.Instance
             if (!IsModified())
                 return false;
 
-            if (!HasId() && Definitions.HasAutomaticKey)
+            if (!HasId() && Definitions.HasAutomaticId)
                 GenerateId();
             else if (!HasId())
                 throw new Exception($"Id not set. Class: {ModlType}");

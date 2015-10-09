@@ -34,8 +34,8 @@ namespace Modl.Structure.Metadata
         internal Type Type { get; set; }
         internal Layer Parent { get; set; }
         internal bool HasParent => Parent != null;
-        internal bool HasPrimaryKey => Properties.Any(x => x.IsPrimaryKey);
-        internal bool HasAutomaticKey => !HasPrimaryKey || (HasPrimaryKey && PrimaryKey.AutomaticKey);
+        internal bool HasId => Properties.Any(x => x.IsId);
+        internal bool HasAutomaticId => !HasId || (HasId && IdProperty.IsAutomaticId);
 
         internal List<Property> Properties { get; private set; }
         internal List<Property> AllProperties { get; private set; }
@@ -77,11 +77,11 @@ namespace Modl.Structure.Metadata
                 AllProperties = Properties;
         }
 
-        internal Property PrimaryKey
+        internal Property IdProperty
         {
             get
             {
-                return Properties.Single(x => x.IsPrimaryKey);
+                return Properties.Single(x => x.IsId);
             }
         }
 

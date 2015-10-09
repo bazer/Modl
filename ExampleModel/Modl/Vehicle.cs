@@ -31,19 +31,10 @@ namespace ExampleModel
     {
         public IModlData Modl { get; set; }
 
-        [Key]
+        [Id]
         public string Id { get; set; }
+
         [Name("Manufacturer_fk")]
-        //public Manufacturer Manufacturer { get; set; }
-
-        //[Name("Manufacturer_fk")]
-        public Manufacturer Manufacturer { get { return this.GetRelation<Vehicle, Manufacturer>("Manufacturer_fk"); } set { this.SetRelation("Manufacturer_fk", value); } }
-
-
-        //public Manufacturer Manufacturer { get { return GetFk("Manufacturer_fk", id => DbModl<Manufacturer>.Get(id)); } }
-
-
-        //public Manufacturer Manufacturer { get { return GetLazy<Manufacturer>("Manufacturer", x => x. set; }
-
+        public Manufacturer Manufacturer { get { return this.GetRelation<Vehicle, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }
     }
 }
