@@ -44,11 +44,14 @@ namespace Modl
 
         internal static M AddFromStorage(IEnumerable<Container> storage)
         {
-            var m = New(storage.First().About.Id);
-            m.Modl.Backer.SetValuesFromStorage(storage);
-            m.Modl.Backer.ResetValuesToUnmodified();
-            m.Modl.Backer.WriteToInstance(m);
-            m.Modl.Backer.IsNew = false;
+            var m = New();
+
+            var backer = m.Modl.Backer;
+            backer.SetId(storage.First().About.Id);
+            backer.SetValuesFromStorage(storage);
+            backer.ResetValuesToUnmodified();
+            backer.WriteToInstance(m);
+            backer.IsNew = false;
 
             return m;
         }

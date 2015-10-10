@@ -63,7 +63,7 @@ namespace Modl.Structure.Metadata
         {
             get
             {
-                return Properties.Single(x => x.IsId);
+                return Properties.SingleOrDefault(x => x.IsId);
             }
         }
 
@@ -119,7 +119,7 @@ namespace Modl.Structure.Metadata
         {
             return new About
             {
-                Id = instance.GetId().ToString(), //instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
+                Id = instance.GetId(), //.ToString(), //instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
                 Type = ModlName,
                 Time = DateTime.UtcNow
             };
@@ -129,7 +129,7 @@ namespace Modl.Structure.Metadata
         {
             return new Identity
             {
-                Id = id.ToString(),
+                Id = id,
                 Name = ModlName,
                 Type = Type
             };

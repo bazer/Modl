@@ -13,7 +13,7 @@ namespace ExampleModel
     {
         public IModlData Modl { get; set; }
 
-        [Id]
+        [Id(automatic: true)]
         public string Id { get; set; }
 
         [Name("Manufacturer_fk")]

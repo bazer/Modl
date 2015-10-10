@@ -12,7 +12,7 @@ namespace Modl.Structure.Instance
     {
         public bool IsNew { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
-        public object InternalId { get; set; }
+        public Guid? InternalId { get; set; }
         public Dictionary<string, IValue> Values { get; set; } = new Dictionary<string, IValue>();
         public Definitions Definitions { get; set; }
         public Type ModlType { get; set; }
@@ -144,7 +144,25 @@ namespace Modl.Structure.Instance
             }
             else
             {
-                InternalId = value;
+                Guid guidValue;
+
+                if (value is Guid)
+                {
+                    guidValue = (Guid)value;
+                }
+                else
+                {
+                    if (!(value is string))
+                        throw new Exception("Id is not a string or Guid");
+
+                    if (!Guid.TryParse(value as string, out guidValue))
+                        throw new Exception("Id is not convertable to a Guid");
+                }
+
+                if (guidValue == Guid.Empty)
+                    throw new Exception("Id is empty");
+
+                InternalId = guidValue;
             }
         }
 
@@ -158,7 +176,12 @@ namespace Modl.Structure.Instance
 
         internal bool HasId()
         {
-            return GetId() != null;
+            var id = GetId();
+
+            if (id is Guid)
+                return id != null && (Guid)id != Guid.Empty;
+            
+            return id != null;
         }
 
         internal void GenerateId()
@@ -241,14 +264,14 @@ namespace Modl.Structure.Instance
                 }
             }
 
-
-            if (!IsModified())
-                return false;
-
             if (!HasId() && Definitions.HasAutomaticId)
                 GenerateId();
             else if (!HasId())
                 throw new Exception($"Id not set. Class: {ModlType}");
+
+
+            if (!IsNew && !IsModified())
+                return false;
 
             Materializer.Write(GetStorage(), Settings.Get(ModlType));
 

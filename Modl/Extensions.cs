@@ -48,7 +48,7 @@ namespace Modl
             return m;
         }
 
-        public static M GenerateId<M>(this M m, object value) where M : IModl, new()
+        public static M GenerateId<M>(this M m) where M : IModl, new()
         {
             var backer = m.GetBacker();
             backer.GenerateId();
