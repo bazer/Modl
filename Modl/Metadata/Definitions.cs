@@ -15,7 +15,7 @@ namespace Modl.Structure.Metadata
         static Dictionary<Type, Definitions> AllDefinitions = new Dictionary<Type, Definitions>();
 
         private Layer FirstLayer { get; set; }
-        public bool HasId => FirstLayer.HasId;
+        public bool HasIdProperty => FirstLayer.HasIdProperty;
         public bool HasAutomaticId => FirstLayer.HasAutomaticId;
         public Property IdProperty => FirstLayer.IdProperty;
         public List<Property> Properties => FirstLayer.AllProperties;

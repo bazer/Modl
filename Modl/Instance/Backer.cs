@@ -26,7 +26,7 @@ namespace Modl.Structure.Instance
 
         public bool IsModified()
         {
-            if (Definitions.HasId)
+            if (Definitions.HasIdProperty)
             {
                 return Values
                     .Where(x => x.Key != Definitions.IdProperty.PropertyName)
@@ -126,49 +126,54 @@ namespace Modl.Structure.Instance
 
 
         internal void SetId(object value)
-        { 
-            if (Definitions.HasId)
+        {
+            if (!IsNew)
+                throw new Exception("Can't change id of a Modl that is not new");
+
+            if (Definitions.HasIdProperty)
             {
                 var id = Definitions.IdProperty;
 
                 if (id.PropertyType == typeof(Guid))
-                    value = Guid.Parse(value.ToString());
-                else if (id.PropertyType == typeof(int))
-                    value = int.Parse(value.ToString());
-                else if (id.PropertyType == typeof(string))
-                    value = value.ToString();
-                else
-                    throw new NotSupportedException("Unsupported Id type");
+                    value = ConvertToGuid(value);
+
+                if (id.PropertyType != value.GetType())
+                    throw new Exception($"Id value should be of type {id.PropertyType}, but is of type {value.GetType()}");
 
                 SetValue(id.PropertyName, value);
             }
             else
             {
-                Guid guidValue;
-
-                if (value is Guid)
-                {
-                    guidValue = (Guid)value;
-                }
-                else
-                {
-                    if (!(value is string))
-                        throw new Exception("Id is not a string or Guid");
-
-                    if (!Guid.TryParse(value as string, out guidValue))
-                        throw new Exception("Id is not convertable to a Guid");
-                }
-
-                if (guidValue == Guid.Empty)
-                    throw new Exception("Id is empty");
-
-                InternalId = guidValue;
+                InternalId = ConvertToGuid(value);
             }
+        }
+
+        private Guid ConvertToGuid(object value)
+        {
+            Guid guidValue;
+
+            if (value is Guid)
+            {
+                guidValue = (Guid)value;
+            }
+            else
+            {
+                if (!(value is string))
+                    throw new Exception("Id is not a string or Guid");
+
+                if (!Guid.TryParse(value as string, out guidValue))
+                    throw new Exception("Id is not convertable to a Guid");
+            }
+
+            if (guidValue == Guid.Empty)
+                throw new Exception("Id is empty");
+
+            return guidValue;
         }
 
         internal object GetId()
         {
-            if (Definitions.HasId)
+            if (Definitions.HasIdProperty)
                 return GetValue<object>(Definitions.IdProperty.PropertyName);
             else
                 return InternalId;
@@ -228,7 +233,7 @@ namespace Modl.Structure.Instance
 
         internal void WriteToInstanceId<M>(M m) where M : IModl
         {
-            if (Definitions.HasId)
+            if (Definitions.HasIdProperty)
                 WriteToInstance(m, Definitions.IdProperty.PropertyName);
         }
 

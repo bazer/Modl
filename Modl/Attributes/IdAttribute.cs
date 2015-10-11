@@ -8,7 +8,7 @@ namespace Modl
     [AttributeUsage(AttributeTargets.Property)]
     public class IdAttribute : Attribute
     {
-        public bool Automatic { get; set; }
+        internal bool Automatic { get; set; }
 
         public IdAttribute(bool automatic = false)
         {

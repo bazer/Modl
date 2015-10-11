@@ -70,7 +70,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\EmptyClass.cs" />
+    <Compile Include="Core\AutomaticIdTest.cs" />
+    <Compile Include="Core\EmptyClassTest.cs" />
     <Compile Include="Databases.cs" />
     <Compile Include="LinqSuite.cs" />
     <Compile Include="MySQL.cs" />

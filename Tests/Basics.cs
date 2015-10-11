@@ -213,7 +213,7 @@ namespace Tests
             return modl;
         }
 
-        public T GetModl<T>(string id) where T : IModl, new()
+        public T GetModl<T>(object id) where T : IModl, new()
         {
             T modl = Modl<T>.Get(id);
 

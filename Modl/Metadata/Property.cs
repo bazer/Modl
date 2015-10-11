@@ -40,6 +40,9 @@ namespace Modl.Structure.Metadata
                 {
                     IsId = true;
                     IsAutomaticId = (attribute as IdAttribute).Automatic;
+
+                    if (IsAutomaticId && PropertyType != typeof(Guid))
+                        throw new Exception("Automatic Ids must be of type Guid");
                 }
                 //else if (attribute is ForeignKeyAttribute)
                 //{

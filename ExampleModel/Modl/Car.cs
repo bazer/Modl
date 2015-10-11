@@ -17,7 +17,7 @@ namespace ExampleModel
         public IModlData Modl { get; set; }
 
         [Id(automatic: true)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         [Name("CarName")]
         public string Name { get; set; }
         [Name("Type_fk")]

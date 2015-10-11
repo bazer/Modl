@@ -16,8 +16,8 @@ namespace Modl.Structure.Metadata
         internal Type Type { get; set; }
         internal Layer Parent { get; set; }
         internal bool HasParent => Parent != null;
-        internal bool HasId => Properties.Any(x => x.IsId);
-        internal bool HasAutomaticId => !HasId || (HasId && IdProperty.IsAutomaticId);
+        internal bool HasIdProperty => Properties.Any(x => x.IsId);
+        internal bool HasAutomaticId => !HasIdProperty || (HasIdProperty && IdProperty.IsAutomaticId);
 
         internal List<Property> Properties { get; private set; }
         internal List<Property> AllProperties { get; private set; }

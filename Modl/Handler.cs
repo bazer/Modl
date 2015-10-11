@@ -46,8 +46,9 @@ namespace Modl
         {
             var m = New();
 
+            var idValue = storage.First().About.Id;
             var backer = m.Modl.Backer;
-            backer.SetId(storage.First().About.Id);
+            backer.SetId(idValue);
             backer.SetValuesFromStorage(storage);
             backer.ResetValuesToUnmodified();
             backer.WriteToInstance(m);
