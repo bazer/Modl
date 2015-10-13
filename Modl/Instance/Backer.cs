@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Modl.Structure.Storage;
 using System.Reflection;
+using Modl.Exceptions;
 
 namespace Modl.Structure.Instance
 {
@@ -12,6 +13,7 @@ namespace Modl.Structure.Instance
     {
         public bool IsNew { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
+        //public bool HasId { get; set; } = false;
         public Guid? InternalId { get; set; }
         public Dictionary<string, IValue> Values { get; set; } = new Dictionary<string, IValue>();
         public Definitions Definitions { get; set; }
@@ -128,7 +130,7 @@ namespace Modl.Structure.Instance
         internal void SetId(object value)
         {
             if (!IsNew)
-                throw new Exception("Can't change id of a Modl that is not new");
+                throw new InvalidIdException("Can't change id of a Modl that is not new");
 
             if (Definitions.HasIdProperty)
             {
@@ -138,7 +140,7 @@ namespace Modl.Structure.Instance
                     value = ConvertToGuid(value);
 
                 if (id.PropertyType != value.GetType())
-                    throw new Exception($"Id value should be of type {id.PropertyType}, but is of type {value.GetType()}");
+                    throw new InvalidIdException($"Id value should be of type {id.PropertyType}, but is of type {value.GetType()}");
 
                 SetValue(id.PropertyName, value);
             }
@@ -146,6 +148,8 @@ namespace Modl.Structure.Instance
             {
                 InternalId = ConvertToGuid(value);
             }
+
+            //HasId = true;
         }
 
         private Guid ConvertToGuid(object value)
@@ -159,14 +163,14 @@ namespace Modl.Structure.Instance
             else
             {
                 if (!(value is string))
-                    throw new Exception("Id is not a string or Guid");
+                    throw new InvalidIdException("Id is not a string or Guid");
 
                 if (!Guid.TryParse(value as string, out guidValue))
-                    throw new Exception("Id is not convertable to a Guid");
+                    throw new InvalidIdException("Id is not convertable to a Guid");
             }
 
-            if (guidValue == Guid.Empty)
-                throw new Exception("Id is empty");
+            //if (guidValue == Guid.Empty)
+            //    throw new InvalidIdException("Id is empty");
 
             return guidValue;
         }
@@ -183,10 +187,18 @@ namespace Modl.Structure.Instance
         {
             var id = GetId();
 
-            if (id is Guid)
+            if (id == null)
+                return false;
+            else if (id is Guid)
                 return id != null && (Guid)id != Guid.Empty;
-            
-            return id != null;
+            else if (id is int)
+                return (int)id != 0;
+            else if (id is string)
+                return !string.IsNullOrWhiteSpace(id as string);
+            else if (id.GetType().IsValueType)
+                return id != Activator.CreateInstance(id.GetType());
+            else
+                return true;
         }
 
         internal void GenerateId()
@@ -219,9 +231,22 @@ namespace Modl.Structure.Instance
 
         internal void ReadFromInstance<M>(M m) where M: IModl
         {
-            foreach (var property in Definitions.Properties.Where(x => !x.IsRelation))
+            foreach (var property in Definitions.Properties.Where(x => !x.IsRelation && !x.IsId))
                 SetValue(property.PropertyName, property.GetValue(m));
                 
+        }
+
+        internal void ReadFromInstanceId<M>(M m) where M : IModl
+        {
+            if (Definitions.HasIdProperty)
+            {
+                var oldValue = GetId();
+                var newValue = Definitions.IdProperty.GetValue(m);
+
+                if ((Definitions.IdProperty.PropertyType == typeof(Guid) && (Guid)newValue != (Guid)oldValue) ||
+                    (Definitions.IdProperty.PropertyType != typeof(Guid) && newValue != oldValue))
+                    SetId(newValue);
+            }
         }
 
         internal void WriteToInstance<M>(M m, string propertyName = null) where M : IModl
@@ -256,6 +281,7 @@ namespace Modl.Structure.Instance
             if (IsDeleted)
                 throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
 
+            ReadFromInstanceId(m);
             ReadFromInstance(m);
 
             if (includeRelations)

@@ -31,6 +31,14 @@ namespace Modl
             return m.GetBacker().IsDeleted;
         }
 
+        public static bool HasId<M>(this M m) where M : IModl, new()
+        {
+            var backer = m.GetBacker();
+            backer.ReadFromInstanceId(m);
+
+            return backer.HasId();
+        }
+
         public static bool IsModified<M>(this M m) where M : IModl, new()
         {
             var backer = m.GetBacker();
@@ -60,7 +68,7 @@ namespace Modl
         public static object GetId<M>(this M m) where M : IModl, new()
         {
             var backer = m.GetBacker();
-            backer.ReadFromInstance(m);
+            backer.ReadFromInstanceId(m);
 
             return backer.GetId();
         }

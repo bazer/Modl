@@ -1,40 +1,36 @@
-﻿using ExampleModel;
+﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
+using Modl.Exceptions;
 using Modl.Json;
 using Modl.Plugins;
-using System;
-using System.Collections.Generic;
-using Modl.Structure;
-using Modl.Structure.Metadata;
-using System.IO;
 
 namespace Tests.Core
 {
-    public class AutomaticIdGuidClass : IModl
-    {
-        public IModlData Modl { get; set; }
-        [Id(automatic: true)]
-        public Guid CustomId { get; set; }
-    }
-
-    public class AutomaticIdIntClass : IModl
-    {
-        public IModlData Modl { get; set; }
-        [Id(automatic: true)]
-        public int CustomId { get; set; }
-    }
-
-    public class AutomaticIdStringClass : IModl
-    {
-        public IModlData Modl { get; set; }
-        [Id(automatic: true)]
-        public string CustomId { get; set; }
-    }
-
     [TestClass]
     public class AutomaticIdTest
     {
+        public class AutomaticIdGuidClass : IModl
+        {
+            public IModlData Modl { get; set; }
+            [Id(automatic: true)]
+            public Guid CustomId { get; set; }
+        }
+
+        public class AutomaticIdIntClass : IModl
+        {
+            public IModlData Modl { get; set; }
+            [Id(automatic: true)]
+            public int CustomId { get; set; }
+        }
+
+        public class AutomaticIdStringClass : IModl
+        {
+            public IModlData Modl { get; set; }
+            [Id(automatic: true)]
+            public string CustomId { get; set; }
+        }
+
         [TestInitialize]
         public void Initialize()
         {
@@ -62,14 +58,14 @@ namespace Tests.Core
                 definitions = Modl<AutomaticIdIntClass>.Definitions;
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (InvalidIdException) { }
 
             try
             {
                 definitions = Modl<AutomaticIdStringClass>.Definitions;
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (InvalidIdException) { }
         }
 
         [TestMethod]

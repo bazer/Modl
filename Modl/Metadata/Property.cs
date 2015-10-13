@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Modl.Exceptions;
 
 namespace Modl.Structure.Metadata
 {
@@ -42,7 +43,7 @@ namespace Modl.Structure.Metadata
                     IsAutomaticId = (attribute as IdAttribute).Automatic;
 
                     if (IsAutomaticId && PropertyType != typeof(Guid))
-                        throw new Exception("Automatic Ids must be of type Guid");
+                        throw new InvalidIdException("Automatic Ids must be of type Guid");
                 }
                 //else if (attribute is ForeignKeyAttribute)
                 //{

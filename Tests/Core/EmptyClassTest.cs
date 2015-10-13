@@ -1,24 +1,19 @@
-﻿using ExampleModel;
+﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
 using Modl.Json;
 using Modl.Plugins;
-using System;
-using System.Collections.Generic;
-using Modl.Structure;
-using Modl.Structure.Metadata;
-using System.IO;
 
 namespace Tests.Core
 {
-    public class EmptyClass : IModl
-    {
-        public IModlData Modl { get; set; }
-    }
-
     [TestClass]
     public class EmptyClassTest
     {
+        public class EmptyClass : IModl
+        {
+            public IModlData Modl { get; set; }
+        }
+
         [TestInitialize]
         public void Initialize()
         {

@@ -70,6 +70,9 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\CustomIdGuidTest .cs" />
+    <Compile Include="Core\CustomIdStringTest.cs" />
+    <Compile Include="Core\CustomIdIntTest.cs" />
     <Compile Include="Core\AutomaticIdTest.cs" />
     <Compile Include="Core\EmptyClassTest.cs" />
     <Compile Include="Databases.cs" />

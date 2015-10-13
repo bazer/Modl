@@ -45,6 +45,7 @@
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\IdAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
+    <Compile Include="Exceptions\InvalidIdException.cs" />
     <Compile Include="Instance\RelationValue.cs" />
     <Compile Include="ModlData.cs" />
     <Compile Include="Metadata\Layer.cs" />
