@@ -298,7 +298,7 @@ namespace Modl.Structure.Instance
             if (!HasId() && Definitions.HasAutomaticId)
                 GenerateId();
             else if (!HasId())
-                throw new Exception($"Id not set. Class: {ModlType}");
+                throw new InvalidIdException($"Id not set. Class: {ModlType}");
 
 
             if (!IsNew && !IsModified())

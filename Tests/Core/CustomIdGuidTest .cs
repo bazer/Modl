@@ -127,36 +127,54 @@ namespace Tests.Core
             Assert.IsFalse(testClass.IsModified());
         }
 
-        //[TestMethod]
-        //public void Save()
-        //{
-        //    var testClass = new AutomaticIdGuidClass();
-        //    var id = testClass.GetId();
-        //    testClass.Save();
-        //    Assert.IsFalse(testClass.IsNew());
-        //    Assert.IsFalse(testClass.IsModified());
-        //    Assert.AreEqual(id, testClass.GetId());
-        //    Assert.AreEqual(id, testClass.CustomId);
+        [TestMethod]
+        public void Save()
+        {
+            var testClass = new CustomIdClass();
+            
+            try
+            {
+                testClass.Save();
+                Assert.Fail();
+            }
+            catch (InvalidIdException) { }
 
-        //    var loadedTestClass = Modl<AutomaticIdGuidClass>.Get(id);
-        //    Assert.AreEqual(id, loadedTestClass.CustomId);
-        //    Assert.AreEqual(id, loadedTestClass.GetId());
-        //    Assert.AreEqual(id, loadedTestClass.CustomId);
-        //    Assert.IsFalse(loadedTestClass.IsNew());
-        //    Assert.IsFalse(loadedTestClass.IsModified());
+            var id = Guid.NewGuid();
+            testClass.CustomId = id;
+            testClass.Save();
 
-        //    try
-        //    {
-        //        loadedTestClass.SetId(Guid.NewGuid());
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception) { }
-        //}
+            Assert.IsFalse(testClass.IsNew());
+            Assert.IsFalse(testClass.IsModified());
+            Assert.AreEqual(id, testClass.GetId());
+            Assert.AreEqual(id, testClass.CustomId);
+
+            var loadedTestClass = Modl<CustomIdClass>.Get(id);
+            Assert.AreEqual(id, loadedTestClass.CustomId);
+            Assert.AreEqual(id, loadedTestClass.GetId());
+            Assert.AreEqual(id, loadedTestClass.CustomId);
+            Assert.IsFalse(loadedTestClass.IsNew());
+            Assert.IsFalse(loadedTestClass.IsModified());
+
+            try
+            {
+                loadedTestClass.SetId(Guid.NewGuid());
+                Assert.Fail();
+            }
+            catch (InvalidIdException) { }
+
+            try
+            {
+                loadedTestClass.CustomId = Guid.NewGuid();
+                loadedTestClass.Save();
+                Assert.Fail();
+            }
+            catch (InvalidIdException) { }
+        }
 
         //[TestMethod]
         //public void Delete()
         //{
-        //    var testClass = new AutomaticIdGuidClass();
+        //    var testClass = new CustomIdClass();
 
         //    try
         //    {
