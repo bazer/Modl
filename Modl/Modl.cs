@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Modl.Linq;
 using Modl.Structure;
 using Modl.Structure.Metadata;
 
@@ -32,5 +36,11 @@ namespace Modl
         {
             return Handler<M>.Get(id);
         }
+
+        public static Query<M> Query()
+        {
+            return new Query<M>();
+        }
     }
 }
+
