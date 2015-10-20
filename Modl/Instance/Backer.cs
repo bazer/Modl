@@ -139,6 +139,9 @@ namespace Modl.Structure.Instance
                 if (id.PropertyType == typeof(Guid))
                     value = ConvertToGuid(value);
 
+                if (id.PropertyType == typeof(int))
+                    value = ConvertToInt32(value);
+
                 if (id.PropertyType != value.GetType())
                     throw new InvalidIdException($"Id value should be of type {id.PropertyType}, but is of type {value.GetType()}");
 
@@ -175,6 +178,26 @@ namespace Modl.Structure.Instance
             return guidValue;
         }
 
+        private int ConvertToInt32(object value)
+        {
+            int intValue;
+
+            if (value is int)
+            {
+                intValue = (int)value;
+            }
+            else
+            {
+                if (!(value is string) && !(value is short) && !(value is long))
+                    throw new InvalidIdException("Id is not a int, short, long or string");
+
+                if (!int.TryParse(value.ToString(), out intValue))
+                    throw new InvalidIdException("Id is not convertable to a int");
+            }
+
+            return intValue;
+        }
+
         internal object GetId()
         {
             if (Definitions.HasIdProperty)
@@ -203,6 +226,9 @@ namespace Modl.Structure.Instance
 
         internal void GenerateId()
         {
+            if (Definitions.HasIdProperty && Definitions.IdProperty.PropertyType != typeof(Guid))
+                throw new InvalidIdException("Only Id of type Guid is supported");
+
             SetId(Guid.NewGuid());
         }
 
@@ -243,10 +269,32 @@ namespace Modl.Structure.Instance
                 var oldValue = GetId();
                 var newValue = Definitions.IdProperty.GetValue(m);
 
-                if ((Definitions.IdProperty.PropertyType == typeof(Guid) && (Guid)newValue != (Guid)oldValue) ||
-                    (Definitions.IdProperty.PropertyType != typeof(Guid) && newValue != oldValue))
+                if (!AreEqual(Definitions.IdProperty.PropertyType, newValue, oldValue))
                     SetId(newValue);
+
+                //if ((Definitions.IdProperty.PropertyType == typeof(Guid) && (Guid)newValue != (Guid)oldValue) ||
+                //    (Definitions.IdProperty.PropertyType != typeof(Guid) && newValue != oldValue))
+                //    SetId(newValue);
             }
+        }
+
+        private bool AreEqual(Type type, object a, object b)
+        {
+            if (a == null && b == null)
+                return true;
+            else if (a == null)
+                return false;
+            else if (b == null)
+                return false;
+
+            if (a.GetType() != b.GetType())
+                return false;
+            else if (a.GetType() != type)
+                return false;
+            else if (b.GetType() != type)
+                return false;
+
+            return a.Equals(b);
         }
 
         internal void WriteToInstance<M>(M m, string propertyName = null) where M : IModl
@@ -279,7 +327,7 @@ namespace Modl.Structure.Instance
         internal bool Save<M>(M m, bool includeRelations) where M : IModl, new()
         {
             if (IsDeleted)
-                throw new Exception(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
+                throw new NotFoundException(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
 
             ReadFromInstanceId(m);
             ReadFromInstance(m);
@@ -316,10 +364,10 @@ namespace Modl.Structure.Instance
         internal bool Delete()
         {
             if (IsNew)
-                throw new Exception(string.Format("Trying to delete a new object. Class: {0}, Id: {1}", ModlType, GetId()));
+                throw new NotFoundException(string.Format("Trying to delete a new object. Class: {0}, Id: {1}", ModlType, GetId()));
 
             if (IsDeleted)
-                throw new Exception(string.Format("Trying to delete a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
+                throw new NotFoundException(string.Format("Trying to delete a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));
 
             Materializer.Delete(GetStorage(), Settings.Get(ModlType));
             IsDeleted = true;

@@ -58,16 +58,32 @@ namespace Tests.Core
             Assert.AreEqual(id, testClass.CustomId);
         }
 
+
         [TestMethod]
         public void SetId()
         {
             var id = Guid.NewGuid().ToString();
             var testClass = new CustomIdClass();
+            Assert.AreEqual(null, testClass.CustomId);
+            Assert.IsFalse(testClass.HasId());
             testClass.SetId(id);
+            Assert.IsTrue(testClass.HasId());
             Assert.AreEqual(id, testClass.GetId());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
+
+            id = Guid.NewGuid().ToString();
+            testClass = new CustomIdClass();
+            Assert.AreEqual(null, testClass.CustomId);
+            Assert.IsFalse(testClass.HasId());
+            testClass.CustomId = id;
+            Assert.IsTrue(testClass.HasId());
+            Assert.AreEqual(id, testClass.GetId());
+            Assert.IsTrue(testClass.IsNew());
+            Assert.IsFalse(testClass.IsModified());
+            Assert.AreEqual(id, testClass.CustomId);
+
 
             try
             {
@@ -79,81 +95,103 @@ namespace Tests.Core
             try
             {
                 testClass.SetId(1);
+            }
+            catch (InvalidIdException) { }
+        }
+
+        [TestMethod]
+        public void GenerateId()
+        {
+            var testClass = new CustomIdClass();
+
+            try
+            {
+                testClass.GenerateId();
+                Assert.Fail();
+            }
+            catch (InvalidIdException) { }
+
+            Assert.IsTrue(testClass.IsNew());
+            Assert.IsFalse(testClass.IsModified());
+        }
+
+        [TestMethod]
+        public void Save()
+        {
+            var testClass = new CustomIdClass();
+
+            try
+            {
+                testClass.Save();
+                Assert.Fail();
+            }
+            catch (InvalidIdException) { }
+
+            var id = Guid.NewGuid().ToString();
+            testClass.CustomId = id;
+            testClass.Save();
+
+            Assert.IsFalse(testClass.IsNew());
+            Assert.IsFalse(testClass.IsModified());
+            Assert.AreEqual(id, testClass.GetId());
+            Assert.AreEqual(id, testClass.CustomId);
+
+            var loadedTestClass = Modl<CustomIdClass>.Get(id);
+            Assert.AreEqual(id, loadedTestClass.CustomId);
+            Assert.AreEqual(id, loadedTestClass.GetId());
+            Assert.AreEqual(id, loadedTestClass.CustomId);
+            Assert.IsFalse(loadedTestClass.IsNew());
+            Assert.IsFalse(loadedTestClass.IsModified());
+
+            try
+            {
+                loadedTestClass.SetId(Guid.NewGuid().ToString());
+                Assert.Fail();
+            }
+            catch (InvalidIdException) { }
+
+            try
+            {
+                loadedTestClass.CustomId = Guid.NewGuid().ToString();
+                loadedTestClass.Save();
                 Assert.Fail();
             }
             catch (InvalidIdException) { }
         }
 
-        //[TestMethod]
-        //public void GenerateId()
-        //{
-        //    var testClass = new AutomaticIdGuidClass();
-        //    var id = testClass.GetId();
-        //    Assert.IsNotNull(id);
-        //    Assert.IsTrue(id is Guid);
-        //    Assert.AreNotEqual(Guid.Empty, id);
-        //    Assert.AreEqual(id, testClass.CustomId);
+        [TestMethod]
+        public void Delete()
+        {
+            var testClass = new CustomIdClass();
 
-        //    testClass.GenerateId();
-        //    Assert.AreNotEqual(id, testClass.GetId());
-        //    Assert.IsNotNull(testClass.GetId());
-        //    Assert.IsTrue(testClass.GetId() is Guid);
-        //    Assert.AreNotEqual(Guid.Empty, testClass.GetId());
-        //    Assert.AreEqual(testClass.GetId(), testClass.CustomId);
+            var id = Guid.NewGuid();
+            testClass.CustomId = Guid.NewGuid().ToString();
 
-        //    Assert.IsTrue(testClass.IsNew());
-        //    Assert.IsFalse(testClass.IsModified());
-        //}
+            try
+            {
+                testClass.Delete();
+                Assert.Fail();
+            }
+            catch (NotFoundException) { }
 
-        //[TestMethod]
-        //public void Save()
-        //{
-        //    var testClass = new AutomaticIdGuidClass();
-        //    var id = testClass.GetId();
-        //    testClass.Save();
-        //    Assert.IsFalse(testClass.IsNew());
-        //    Assert.IsFalse(testClass.IsModified());
-        //    Assert.AreEqual(id, testClass.GetId());
-        //    Assert.AreEqual(id, testClass.CustomId);
+            testClass.Save();
+            Assert.IsFalse(testClass.IsDeleted());
+            testClass.Delete();
+            Assert.IsTrue(testClass.IsDeleted());
 
-        //    var loadedTestClass = Modl<AutomaticIdGuidClass>.Get(id);
-        //    Assert.AreEqual(id, loadedTestClass.CustomId);
-        //    Assert.AreEqual(id, loadedTestClass.GetId());
-        //    Assert.AreEqual(id, loadedTestClass.CustomId);
-        //    Assert.IsFalse(loadedTestClass.IsNew());
-        //    Assert.IsFalse(loadedTestClass.IsModified());
+            try
+            {
+                testClass.Save();
+                Assert.Fail();
+            }
+            catch (NotFoundException) { }
 
-        //    try
-        //    {
-        //        loadedTestClass.SetId(Guid.NewGuid());
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception) { }
-        //}
-
-        //[TestMethod]
-        //public void Delete()
-        //{
-        //    var testClass = new AutomaticIdGuidClass();
-
-        //    try
-        //    {
-        //        testClass.Delete();
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception) { }
-
-        //    testClass.Save();
-        //    Assert.IsFalse(testClass.IsDeleted());
-        //    testClass.Delete();
-        //    Assert.IsTrue(testClass.IsDeleted());
-
-        //    try
-        //    {
-        //        testClass.Delete();
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception) { }
-        //}
+            try
+            {
+                testClass.Delete();
+                Assert.Fail();
+            }
+            catch (NotFoundException) { }
+        }
     }
 }

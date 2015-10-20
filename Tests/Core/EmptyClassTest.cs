@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
+using Modl.Exceptions;
 using Modl.Json;
 using Modl.Plugins;
 
@@ -106,7 +107,7 @@ namespace Tests.Core
                 testClass.Delete();
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (NotFoundException) { }
 
             testClass.Save();
             Assert.IsFalse(testClass.IsDeleted());
@@ -118,7 +119,7 @@ namespace Tests.Core
                 testClass.Delete();
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (NotFoundException) { }
         }
     }
 }

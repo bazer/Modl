@@ -143,7 +143,7 @@ namespace Tests.Core
                 loadedTestClass.SetId(Guid.NewGuid());
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (InvalidIdException) { }
         }
 
         [TestMethod]
@@ -156,7 +156,7 @@ namespace Tests.Core
                 testClass.Delete();
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (NotFoundException) { }
 
             testClass.Save();
             Assert.IsFalse(testClass.IsDeleted());
@@ -168,7 +168,7 @@ namespace Tests.Core
                 testClass.Delete();
                 Assert.Fail();
             }
-            catch (Exception) { }
+            catch (NotFoundException) { }
         }
     }
 }

@@ -171,29 +171,39 @@ namespace Tests.Core
             catch (InvalidIdException) { }
         }
 
-        //[TestMethod]
-        //public void Delete()
-        //{
-        //    var testClass = new CustomIdClass();
+        [TestMethod]
+        public void Delete()
+        {
+            var testClass = new CustomIdClass();
 
-        //    try
-        //    {
-        //        testClass.Delete();
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception) { }
+            var id = Guid.NewGuid();
+            testClass.CustomId = id;
 
-        //    testClass.Save();
-        //    Assert.IsFalse(testClass.IsDeleted());
-        //    testClass.Delete();
-        //    Assert.IsTrue(testClass.IsDeleted());
+            try
+            {
+                testClass.Delete();
+                Assert.Fail();
+            }
+            catch (NotFoundException) { }
 
-        //    try
-        //    {
-        //        testClass.Delete();
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception) { }
-        //}
+            testClass.Save();
+            Assert.IsFalse(testClass.IsDeleted());
+            testClass.Delete();
+            Assert.IsTrue(testClass.IsDeleted());
+
+            try
+            {
+                testClass.Save();
+                Assert.Fail();
+            }
+            catch (NotFoundException) { }
+
+            try
+            {
+                testClass.Delete();
+                Assert.Fail();
+            }
+            catch (NotFoundException) { }
+        }
     }
 }

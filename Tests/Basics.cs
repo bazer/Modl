@@ -129,11 +129,10 @@ namespace Tests
                 Assert.Fail();
             }
             catch (FileNotFoundException) { }
-            catch (Exception)
-            {
-                Assert.Fail();
-            }
-
+            //catch (Exception)
+            //{
+            //    Assert.Fail();
+            //}
         }
 
         [TestMethod]
@@ -165,10 +164,10 @@ namespace Tests
                 Assert.Fail();
             }
             catch (FileNotFoundException) { }
-            catch (Exception)
-            {
-                Assert.Fail();
-            }
+            //catch (Exception)
+            //{
+            //    Assert.Fail();
+            //}
         }
 
         ////public void CRUDTransaction(Database database = null)
