@@ -8,6 +8,11 @@ namespace Modl.Structure.Storage
 {
     public class Materializer
     {
+        internal static IEnumerable<Identity> List(Identity identity, Settings settings)
+        {
+            return settings.Endpoint.List(identity);
+        }
+
         internal static IEnumerable<Container> Read(IEnumerable<Identity> identities, Settings settings)
         {
             foreach (var identity in identities)

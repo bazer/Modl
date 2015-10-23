@@ -11,6 +11,7 @@ namespace Modl.Interfaces
 {
     public interface IEndpoint
     {
+        IEnumerable<Identity> List(Identity identity);
         Stream Get(Identity identity);
         void Save(Identity identity, MemoryStream stream);
         void Delete(Identity identity);

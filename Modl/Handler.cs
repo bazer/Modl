@@ -73,6 +73,9 @@ namespace Modl
             return AddFromStorage(Materializer.Read(Definitions.GetIdentities(id), Settings).ToList());
         }
 
-        
+        internal static IEnumerable<object> List()
+        {
+            return Materializer.List(Definitions.GetIdentities("").First(), Settings).Select(x => x.Id);
+        }
     }
 }

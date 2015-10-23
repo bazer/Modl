@@ -21,6 +21,18 @@ namespace Modl.Plugins
                 Directory.CreateDirectory(path);
         }
 
+        public IEnumerable<Identity> List(Identity identity)
+        {
+            return Directory
+                .EnumerateFiles(GetDirectory(identity))
+                .Select(file => new Identity
+                {
+                    Id = Path.GetFileNameWithoutExtension(file),
+                    Name = identity.Name,
+                    Type = identity.Type
+                });
+        }
+
         public Stream Get(Identity identity)
         {
             var path = GetPath(identity);
