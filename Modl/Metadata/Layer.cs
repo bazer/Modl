@@ -130,6 +130,7 @@ namespace Modl.Structure.Metadata
             return new Identity
             {
                 Id = id,
+                IdType = HasIdProperty ? IdProperty.PropertyType : typeof(Guid),
                 Name = ModlName,
                 Type = Type
             };

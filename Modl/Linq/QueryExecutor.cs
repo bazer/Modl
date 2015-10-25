@@ -22,9 +22,9 @@ namespace Modl.Linq
 
         public IEnumerable<T> ExecuteCollection<T>(QueryModel queryModel)
         {
-            foreach (var id in Modl.List(typeof(T)))
+            foreach (var id in ModlReflect.List(typeof(T)))
             {
-                yield return (T)Modl.Get(typeof(T), id);
+                yield return (T)ModlReflect.Get(typeof(T), id);
             }
 
             //return new List<M>();

@@ -75,7 +75,7 @@ namespace Modl
 
         internal static IEnumerable<object> List()
         {
-            return Materializer.List(Definitions.GetIdentities("").First(), Settings).Select(x => x.Id);
+            return Materializer.List(Definitions.GetIdentities("").First(), Settings);
         }
     }
 }

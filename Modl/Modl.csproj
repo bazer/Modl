@@ -55,6 +55,7 @@
     <Compile Include="Linq\Query.cs" />
     <Compile Include="Linq\QueryExecutor.cs" />
     <Compile Include="Linq\QueryModelVisitor.cs" />
+    <Compile Include="ModlReflect.cs" />
     <Compile Include="ModlData.cs" />
     <Compile Include="Metadata\Layer.cs" />
     <Compile Include="Extensions.cs" />

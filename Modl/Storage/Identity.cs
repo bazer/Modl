@@ -9,6 +9,7 @@ namespace Modl.Structure.Storage
     public class Identity
     {
         public object Id { get; set; }
+        public Type IdType { get; set; }
         public string Name { get; set; }
         public Type Type { get; set; }
     }
