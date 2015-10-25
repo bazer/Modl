@@ -26,6 +26,23 @@ namespace Tests.Linq
         }
 
         [TestMethod]
+        public void List()
+        {
+            var modl = new EmptyClass().Save();
+            var modl2 = new EmptyClass().Save();
+
+            var modlList = Modl<EmptyClass>.List().ToList();
+            Assert.AreNotEqual(0, modlList.Count);
+            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl2.GetId()));
+
+            var modlList2 = Modl<EmptyClass>.List<Guid>().ToList();
+            Assert.AreNotEqual(0, modlList2.Count);
+            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl2.GetId()));
+        }
+
+        [TestMethod]
         public void GetAll()
         {
             foreach (var m in Modl<EmptyClass>.Query())

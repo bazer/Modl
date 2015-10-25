@@ -65,6 +65,11 @@ namespace Tests.Core
             Assert.AreNotEqual(0, modlList.Count);
             Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl.GetId()));
             Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl2.GetId()));
+
+            var modlList2 = ModlReflect.List<Guid>(typeof(EmptyClass)).ToList();
+            Assert.AreNotEqual(0, modlList2.Count);
+            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl2.GetId()));
         }
     }
 }

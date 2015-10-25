@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Modl.Linq;
 using Modl.Structure.Metadata;
 using Remotion.Linq.Parsing.Structure;
@@ -37,6 +38,11 @@ namespace Modl
         public static IEnumerable<object> List()
         {
             return Handler<M>.List();
+        }
+
+        public static IEnumerable<T> List<T>()
+        {
+            return Handler<M>.List().Select(x => (T)x);
         }
 
         public static Query<M> Query()
