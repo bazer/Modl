@@ -35,10 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Remotion.Linq, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Remotion.Linq.2.0.0\lib\net45\Remotion.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,9 +48,6 @@
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\InvalidIdException.cs" />
     <Compile Include="Instance\RelationValue.cs" />
-    <Compile Include="Linq\Query.cs" />
-    <Compile Include="Linq\QueryExecutor.cs" />
-    <Compile Include="Linq\QueryModelVisitor.cs" />
     <Compile Include="ModlReflect.cs" />
     <Compile Include="ModlData.cs" />
     <Compile Include="Metadata\Layer.cs" />
@@ -79,9 +72,6 @@
     <Compile Include="Storage\Identity.cs" />
     <Compile Include="Storage\Materializer.cs" />
     <Compile Include="Storage\Container.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

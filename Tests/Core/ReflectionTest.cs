@@ -53,6 +53,24 @@ namespace Tests.Core
         }
 
         [TestMethod]
+        public void GetAll()
+        {
+            foreach (var m in ModlReflect.GetAll(typeof(EmptyClass)).Select(x => x as EmptyClass))
+                m.Delete();
+
+            var modlList = ModlReflect.GetAll(typeof(EmptyClass)).ToList();
+            Assert.AreEqual(0, modlList.Count);
+
+            var modl = new EmptyClass().Save();
+            var modl2 = new EmptyClass().Save();
+
+            var modlList2 = ModlReflect.GetAll(typeof(EmptyClass)).Select(x => x as EmptyClass).ToList();
+            Assert.AreEqual(2, modlList2.Count);
+            Assert.IsTrue(modlList2.Any(x => (Guid)x.GetId() == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList2.Any(x => (Guid)x.GetId() == (Guid)modl2.GetId()));
+        }
+
+        [TestMethod]
         public void List()
         {
             var modl = ModlReflect.New(typeof(EmptyClass)) as EmptyClass;

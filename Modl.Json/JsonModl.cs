@@ -39,6 +39,9 @@ namespace Modl.Json
 
         object ISerializer.DeserializeObject(object obj, Type toType)
         {
+            if (toType == typeof(string) && obj.GetType() == typeof(string))
+                return obj;
+
             if (toType == typeof(Guid))
                 return Guid.Parse(obj.ToString());
 

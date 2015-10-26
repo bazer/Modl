@@ -22,6 +22,11 @@ namespace Modl
             return InvokeMethod<object>(type, "Get", id);
         }
 
+        public static IEnumerable<object> GetAll(Type type)
+        {
+            return InvokeMethod<IEnumerable<object>>(type, "GetAll");
+        }
+
         public static IEnumerable<object> List(Type type)
         {
             return InvokeMethod<IEnumerable<object>>(type, "List");

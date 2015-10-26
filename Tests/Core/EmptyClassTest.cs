@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
 using Modl.Exceptions;
@@ -120,6 +121,41 @@ namespace Tests.Core
                 Assert.Fail();
             }
             catch (NotFoundException) { }
+        }
+
+        [TestMethod]
+        public void List()
+        {
+            var modl = new EmptyClass().Save();
+            var modl2 = new EmptyClass().Save();
+
+            var modlList = Modl<EmptyClass>.List().ToList();
+            Assert.AreNotEqual(0, modlList.Count);
+            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl2.GetId()));
+
+            var modlList2 = Modl<EmptyClass>.List<Guid>().ToList();
+            Assert.AreNotEqual(0, modlList2.Count);
+            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl2.GetId()));
+        }
+
+        [TestMethod]
+        public void GetAll()
+        {
+            foreach (var m in Modl<EmptyClass>.GetAll())
+                m.Delete();
+
+            var modlList = Modl<EmptyClass>.GetAll().ToList();
+            Assert.AreEqual(0, modlList.Count);
+
+            var modl = new EmptyClass().Save();
+            var modl2 = new EmptyClass().Save();
+
+            modlList = Modl<EmptyClass>.GetAll().ToList();
+            Assert.AreEqual(2, modlList.Count);
+            Assert.IsTrue(modlList.Any(x => (Guid)x.GetId() == (Guid)modl.GetId()));
+            Assert.IsTrue(modlList.Any(x => (Guid)x.GetId() == (Guid)modl2.GetId()));
         }
     }
 }

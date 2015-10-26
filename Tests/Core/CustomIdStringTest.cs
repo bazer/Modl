@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Modl;
 using Modl.Exceptions;
@@ -192,6 +193,42 @@ namespace Tests.Core
                 Assert.Fail();
             }
             catch (NotFoundException) { }
+        }
+
+
+        [TestMethod]
+        public void List()
+        {
+            var modl = new CustomIdClass().SetId(Guid.NewGuid().ToString()).Save();
+            var modl2 = new CustomIdClass().SetId(Guid.NewGuid().ToString()).Save();
+
+            var modlList = Modl<CustomIdClass>.List().ToList();
+            Assert.AreNotEqual(0, modlList.Count);
+            Assert.IsTrue(modlList.Any(x => x as string == modl.GetId() as string));
+            Assert.IsTrue(modlList.Any(x => x as string == modl2.GetId() as string));
+
+            var modlList2 = Modl<CustomIdClass>.List<string>().ToList();
+            Assert.AreNotEqual(0, modlList2.Count);
+            Assert.IsTrue(modlList2.Any(x => x == modl.GetId() as string));
+            Assert.IsTrue(modlList2.Any(x => x == modl2.GetId() as string));
+        }
+
+        [TestMethod]
+        public void GetAll()
+        {
+            foreach (var m in Modl<CustomIdClass>.GetAll())
+                m.Delete();
+
+            var modlList = Modl<CustomIdClass>.GetAll().ToList();
+            Assert.AreEqual(0, modlList.Count);
+
+            var modl = new CustomIdClass().SetId(Guid.NewGuid().ToString()).Save();
+            var modl2 = new CustomIdClass().SetId(Guid.NewGuid().ToString()).Save();
+
+            modlList = Modl<CustomIdClass>.GetAll().ToList();
+            Assert.AreEqual(2, modlList.Count);
+            Assert.IsTrue(modlList.Any(x => x.GetId() as string == modl.GetId() as string));
+            Assert.IsTrue(modlList.Any(x => x.GetId() as string == modl2.GetId() as string));
         }
     }
 }
