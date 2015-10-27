@@ -49,7 +49,7 @@ namespace Tests.Core
             testClass = Modl<EmptyClass>.New(id);
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.IsTrue(id == testClass.Id());
         }
 
         [TestMethod]
@@ -57,8 +57,8 @@ namespace Tests.Core
         {
             var id = Guid.NewGuid();
             var testClass = new EmptyClass();
-            testClass.SetId(id);
-            Assert.AreEqual(id, testClass.GetId());
+            testClass.Id(id);
+            Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
         }
@@ -67,16 +67,16 @@ namespace Tests.Core
         public void GenerateId()
         {
             var testClass = new EmptyClass();
-            var id = testClass.GetId();
+            var id = testClass.Id().Get();
             Assert.IsNotNull(id);
             Assert.IsTrue(id is Guid);
             Assert.AreNotEqual(Guid.Empty, id);
             
-            testClass.GenerateId();
-            Assert.AreNotEqual(id, testClass.GetId());
-            Assert.IsNotNull(testClass.GetId());
-            Assert.IsTrue(testClass.GetId() is Guid);
-            Assert.AreNotEqual(Guid.Empty, testClass.GetId());
+            testClass.Id().Generate();
+            Assert.AreNotEqual(id, testClass.Id());
+            Assert.IsNotNull(testClass.Id());
+            Assert.IsTrue(testClass.Id().Get() is Guid);
+            Assert.AreNotEqual(Guid.Empty, testClass.Id());
 
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
@@ -86,14 +86,14 @@ namespace Tests.Core
         public void Save()
         {
             var testClass = new EmptyClass();
-            var id = testClass.GetId();
+            var id = testClass.Id();
             testClass.Save();
             Assert.IsFalse(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.AreEqual(id, testClass.Id());
 
             var loadedTestClass = Modl<EmptyClass>.Get(id);
-            Assert.AreEqual(id, loadedTestClass.GetId());
+            Assert.AreEqual(id, loadedTestClass.Id());
             Assert.IsFalse(loadedTestClass.IsNew());
             Assert.IsFalse(loadedTestClass.IsModified());
         }
@@ -131,13 +131,13 @@ namespace Tests.Core
 
             var modlList = Modl<EmptyClass>.List().ToList();
             Assert.AreNotEqual(0, modlList.Count);
-            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl.GetId()));
-            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl2.GetId()));
+            Assert.IsTrue(modlList.Any(x => x == modl.Id()));
+            Assert.IsTrue(modlList.Any(x => x == modl2.Id()));
 
             var modlList2 = Modl<EmptyClass>.List<Guid>().ToList();
             Assert.AreNotEqual(0, modlList2.Count);
-            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl.GetId()));
-            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl2.GetId()));
+            Assert.IsTrue(modlList2.Any(x => x == modl.Id()));
+            Assert.IsTrue(modlList2.Any(x => x == modl2.Id()));
         }
 
         [TestMethod]
@@ -154,8 +154,8 @@ namespace Tests.Core
 
             modlList = Modl<EmptyClass>.GetAll().ToList();
             Assert.AreEqual(2, modlList.Count);
-            Assert.IsTrue(modlList.Any(x => (Guid)x.GetId() == (Guid)modl.GetId()));
-            Assert.IsTrue(modlList.Any(x => (Guid)x.GetId() == (Guid)modl2.GetId()));
+            Assert.IsTrue(modlList.Any(x => x.Id() == modl.Id()));
+            Assert.IsTrue(modlList.Any(x => x.Id() == modl2.Id()));
         }
     }
 }

@@ -21,11 +21,11 @@ namespace Modl.Plugins
                 Directory.CreateDirectory(path);
         }
 
-        public IEnumerable<Identity> List(Identity identity)
+        public IEnumerable<StorageIdentity> List(StorageIdentity identity)
         {
             return Directory
                 .EnumerateFiles(GetDirectory(identity))
-                .Select(file => new Identity
+                .Select(file => new StorageIdentity
                 {
                     Id = Path.GetFileNameWithoutExtension(file),
                     Name = identity.Name,
@@ -33,7 +33,7 @@ namespace Modl.Plugins
                 });
         }
 
-        public Stream Get(Identity identity)
+        public Stream Get(StorageIdentity identity)
         {
             var path = GetPath(identity);
 
@@ -43,7 +43,7 @@ namespace Modl.Plugins
             return File.OpenRead(path);
         }
 
-        public void Save(Identity identity, MemoryStream stream)
+        public void Save(StorageIdentity identity, MemoryStream stream)
         {
             if (!Directory.Exists(GetDirectory(identity)))
                 Directory.CreateDirectory(GetDirectory(identity));
@@ -59,7 +59,7 @@ namespace Modl.Plugins
             }
         }
 
-        public void Delete(Identity identity)
+        public void Delete(StorageIdentity identity)
         {
             var path = GetPath(identity);
 
@@ -69,19 +69,19 @@ namespace Modl.Plugins
             File.Delete(path);
         }
 
-        private string GetPath(Identity identity)
+        private string GetPath(StorageIdentity identity)
         {
 
             return GetDirectory(identity) + GetFilename(identity);
         }
 
-        private string GetDirectory(Identity identity)
+        private string GetDirectory(StorageIdentity identity)
         {
 
             return path + identity.Name + Path.DirectorySeparatorChar;
         }
 
-        private string GetFilename(Identity identity)
+        private string GetFilename(StorageIdentity identity)
         {
             
             return identity.Id + "." + fileEnding;

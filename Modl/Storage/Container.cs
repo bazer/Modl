@@ -18,7 +18,7 @@ namespace Modl.Structure.Storage
         public Dictionary<string, object> Values { get; set; }
         public About About { get; set; }
         public string Hash { get; set; }
-        internal Identity Identity { get; set; }
+        internal StorageIdentity Identity { get; set; }
 
         public Container()
         {

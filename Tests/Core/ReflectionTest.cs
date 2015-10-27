@@ -36,7 +36,7 @@ namespace Tests.Core
             modl = ModlReflect.New(typeof(EmptyClass), id);
             Assert.AreEqual(typeof(EmptyClass), modl.GetType());
             Assert.IsTrue((modl as EmptyClass).IsNew());
-            Assert.AreEqual(id, (modl as EmptyClass).GetId());
+            Assert.IsTrue(id == (modl as EmptyClass).Id());
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace Tests.Core
             modl = ModlReflect.Get(typeof(EmptyClass), id) as EmptyClass;
             Assert.AreEqual(typeof(EmptyClass), modl.GetType());
             Assert.IsFalse(modl.IsNew());
-            Assert.AreEqual(id, modl.GetId());
+            Assert.AreEqual(id, modl.Id().Get<Guid>());
         }
 
         [TestMethod]
@@ -66,8 +66,8 @@ namespace Tests.Core
 
             var modlList2 = ModlReflect.GetAll(typeof(EmptyClass)).Select(x => x as EmptyClass).ToList();
             Assert.AreEqual(2, modlList2.Count);
-            Assert.IsTrue(modlList2.Any(x => (Guid)x.GetId() == (Guid)modl.GetId()));
-            Assert.IsTrue(modlList2.Any(x => (Guid)x.GetId() == (Guid)modl2.GetId()));
+            Assert.IsTrue(modlList2.Any(x => x.Id() == modl.Id()));
+            Assert.IsTrue(modlList2.Any(x => x.Id() == modl2.Id()));
         }
 
         [TestMethod]
@@ -81,13 +81,13 @@ namespace Tests.Core
 
             var modlList = ModlReflect.List(typeof(EmptyClass)).ToList();
             Assert.AreNotEqual(0, modlList.Count);
-            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl.GetId()));
-            Assert.IsTrue(modlList.Any(x => (Guid)x == (Guid)modl2.GetId()));
+            Assert.IsTrue(modlList.Any(x => (Guid)x == modl.Id().Get<Guid>()));
+            Assert.IsTrue(modlList.Any(x => (Guid)x == modl2.Id().Get<Guid>()));
 
             var modlList2 = ModlReflect.List<Guid>(typeof(EmptyClass)).ToList();
             Assert.AreNotEqual(0, modlList2.Count);
-            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl.GetId()));
-            Assert.IsTrue(modlList2.Any(x => x == (Guid)modl2.GetId()));
+            Assert.IsTrue(modlList2.Any(x => x == modl.Id().Get<Guid>()));
+            Assert.IsTrue(modlList2.Any(x => x == modl2.Id().Get<Guid>()));
         }
     }
 }

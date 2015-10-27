@@ -47,6 +47,7 @@
     <Compile Include="Cache\ConcurrentHashSet.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\InvalidIdException.cs" />
+    <Compile Include="Identity.cs" />
     <Compile Include="Instance\RelationValue.cs" />
     <Compile Include="ModlReflect.cs" />
     <Compile Include="ModlData.cs" />

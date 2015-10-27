@@ -54,7 +54,7 @@ namespace Tests.Core
             testClass = Modl<CustomIdClass>.New(id);
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.IsTrue(id == testClass.Id());
             Assert.AreEqual(id, testClass.CustomId);
         }
 
@@ -64,17 +64,17 @@ namespace Tests.Core
             var id = Guid.NewGuid();
             var testClass = new CustomIdClass();
             Assert.AreEqual(Guid.Empty, testClass.CustomId);
-            Assert.IsFalse(testClass.HasId());
-            testClass.SetId(id);
-            Assert.IsTrue(testClass.HasId());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.IsFalse(testClass.Id().IsSet);
+            testClass.Id().Set(id);
+            Assert.IsTrue(testClass.Id().IsSet);
+            Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
 
             id = Guid.NewGuid();
-            testClass.SetId(id.ToString());
-            Assert.AreEqual(id, testClass.GetId());
+            testClass.Id().Set(id.ToString());
+            Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
@@ -82,10 +82,10 @@ namespace Tests.Core
             id = Guid.NewGuid();
             testClass = new CustomIdClass();
             Assert.AreEqual(Guid.Empty, testClass.CustomId);
-            Assert.IsFalse(testClass.HasId());
+            Assert.IsFalse(testClass.Id().IsSet);
             testClass.CustomId = id;
-            Assert.IsTrue(testClass.HasId());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.IsTrue(testClass.Id().IsSet);
+            Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
@@ -93,14 +93,14 @@ namespace Tests.Core
 
             try
             {
-                testClass.SetId(1);
+                testClass.Id().Set(1);
                 Assert.Fail();
             }
             catch (InvalidIdException) { }
 
             try
             {
-                testClass.SetId("1");
+                testClass.Id().Set("1");
             }
             catch (InvalidIdException) { }
         }
@@ -109,19 +109,19 @@ namespace Tests.Core
         public void GenerateId()
         {
             var testClass = new CustomIdClass();
-            var id = testClass.GetId();
+            var id = testClass.Id().Get();
             Assert.AreEqual(Guid.Empty, testClass.CustomId);
-            Assert.IsFalse(testClass.HasId());
+            Assert.IsFalse(testClass.Id().IsSet);
             Assert.IsTrue(id is Guid);
             Assert.AreEqual(id, testClass.CustomId);
 
-            testClass.GenerateId();
-            Assert.IsTrue(testClass.HasId());
-            Assert.AreNotEqual(id, testClass.GetId());
-            Assert.IsNotNull(testClass.GetId());
-            Assert.IsTrue(testClass.GetId() is Guid);
-            Assert.AreNotEqual(Guid.Empty, testClass.GetId());
-            Assert.AreEqual(testClass.GetId(), testClass.CustomId);
+            testClass.Id().Generate();
+            Assert.IsTrue(testClass.Id().IsSet);
+            Assert.AreNotEqual(id, testClass.Id());
+            Assert.IsNotNull(testClass.Id());
+            Assert.IsTrue(testClass.Id().Get() is Guid);
+            Assert.AreNotEqual(Guid.Empty, testClass.Id());
+            Assert.AreEqual(testClass.Id(), testClass.CustomId);
 
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
@@ -145,19 +145,19 @@ namespace Tests.Core
 
             Assert.IsFalse(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.AreEqual(id, testClass.Id().Get());
             Assert.AreEqual(id, testClass.CustomId);
 
             var loadedTestClass = Modl<CustomIdClass>.Get(id);
             Assert.AreEqual(id, loadedTestClass.CustomId);
-            Assert.AreEqual(id, loadedTestClass.GetId());
+            Assert.AreEqual(id, loadedTestClass.Id().Get<Guid>());
             Assert.AreEqual(id, loadedTestClass.CustomId);
             Assert.IsFalse(loadedTestClass.IsNew());
             Assert.IsFalse(loadedTestClass.IsModified());
 
             try
             {
-                loadedTestClass.SetId(Guid.NewGuid());
+                loadedTestClass.Id().Set(Guid.NewGuid());
                 Assert.Fail();
             }
             catch (InvalidIdException) { }

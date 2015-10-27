@@ -65,7 +65,7 @@ namespace Modl
 
         internal static M New(object id)
         {
-            return New().SetId(id);
+            return New().Id(id);
         }
 
         internal static M Get(object id)

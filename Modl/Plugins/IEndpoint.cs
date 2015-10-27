@@ -11,9 +11,9 @@ namespace Modl.Interfaces
 {
     public interface IEndpoint
     {
-        IEnumerable<Identity> List(Identity identity);
-        Stream Get(Identity identity);
-        void Save(Identity identity, MemoryStream stream);
-        void Delete(Identity identity);
+        IEnumerable<StorageIdentity> List(StorageIdentity identity);
+        Stream Get(StorageIdentity identity);
+        void Save(StorageIdentity identity, MemoryStream stream);
+        void Delete(StorageIdentity identity);
     }
 }

@@ -106,7 +106,7 @@ namespace Modl.Structure.Instance
 
             var relationValue = Values[name] as RelationValue;
             relationValue.IsLoaded = true;
-            relationValue.Id = value.GetId();
+            relationValue.Id = value.Id().Get();
         }
 
         public void SetRelationId(string name, object id)

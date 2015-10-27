@@ -11,7 +11,7 @@ namespace Modl.Mvc
         public static IEnumerable<SelectListItem> AsSelectList<M>(this IEnumerable<M> list, Func<M, string> text, Func<M, string> value = null) where M : IMvcModl, new()
         {
             if (value == null)
-                value = x => x.GetId().ToString();
+                value = x => x.Id().ToString();
 
             return from c in list
                    select new SelectListItem

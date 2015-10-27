@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Modl.Structure.Storage
 {
-    public class Identity
+    public class StorageIdentity
     {
         public object Id { get; set; }
         public Type IdType { get; set; }

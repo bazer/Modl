@@ -83,7 +83,8 @@ namespace Tests.Core
             testClass = Modl<AutomaticIdGuidClass>.New(id);
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.IsTrue(testClass.Id().Equals(id));
+            Assert.IsTrue(id == testClass.Id());
             Assert.AreEqual(id, testClass.CustomId);
         }
 
@@ -92,8 +93,8 @@ namespace Tests.Core
         {
             var id = Guid.NewGuid();
             var testClass = new AutomaticIdGuidClass();
-            testClass.SetId(id);
-            Assert.AreEqual(id, testClass.GetId());
+            testClass.Id().Set(id);
+            Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
@@ -103,18 +104,19 @@ namespace Tests.Core
         public void GenerateId()
         {
             var testClass = new AutomaticIdGuidClass();
-            var id = testClass.GetId();
+            var id = testClass.Id().Get();
             Assert.IsNotNull(id);
             Assert.IsTrue(id is Guid);
             Assert.AreNotEqual(Guid.Empty, id);
             Assert.AreEqual(id, testClass.CustomId);
 
-            testClass.GenerateId();
-            Assert.AreNotEqual(id, testClass.GetId());
-            Assert.IsNotNull(testClass.GetId());
-            Assert.IsTrue(testClass.GetId() is Guid);
-            Assert.AreNotEqual(Guid.Empty, testClass.GetId());
-            Assert.AreEqual(testClass.GetId(), testClass.CustomId);
+            testClass.Id().Generate();
+            Assert.IsTrue(id != testClass.Id());
+            Assert.IsNotNull(testClass.Id().Get());
+            Assert.IsTrue(testClass.Id().Get() is Guid);
+            Assert.AreNotEqual(Guid.Empty, testClass.Id().Get());
+            Assert.AreEqual(testClass.Id().Get(), testClass.CustomId);
+            Assert.IsTrue(testClass.Id() == testClass.CustomId);
 
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
@@ -124,23 +126,23 @@ namespace Tests.Core
         public void Save()
         {
             var testClass = new AutomaticIdGuidClass();
-            var id = testClass.GetId();
+            var id = testClass.Id();
             testClass.Save();
             Assert.IsFalse(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
-            Assert.AreEqual(id, testClass.GetId());
+            Assert.AreEqual(id, testClass.Id());
             Assert.AreEqual(id, testClass.CustomId);
 
             var loadedTestClass = Modl<AutomaticIdGuidClass>.Get(id);
             Assert.AreEqual(id, loadedTestClass.CustomId);
-            Assert.AreEqual(id, loadedTestClass.GetId());
+            Assert.AreEqual(id, loadedTestClass.Id());
             Assert.AreEqual(id, loadedTestClass.CustomId);
             Assert.IsFalse(loadedTestClass.IsNew());
             Assert.IsFalse(loadedTestClass.IsModified());
 
             try
             {
-                loadedTestClass.SetId(Guid.NewGuid());
+                loadedTestClass.Id().Set(Guid.NewGuid());
                 Assert.Fail();
             }
             catch (InvalidIdException) { }

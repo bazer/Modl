@@ -33,7 +33,7 @@ namespace Modl.Structure.Metadata
             FirstLayer = new Layer(type);
         }
 
-        internal IEnumerable<Identity> GetIdentities(object id)
+        internal IEnumerable<StorageIdentity> GetIdentities(object id)
         {
             return FirstLayer.GetIdentities(id);
         }

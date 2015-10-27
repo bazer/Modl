@@ -125,9 +125,9 @@ namespace Modl.Structure.Metadata
             };
         }
 
-        internal Identity GetIdentity(object id)
+        internal StorageIdentity GetIdentity(object id)
         {
-            return new Identity
+            return new StorageIdentity
             {
                 Id = id,
                 IdType = HasIdProperty ? IdProperty.PropertyType : typeof(Guid),
@@ -136,7 +136,7 @@ namespace Modl.Structure.Metadata
             };
         }
 
-        internal IEnumerable<Identity> GetIdentities(object id)
+        internal IEnumerable<StorageIdentity> GetIdentities(object id)
         {
             yield return GetIdentity(id);
 
