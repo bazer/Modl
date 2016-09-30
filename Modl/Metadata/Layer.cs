@@ -14,8 +14,8 @@ namespace Modl.Structure.Metadata
         public string Name { get; set; }
         public string ModlName { get; private set; }
         internal Type Type { get; set; }
-        internal Layer Parent { get; set; }
-        internal bool HasParent => Parent != null;
+        //internal Layer Parent { get; set; }
+        //internal bool HasParent => Parent != null;
         internal bool HasIdProperty => Properties.Any(x => x.IsId);
         internal bool HasAutomaticId => !HasIdProperty || (HasIdProperty && IdProperty.IsAutomaticId);
 
@@ -24,8 +24,9 @@ namespace Modl.Structure.Metadata
 
         public Layer(Type type)
         {
-            if (type.BaseType != null && type.BaseType != typeof(object))
-                Parent = new Layer(type.BaseType);
+            //Disable inheritance for now
+            //if (type.BaseType != null && type.BaseType != typeof(object))
+            //    Parent = new Layer(type.BaseType);
 
             Properties = new List<Property>();
 
@@ -53,9 +54,9 @@ namespace Modl.Structure.Metadata
                 }
             }
 
-            if (HasParent)
-                AllProperties = Properties.Concat(Parent.AllProperties).ToList();
-            else
+            //if (HasParent)
+            //    AllProperties = Properties.Concat(Parent.AllProperties.Where(x => !Properties.Any(y => y.PropertyName == x.PropertyName))).ToList();
+            //else
                 AllProperties = Properties;
         }
 
@@ -79,8 +80,8 @@ namespace Modl.Structure.Metadata
 
         internal void SetValuesFromStorage(Backer instance, IEnumerable<Container> storage)
         {
-            if (HasParent)
-                Parent.SetValuesFromStorage(instance, storage);
+            //if (HasParent)
+            //    Parent.SetValuesFromStorage(instance, storage);
 
             foreach (var value in storage.Single(x => x.About.Type == ModlName).Values)
             {
@@ -110,9 +111,9 @@ namespace Modl.Structure.Metadata
                 Identity = GetIdentity(instance.GetId())
             };
 
-            if (HasParent)
-                foreach (var x in Parent.GetStorage(instance))
-                    yield return x;
+            //if (HasParent)
+            //    foreach (var x in Parent.GetStorage(instance))
+            //        yield return x;
         }
 
         internal About GetAbout(Backer instance)
@@ -140,9 +141,9 @@ namespace Modl.Structure.Metadata
         {
             yield return GetIdentity(id);
 
-            if (HasParent)
-                foreach (var x in Parent.GetIdentities(id))
-                    yield return x;
+            //if (HasParent)
+            //    foreach (var x in Parent.GetIdentities(id))
+            //        yield return x;
         }
 
 
