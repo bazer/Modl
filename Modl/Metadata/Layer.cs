@@ -47,7 +47,7 @@ namespace Modl.Structure.Metadata
 
             foreach (PropertyInfo info in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (info.CanWrite && !typeof(IModlData).IsAssignableFrom(info.PropertyType))
+                if (info.CanWrite && !typeof(IModlData).IsAssignableFrom(info.PropertyType) && !info.GetMethod.IsAbstract)
                 {
                     var property = new Property(info, this);
                     Properties.Add(property);
