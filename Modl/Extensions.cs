@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Modl.Structure.Instance;
 using Modl.Structure.Metadata;
+using Modl.Relations;
 
 namespace Modl
 {
@@ -88,7 +89,7 @@ namespace Modl
         public static Relation<M> Relation<M>(this M m, string name)
             where M : IModl, new()
         {
-            return new Modl.Relation<M>
+            return new Relation<M>
             {
                 Name = name,
                 Backer = m.GetBacker()
@@ -123,24 +124,6 @@ namespace Modl
             backer.Delete();
 
             return m;
-        }
-    }
-
-    public class Relation<M> where M : IModl, new()
-    {
-        public string Name { get; internal set; }
-        public Backer Backer { get; internal set; }
-
-        public T GetValue<T>()
-            where T : IModl, new()
-        {
-            return Backer.GetRelationValue<T>(Name);
-        }
-
-        public void SetValue<T>(T value)
-            where T : IModl, new()
-        {
-            Backer.SetRelationValue(Name, value);
         }
     }
 }

@@ -58,6 +58,7 @@
     <Compile Include="Plugins\IEndpoint.cs" />
     <Compile Include="Metadata\Relation.cs" />
     <Compile Include="Metadata\Property.cs" />
+    <Compile Include="Relations\Relation.cs" />
     <Compile Include="Storage\About.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="Metadata\Definitions.cs" />
