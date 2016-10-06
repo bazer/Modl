@@ -10,3 +10,6 @@ TestResults
 *.ctl
 *.vs
 *.ide
+*.ncrunchproject
+Modl.v2.ncrunchsolution
+*.cache
