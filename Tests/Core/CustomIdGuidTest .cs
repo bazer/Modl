@@ -73,7 +73,7 @@ namespace Tests.Core
             Assert.AreEqual(id, testClass.CustomId);
 
             id = Guid.NewGuid();
-            testClass.Id().Set(id.ToString());
+            testClass.Id().Set(id);
             Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());

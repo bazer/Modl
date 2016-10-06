@@ -61,7 +61,7 @@ namespace Modl
 
         public Identity<M> Set<T>(T value)
         {
-            modl.Modl.Backer.SetId(value);
+            modl.Modl.Backer.SetId(value, false);
             modl.Modl.Backer.WriteToInstanceId(modl);
 
             return this;

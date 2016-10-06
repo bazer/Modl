@@ -127,7 +127,7 @@ namespace Modl.Structure.Instance
         }
 
 
-        internal void SetId(object value)
+        internal void SetId(object value, bool allowCasting = true)
         {
             if (!IsNew)
                 throw new InvalidIdException("Can't change id of a Modl that is not new");
@@ -137,10 +137,13 @@ namespace Modl.Structure.Instance
                 var id = Definitions.IdProperty;
 
                 if (id.PropertyType == typeof(Guid))
-                    value = ConvertToGuid(value);
+                    value = ConvertToGuid(value, allowCasting);
 
                 if (id.PropertyType == typeof(int))
-                    value = ConvertToInt32(value);
+                    value = ConvertToInt32(value, allowCasting);
+
+                if (id.PropertyType == typeof(string))
+                    value = ConvertToString(value, allowCasting);
 
                 if (id.PropertyType != value.GetType())
                     throw new InvalidIdException($"Id value should be of type {id.PropertyType}, but is of type {value.GetType()}");
@@ -155,13 +158,17 @@ namespace Modl.Structure.Instance
             //HasId = true;
         }
 
-        private Guid ConvertToGuid(object value)
+        private Guid ConvertToGuid(object value, bool allowCasting = true)
         {
             Guid guidValue;
 
             if (value is Guid)
             {
                 guidValue = (Guid)value;
+            }
+            else if (!allowCasting)
+            {
+                throw new InvalidIdException("Id is not a Guid");
             }
             else
             {
@@ -178,13 +185,17 @@ namespace Modl.Structure.Instance
             return guidValue;
         }
 
-        private int ConvertToInt32(object value)
+        private int ConvertToInt32(object value, bool allowCasting = true)
         {
             int intValue;
 
             if (value is int)
             {
                 intValue = (int)value;
+            }
+            else if (!allowCasting)
+            {
+                throw new InvalidIdException("Id is not a int");
             }
             else
             {
@@ -196,6 +207,16 @@ namespace Modl.Structure.Instance
             }
 
             return intValue;
+        }
+
+        private string ConvertToString(object value, bool allowCasting = true)
+        {
+            if (value is string)
+                return value as string;
+            else if (allowCasting)
+                return value.ToString();
+            else
+                throw new InvalidIdException("Id is not a string");
         }
 
         internal object GetId()

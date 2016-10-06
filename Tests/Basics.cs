@@ -382,7 +382,7 @@ namespace Tests
         public void SetIdExplicit()
         {
             var id = Guid.NewGuid();
-            Manufacturer m1 = Modl<Manufacturer>.New(id.ToString());
+            Manufacturer m1 = Modl<Manufacturer>.New(id);
             m1.Name = "Audi";
             Assert.AreEqual(id, m1.ManufacturerID);
             m1.Save();
