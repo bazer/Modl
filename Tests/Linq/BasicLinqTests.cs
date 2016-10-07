@@ -27,20 +27,20 @@ namespace Tests.Linq
 
         
 
-        [TestMethod]
-        public void QueryAll()
-        {
-            foreach (var m in Modl<EmptyClass>.Query())
-                m.Delete();
+        //[TestMethod]
+        //public void QueryAll()
+        //{
+        //    foreach (var m in Modl<EmptyClass>.Query())
+        //        m.Delete();
 
-            var modls = Modl<EmptyClass>.Query().ToList();
-            Assert.AreEqual(0, modls.Count);
+        //    var modls = Modl<EmptyClass>.Query().ToList();
+        //    Assert.AreEqual(0, modls.Count);
 
-            var modl = new EmptyClass();
-            modl.Save();
+        //    var modl = new EmptyClass();
+        //    modl.Save();
 
-            modls = Modl<EmptyClass>.Query().ToList();
-            Assert.AreEqual(1, modls.Count);
-        }
+        //    modls = Modl<EmptyClass>.Query().ToList();
+        //    Assert.AreEqual(1, modls.Count);
+        //}
     }
 }

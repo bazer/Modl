@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using System.Reflection;
-using Modl.Structure.Metadata;
 
 namespace Modl.Mvc
 {

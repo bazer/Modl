@@ -1,5 +1,4 @@
 ﻿using Modl.Cache;
-using Modl.Structure.Metadata;
 using Modl.Structure.Storage;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Modl.Structure.Instance;
+using Modl.Metadata;
+using Modl.Instance;
 
 namespace Modl
 {
@@ -38,6 +38,8 @@ namespace Modl
                 {
                     Backer = backer
                 };
+
+                backer.WriteRelationsToInstance(m);
             }
 
             return m;
@@ -50,6 +52,7 @@ namespace Modl
             var idValue = storage.First().About.Id;
             var backer = m.Modl.Backer;
             backer.SetId(idValue);
+            backer.WriteToInstanceId(m);
             backer.SetValuesFromStorage(storage);
             backer.ResetValuesToUnmodified();
             backer.WriteToInstance(m);

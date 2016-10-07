@@ -6,32 +6,30 @@ using System.Text;
 using System.Threading.Tasks;
 using Modl.Exceptions;
 
-namespace Modl.Structure.Metadata
+namespace Modl.Metadata
 {
     public class Property
     {
-        public string PropertyName { get; private set; }
-        public string StorageName { get; private set; }
-        public Type ModlType { get; private set; }
-        public Type PropertyType { get; private set; }
-        public PropertyInfo PropertyInfo { get; set; }
-        public bool IsId { get; private set; }
-        public bool IsAutomaticId { get; private set; }
-        public bool IsRelation { get; private set; }
+        public string PropertyName { get; }
+        public string StorageName { get; }
+        public Type ModlType { get; }
+        public Type PropertyType { get; }
+        public PropertyInfo PropertyInfo { get; }
+        public bool IsId { get; }
+        public bool IsAutomaticId { get; }
+        public bool IsLink { get; protected set; } = false;
 
         //public bool IsForeignKey { get { return ForeignKeyType != null; } }
         //public Type ForeignKeyType { get; private set; }
 
-        public Property(PropertyInfo property, Layer layer)
+        public Property(PropertyInfo property, Type modlType)
         {
             PropertyInfo = property;
             PropertyName = property.Name;
             StorageName = property.Name;
             PropertyType = property.PropertyType;
-            ModlType = layer.Type;
+            ModlType = modlType;
 
-            if (typeof(IModl).IsAssignableFrom(PropertyType))
-                IsRelation = true;
 
             foreach (var attribute in property.GetCustomAttributes(false))
             {

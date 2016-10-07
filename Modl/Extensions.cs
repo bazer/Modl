@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Modl.Structure.Instance;
-using Modl.Structure.Metadata;
-using Modl.Relations;
+using Modl.Instance;
 
 namespace Modl
 {
@@ -86,29 +84,29 @@ namespace Modl
         //    return backer.GetId();
         //}
 
-        public static Relation<M> Relation<M>(this M m, string name)
-            where M : IModl, new()
-        {
-            return new Relation<M>
-            {
-                Name = name,
-                Backer = m.GetBacker()
-            };
-        }
+        //public static Relation<M> Relation<M>(this M m, string name)
+        //    where M : IModl, new()
+        //{
+        //    return new Relation<M>
+        //    {
+        //        Name = name,
+        //        Backer = m.GetBacker()
+        //    };
+        //}
 
-        public static T GetRelation<M, T>(this M m, string name) 
-            where M: IModl, new()
-            where T: IModl, new()
-        {
-            return m.GetBacker().GetRelationValue<T>(name);
-        }
+        //public static T GetRelation<M, T>(this M m, string name) 
+        //    where M: IModl, new()
+        //    where T: IModl, new()
+        //{
+        //    return m.GetBacker().GetRelationValue<T>(name);
+        //}
 
-        public static void SetRelation<M, T>(this M m, string name, T value)
-            where M : IModl, new()
-            where T : IModl, new()
-        {
-            m.GetBacker().SetRelationValue(name, value);
-        }
+        //public static void SetRelation<M, T>(this M m, string name, T value)
+        //    where M : IModl, new()
+        //    where T : IModl, new()
+        //{
+        //    m.GetBacker().SetRelationValue(name, value);
+        //}
 
         public static M Save<M>(this M m, bool includeRelations = true) where M : IModl, new()
         {

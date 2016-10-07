@@ -33,7 +33,7 @@ namespace Tests.Core
             Assert.AreEqual(1, definitions.Properties.Count);
             Assert.IsTrue(definitions.IdProperty.IsId);
             Assert.IsFalse(definitions.IdProperty.IsAutomaticId);
-            Assert.IsFalse(definitions.IdProperty.IsRelation);
+            Assert.IsFalse(definitions.IdProperty.IsLink);
             Assert.AreEqual("CustomId", definitions.IdProperty.PropertyName);
             Assert.AreEqual(typeof(Guid), definitions.IdProperty.PropertyType);
             Assert.AreEqual("CustomId", definitions.IdProperty.StorageName);

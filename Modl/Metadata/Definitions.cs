@@ -6,9 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Modl.Structure.Instance;
+using Modl.Instance;
 
-namespace Modl.Structure.Metadata
+namespace Modl.Metadata
 {
     public class Definitions
     {

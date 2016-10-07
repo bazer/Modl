@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Modl.Structure.Instance;
+using Modl.Instance;
 
-namespace Modl.Structure.Metadata
+namespace Modl.Metadata
 {
     public class Layer
     {
@@ -49,15 +49,14 @@ namespace Modl.Structure.Metadata
             {
                 if (info.CanWrite && !typeof(IModlData).IsAssignableFrom(info.PropertyType) && !info.GetMethod.IsAbstract)
                 {
-                    var property = new Property(info, this);
-                    Properties.Add(property);
+                    Properties.Add(PropertyFactory.Create(info, Type));
                 }
             }
 
             //if (HasParent)
             //    AllProperties = Properties.Concat(Parent.AllProperties.Where(x => !Properties.Any(y => y.PropertyName == x.PropertyName))).ToList();
             //else
-                AllProperties = Properties;
+            AllProperties = Properties;
         }
 
         internal Property IdProperty
@@ -68,7 +67,7 @@ namespace Modl.Structure.Metadata
             }
         }
 
-        
+
 
         //internal IEnumerable<Property> ForeignKeys
         //{
@@ -86,21 +85,19 @@ namespace Modl.Structure.Metadata
             foreach (var value in storage.Single(x => x.About.Type == ModlName).Values)
             {
                 var property = GetPropertyFromModlName(value.Key);
+
+                if (property.IsId)
+                    continue;
+
                 var newValue = value.Value;
 
+                if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
+                    newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
 
-                if (property.IsRelation)
-                {
-                    instance.SetRelationId(property.PropertyName, newValue);
-                }
+                if (property.IsLink)
+                    instance.GetRelation(property.PropertyName).Set(newValue as IEnumerable<RelationIdValue>);
                 else
-                {
-                    if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
-                        newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
-
                     instance.SetValue(property.PropertyName, newValue);
-                }
-                
             }
         }
 
@@ -154,8 +151,8 @@ namespace Modl.Structure.Metadata
 
                 object value;
 
-                if (x.IsRelation)
-                    value = backer.GetRelationId(x.PropertyName);
+                if (x.IsLink)
+                    value = backer.GetRelation(x.PropertyName).Get();
                 else
                     value = backer.GetValue<object>(x.PropertyName);
 

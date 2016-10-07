@@ -17,6 +17,7 @@ namespace ExampleModel
         public string Id { get; set; }
 
         [Name("Manufacturer_fk")]
-        public Manufacturer Manufacturer { get { return this.GetRelation<Vehicle, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }
+        public Link<Manufacturer> Manufacturer { get; set; }
+        //public Manufacturer Manufacturer { get { return this.GetRelation<Vehicle, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }
     }
 }

@@ -5,9 +5,8 @@ using Modl.Json;
 using Modl.Plugins;
 using System;
 using System.Collections.Generic;
-using Modl.Structure;
-using Modl.Structure.Metadata;
 using System.IO;
+using System.Linq;
 
 namespace Tests
 {
@@ -50,12 +49,12 @@ namespace Tests
             //car.Save();
 
             car = Modl<Car>.New();
-            car.Manufacturer = new Manufacturer("BMW");
+            car.Manufacturer.Val = new Manufacturer("BMW");
             Assert.IsTrue(car.IsNew());
-            Assert.IsFalse(car.IsModified());
-            Assert.AreEqual("BMW", car.Manufacturer.Name);
-            Assert.IsTrue(car.Manufacturer.IsNew());
-            Assert.IsTrue(car.Manufacturer.IsModified());
+            Assert.IsTrue(car.IsModified());
+            Assert.AreEqual("BMW", car.Manufacturer.Val.Name);
+            Assert.IsTrue(car.Manufacturer.Val.IsNew());
+            Assert.IsTrue(car.Manufacturer.Val.IsModified());
         }
 
 
@@ -93,7 +92,7 @@ namespace Tests
             var car = new Car();
             Assert.IsFalse(car.IsModified());
             car.Name = "M3";
-            car.Manufacturer = new Manufacturer("BMW");
+            car.Manufacturer.Val = new Manufacturer("BMW");
             car.Type = new CarType();
             car.Type.Description = "Sedan";
             car.Tags = new List<string>();
@@ -111,17 +110,17 @@ namespace Tests
             Car car2 = GetModl<Car>(car.Id);
             AssertEqual(car, car2);
             Assert.AreEqual("Sedan", car2.Type.Description);
-            car2.Manufacturer.Name = "Mercedes";
-            Assert.AreEqual("Mercedes", car2.Manufacturer.Name);
-            car2.Manufacturer.Save();
+            car2.Manufacturer.Val.Name = "Mercedes";
+            Assert.AreEqual("Mercedes", car2.Manufacturer.Val.Name);
+            car2.Manufacturer.Val.Save();
 
             Car car3 = GetModl<Car>(car.Id);
-            Assert.AreEqual("Mercedes", car3.Manufacturer.Name);
+            Assert.AreEqual("Mercedes", car3.Manufacturer.Val.Name);
             car3.Delete();
             Assert.IsTrue(car3.IsDeleted());
-            Assert.IsFalse(car3.Manufacturer.IsDeleted());
-            car3.Manufacturer.Delete();
-            Assert.IsTrue(car3.Manufacturer.IsDeleted());
+            Assert.IsFalse(car3.Manufacturer.Val.IsDeleted());
+            car3.Manufacturer.Val.Delete();
+            Assert.IsTrue(car3.Manufacturer.Val.IsDeleted());
 
             try
             {
@@ -366,7 +365,7 @@ namespace Tests
             Assert.AreEqual(car1.Tags.Count, car2.Tags.Count);
             Assert.AreEqual(car1.Tags[0], car2.Tags[0]);
             Assert.AreEqual(car1.Type.Description, car2.Type.Description);
-            AssertEqual(car1.Manufacturer, car2.Manufacturer);
+            AssertEqual(car1.Manufacturer.First(), car2.Manufacturer.First());
             Assert.AreEqual(car1.Name, car2.Name);
         }
 

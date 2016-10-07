@@ -3,16 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Modl.Structure.Instance
+namespace Modl.Instance
 {
-    public interface IValue
-    {
-        bool IsModified { get; }
-        void Set(object value);
-        object Get();
-        void Reset();
-    }
-
     public class SimpleValue : IValue
     {
         public virtual bool IsModified { get; private set; }

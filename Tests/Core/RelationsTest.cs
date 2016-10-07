@@ -16,6 +16,9 @@ namespace Tests.Core
         public class Class1 : IModl
         {
             public IModlData Modl { get; set; }
+
+            public MultiLink<Class2> MultipleRelation { get; set; }
+
             //public IEnumerable<Class2> MultipleRelation
             //{
             //    get { return this.Relation(nameof(MultipleRelation)).GetValue<Class2>(); }
@@ -26,6 +29,7 @@ namespace Tests.Core
         public class Class2: IModl
         {
             public IModlData Modl { get; set; }
+            public Link<Class1> SingleRelation { get; set; }
             //public Relation<Class1> SingleRelation
             //{
             //    get { return this.Relation(nameof(SingleRelation)).GetValue<Class1>(); }
@@ -47,30 +51,20 @@ namespace Tests.Core
         {
             var definitions1 = Modl<Class1>.Definitions;
             Assert.AreEqual(1, definitions1.Properties.Count);
-            Assert.IsTrue(definitions1.Properties.First().IsRelation);
+            Assert.IsTrue(definitions1.Properties.First().IsLink);
 
             var definitions2 = Modl<Class2>.Definitions;
             Assert.AreEqual(1, definitions2.Properties.Count);
-            Assert.IsTrue(definitions2.Properties.First().IsRelation);
+            Assert.IsTrue(definitions2.Properties.First().IsLink);
         }
 
-        //[TestMethod]
-        //public void CreateNew()
-        //{
-        //    var testClass = new EmptyClass();
-        //    Assert.IsTrue(testClass.IsNew());
-        //    Assert.IsFalse(testClass.IsModified());
-
-        //    testClass = Modl<EmptyClass>.New();
-        //    Assert.IsTrue(testClass.IsNew());
-        //    Assert.IsFalse(testClass.IsModified());
-
-        //    var id = Guid.NewGuid();
-        //    testClass = Modl<EmptyClass>.New(id);
-        //    Assert.IsTrue(testClass.IsNew());
-        //    Assert.IsFalse(testClass.IsModified());
-        //    Assert.IsTrue(id == testClass.Id());
-        //}
+        [TestMethod]
+        public void AddRelations()
+        {
+            var class1 = new Class1();
+            //class1.MultipleRelation.
+                
+        }
 
         //[TestMethod]
         //public void SetId()

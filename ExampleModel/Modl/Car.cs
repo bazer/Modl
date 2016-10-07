@@ -10,7 +10,7 @@ namespace ExampleModel
 {
     [Name("Cars")]
     [Cache(CacheLevel.Off, CacheTimeout.Never)]
-    public class Car: IModl //: Vehicle
+    public class Car : IModl //: Vehicle
     {
         //[ForeignKey(typeof(Vehicle))]
         //public int Vehicle_fk { get; set; }
@@ -24,7 +24,9 @@ namespace ExampleModel
         public CarType Type { get; set; }
         public List<string> Tags { get; set; }
 
-        public Manufacturer Manufacturer { get { return this.Relation(nameof(Manufacturer)).GetValue<Manufacturer>(); } set { this.Relation(nameof(Manufacturer)).SetValue(value); } }
+        public Link<Manufacturer> Manufacturer { get; set; }
+
+        //public Manufacturer Manufacturer { get { return this.Relation(nameof(Manufacturer)).GetValue<Manufacturer>(); } set { this.Relation(nameof(Manufacturer)).SetValue(value); } }
         //public Manufacturer Manufacturer { get { return this.GetRelation<Car, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }
     }
 }

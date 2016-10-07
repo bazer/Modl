@@ -1,21 +1,24 @@
-﻿using Modl.Structure.Metadata;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using Modl.Structure.Storage;
 using System.Reflection;
 using Modl.Exceptions;
+using Modl.Instance;
+using Modl.Metadata;
 
-namespace Modl.Structure.Instance
+namespace Modl.Instance
 {
     public class Backer
     {
-        public bool IsNew { get; set; } = true;
-        public bool IsDeleted { get; set; } = false;
+        public bool IsNew { get; internal set; } = true;
+        public bool IsDeleted { get; private set; } = false;
         //public bool HasId { get; set; } = false;
-        public Guid? InternalId { get; set; }
-        public Dictionary<string, IValue> Values { get; set; } = new Dictionary<string, IValue>();
+        //public Guid? InternalId { get; private set; }
+        public SimpleValue IdValue { get; private set; }
+        public ValueBacker<SimpleValue> SimpleValueBacker { get; } = new ValueBacker<SimpleValue>();
+        public ValueBacker<RelationValue> RelationValueBacker { get; } = new ValueBacker<RelationValue>();
         public Definitions Definitions { get; set; }
         public Type ModlType { get; set; }
 
@@ -26,104 +29,46 @@ namespace Modl.Structure.Instance
             SetDefaultValues();
         }
 
-        public bool IsModified()
-        {
-            if (Definitions.HasIdProperty)
-            {
-                return Values
-                    .Where(x => x.Key != Definitions.IdProperty.PropertyName)
-                    .Any(x => x.Value.IsModified);
-            }
-            else
-                return Values.Any(x => x.Value.IsModified);
-        }
+        public bool IsModified() => SimpleValueBacker.IsModified || RelationValueBacker.IsModified;
 
         public T GetValue<T>(string name)
         {
-            if (!Values.ContainsKey(name))
-                Values[name] = new SimpleValue(default(T));
+            if (SimpleValueBacker.HasValue(name))
+                return (T)SimpleValueBacker.GetValue(name).Get();
+            else
+                throw new NotImplementedException();
 
-            return (T)Values[name].Get();
         }
 
         public void SetValue<T>(string name, T value)
         {
-            if (!Values.ContainsKey(name))
-                Values[name] = new SimpleValue(value);
+            if (SimpleValueBacker.HasValue(name))
+                SimpleValueBacker.GetValue(name).Set(value);
             else
-                Values[name].Set(value);
+                throw new NotImplementedException();
         }
 
-        public M GetRelationValue<M>(string name) where M: IModl, new()
+        public void AddValue(Property property)
         {
-            if (!Values.ContainsKey(name))
-                Values[name] = new RelationValue(default(M));
-
-            var relationValue = Values[name] as RelationValue;
-            if (relationValue.IsLoaded)
-                return (M)relationValue.Get();
-            else if (relationValue.HasId)
-            {
-                var m = Handler<M>.Get(relationValue.Id);
-                relationValue.Set(m);
-                relationValue.IsLoaded = true;
-                relationValue.Reset();
-
-                return m;
-            }
+            if (property.IsLink)
+                RelationValueBacker.AddValue(property.PropertyName, new RelationValue());
             else
-                return default(M);
+                SimpleValueBacker.AddValue(property.PropertyName, new SimpleValue(GetDefault(property.PropertyType)));
         }
 
-        public object GetRelationId(string name)
+        public RelationValue GetRelation(string name)
         {
-            if (!Values.ContainsKey(name))
-                return null;
-
-            var relationValue = Values[name] as RelationValue;
-
-            return relationValue.Id;
-        }
-
-        public bool IsRelationModified<M>(string name) where M : IModl, new()
-        {
-            if (!Values.ContainsKey(name))
-                return false;
-
-            var relationValue = Values[name] as RelationValue;
-            if (!relationValue.IsLoaded)
-                return false;
-
-            return ((M)relationValue.Get()).IsModified();
-        }
-
-        public void SetRelationValue<M>(string name, M value) where M : IModl, new()
-        {
-            if (!Values.ContainsKey(name))
-                Values[name] = new RelationValue(value);
+            if (RelationValueBacker.HasValue(name))
+                return RelationValueBacker.GetValue(name);
             else
-                Values[name].Set(value);
-
-            var relationValue = Values[name] as RelationValue;
-            relationValue.IsLoaded = true;
-            relationValue.Id = value.Id().Get();
+                throw new NotImplementedException();
         }
 
-        public void SetRelationId(string name, object id)
-        {
-            if (!Values.ContainsKey(name))
-                Values[name] = new RelationValue(null);
-
-            var relationValue = Values[name] as RelationValue;
-            relationValue.Id = id;
-            relationValue.HasId = true;
-            relationValue.IsLoaded = false;
-        }
 
         internal void ResetValuesToUnmodified()
         {
-            foreach (var value in Values.Values)
-                value.Reset();
+            SimpleValueBacker.ResetValuesToUnmodified();
+            RelationValueBacker.ResetValuesToUnmodified();
         }
 
 
@@ -148,14 +93,16 @@ namespace Modl.Structure.Instance
                 if (id.PropertyType != value.GetType())
                     throw new InvalidIdException($"Id value should be of type {id.PropertyType}, but is of type {value.GetType()}");
 
-                SetValue(id.PropertyName, value);
+                //IdValue.Set(value);
+                //SetValue(id.PropertyName, value);
+                IdValue = new SimpleValue(value);
+                
             }
             else
             {
-                InternalId = ConvertToGuid(value);
+                //InternalId = ConvertToGuid(value);
+                IdValue = new SimpleValue(ConvertToGuid(value));
             }
-
-            //HasId = true;
         }
 
         private Guid ConvertToGuid(object value, bool allowCasting = true)
@@ -221,10 +168,10 @@ namespace Modl.Structure.Instance
 
         internal object GetId()
         {
-            if (Definitions.HasIdProperty)
-                return GetValue<object>(Definitions.IdProperty.PropertyName);
-            else
-                return InternalId;
+            //if (Definitions.HasIdProperty)
+                return IdValue?.Get();
+            //else
+            //    return InternalId;
         }
 
         internal bool HasId()
@@ -271,16 +218,16 @@ namespace Modl.Structure.Instance
 
         internal void SetDefaultValues()
         {
-            foreach (var property in Definitions.Properties.Where(x => !x.IsRelation))
-                SetValue(property.PropertyName, GetDefault(property.PropertyType));
+            foreach (var property in Definitions.Properties)
+                AddValue(property);
         }
 
 
-        internal void ReadFromInstance<M>(M m) where M: IModl
+        internal void ReadFromInstance<M>(M m) where M : IModl
         {
-            foreach (var property in Definitions.Properties.Where(x => !x.IsRelation && !x.IsId))
+            foreach (var property in Definitions.Properties.Where(x => !x.IsLink && !x.IsId))
                 SetValue(property.PropertyName, property.GetValue(m));
-                
+
         }
 
         internal void ReadFromInstanceId<M>(M m) where M : IModl
@@ -320,7 +267,7 @@ namespace Modl.Structure.Instance
 
         internal void WriteToInstance<M>(M m, string propertyName = null) where M : IModl
         {
-            foreach (var property in Definitions.Properties.Where(x => !x.IsRelation))
+            foreach (var property in Definitions.Properties.Where(x => !x.IsLink && !x.IsId))
                 if (propertyName == null || property.PropertyName == propertyName)
                     property.SetValue(m, GetValue<object>(property.PropertyName));
         }
@@ -328,7 +275,13 @@ namespace Modl.Structure.Instance
         internal void WriteToInstanceId<M>(M m) where M : IModl
         {
             if (Definitions.HasIdProperty)
-                WriteToInstance(m, Definitions.IdProperty.PropertyName);
+                Definitions.IdProperty.SetValue(m, IdValue.Get());
+        }
+
+        internal void WriteRelationsToInstance<M>(M m) where M : IModl, new()
+        {
+            foreach (LinkProperty property in Definitions.Properties.Where(x => x.IsLink))
+                property.SetLinkValue(m);
         }
 
         private object GetDefault(Type type)
@@ -337,12 +290,6 @@ namespace Modl.Structure.Instance
                 return null;
             else
                 return Activator.CreateInstance(type);
-        }
-
-        internal void SaveRelation<M>(Property property) where M : IModl, new()
-        {
-            if (IsRelationModified<M>(property.PropertyName))
-                GetValue<M>(property.PropertyName).Save();
         }
 
         internal bool Save<M>(M m, bool includeRelations) where M : IModl, new()
@@ -355,7 +302,7 @@ namespace Modl.Structure.Instance
 
             if (includeRelations)
             {
-                foreach (var property in Definitions.Properties.Where(x => x.IsRelation))
+                foreach (var property in Definitions.Properties.Where(x => x.IsLink))
                 {
                     typeof(Backer)
                         .GetMethod("SaveRelation", BindingFlags.Instance | BindingFlags.NonPublic)
