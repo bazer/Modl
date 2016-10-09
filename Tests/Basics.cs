@@ -365,7 +365,7 @@ namespace Tests
             Assert.AreEqual(car1.Tags.Count, car2.Tags.Count);
             Assert.AreEqual(car1.Tags[0], car2.Tags[0]);
             Assert.AreEqual(car1.Type.Description, car2.Type.Description);
-            AssertEqual(car1.Manufacturer.First(), car2.Manufacturer.First());
+            AssertEqual(car1.Manufacturer.Val, car2.Manufacturer.Val);
             Assert.AreEqual(car1.Name, car2.Name);
         }
 
