@@ -35,7 +35,7 @@ namespace Tests.Core
         public void Initialize()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
-            Settings.GlobalSettings.Endpoint = new FileModl();
+            Settings.GlobalSettings.Endpoint = new FileModl(Config.TestOutput);
         }
 
         [TestMethod]
@@ -93,34 +93,34 @@ namespace Tests.Core
         {
             var id = Guid.NewGuid();
             var testClass = new AutomaticIdGuidClass();
-            testClass.Id().Set(id);
+            testClass.Id(id);
             Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
         }
 
-        [TestMethod]
-        public void GenerateId()
-        {
-            var testClass = new AutomaticIdGuidClass();
-            var id = testClass.Id().Get();
-            Assert.IsNotNull(id);
-            Assert.IsTrue(id is Guid);
-            Assert.AreNotEqual(Guid.Empty, id);
-            Assert.AreEqual(id, testClass.CustomId);
+        //[TestMethod]
+        //public void GenerateId()
+        //{
+        //    var testClass = new AutomaticIdGuidClass();
+        //    var id = testClass.Id().Get();
+        //    Assert.IsNotNull(id);
+        //    Assert.IsTrue(id is Guid);
+        //    Assert.AreNotEqual(Guid.Empty, id);
+        //    Assert.AreEqual(id, testClass.CustomId);
 
-            testClass.Id().Generate();
-            Assert.IsTrue(id != testClass.Id());
-            Assert.IsNotNull(testClass.Id().Get());
-            Assert.IsTrue(testClass.Id().Get() is Guid);
-            Assert.AreNotEqual(Guid.Empty, testClass.Id().Get());
-            Assert.AreEqual(testClass.Id().Get(), testClass.CustomId);
-            Assert.IsTrue(testClass.Id() == testClass.CustomId);
+        //    testClass.Id().Generate();
+        //    Assert.IsTrue(id != testClass.Id());
+        //    Assert.IsNotNull(testClass.Id().Get());
+        //    Assert.IsTrue(testClass.Id().Get() is Guid);
+        //    Assert.AreNotEqual(Guid.Empty, testClass.Id().Get());
+        //    Assert.AreEqual(testClass.Id().Get(), testClass.CustomId);
+        //    Assert.IsTrue(testClass.Id() == testClass.CustomId);
 
-            Assert.IsTrue(testClass.IsNew());
-            Assert.IsFalse(testClass.IsModified());
-        }
+        //    Assert.IsTrue(testClass.IsNew());
+        //    Assert.IsFalse(testClass.IsModified());
+        //}
 
         [TestMethod]
         public void Save()
@@ -142,7 +142,7 @@ namespace Tests.Core
 
             try
             {
-                loadedTestClass.Id().Set(Guid.NewGuid());
+                loadedTestClass.Id(Guid.NewGuid());
                 Assert.Fail();
             }
             catch (InvalidIdException) { }

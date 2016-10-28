@@ -11,20 +11,28 @@ namespace Modl
         {
         }
 
-        public object Id => Relation.All().FirstOrDefault();
+        public Identity Id => Relation.All().FirstOrDefault();
 
         public M Val
         {
             get
             {
-                return Modl<M>.Get(Id);
+                if (HasLinkValue)
+                    return LinkValue;
+
+                LinkValue = Handler<M>.Get(Id);
+                return LinkValue;
             }
             set
             {
-                Relation.Set(new List<RelationIdValue> { new RelationIdValue(value) });
+                LinkValue = value;
+                Relation.Set(value.Id());
             }
         }
 
         private RelationValue Relation => Backer.GetRelation(Name);
+
+        private bool HasLinkValue => LinkValue != null;
+        private M LinkValue { get; set; }
     }
 }

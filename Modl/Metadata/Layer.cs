@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Modl.Instance;
+using System.Collections;
 
 namespace Modl.Metadata
 {
@@ -89,23 +90,33 @@ namespace Modl.Metadata
                 if (property.IsId)
                     continue;
 
-                var newValue = value.Value;
-
-                if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
-                    newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
-
                 if (property.IsLink)
-                    instance.GetRelation(property.PropertyName).Set(newValue as IEnumerable<RelationIdValue>);
+                {
+                    var linkedDefinition = Definitions.Get((property as LinkProperty).LinkedModlType);
+                    var linkIdType = linkedDefinition.HasIdProperty ? linkedDefinition.IdProperty.PropertyType : typeof(Guid);
+                    var newValue = Materializer.DeserializeObject(value.Value, typeof(List<>).MakeGenericType(linkIdType), Settings.Get(Type));
+
+                    var list = ((IEnumerable)newValue).Cast<object>();
+                    instance.GetRelation(property.PropertyName).Set(list.Select(x => Identity.FromId(x, linkedDefinition)));
+                }
                 else
+                {
+                    var newValue = value.Value;
+
+                    if (value.Value != null && !property.PropertyType.IsInstanceOfType(value.Value))
+                        newValue = Materializer.DeserializeObject(value.Value, property.PropertyType, Settings.Get(Type));
+
                     instance.SetValue(property.PropertyName, newValue);
+                }
+                    
             }
         }
 
-        public IEnumerable<Container> GetStorage(Backer instance)
+        public IEnumerable<Container> GetStorage(Identity id, Backer instance)
         {
-            yield return new Container(GetAbout(instance), GetValues(instance))
+            yield return new Container(GetAbout(id, instance), GetValues(id, instance))
             {
-                Identity = GetIdentity(instance.GetId())
+                Identity = GetIdentity(id.Get())
             };
 
             //if (HasParent)
@@ -113,11 +124,11 @@ namespace Modl.Metadata
             //        yield return x;
         }
 
-        internal About GetAbout(Backer instance)
+        internal About GetAbout(Identity id, Backer instance)
         {
             return new About
             {
-                Id = instance.GetId(), //.ToString(), //instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
+                Id = id.Get(), //.ToString(), //instance.GetValue<object>(PrimaryKey.PropertyName).ToString(),
                 Type = ModlName,
                 Time = DateTime.UtcNow
             };
@@ -144,7 +155,7 @@ namespace Modl.Metadata
         }
 
 
-        private Dictionary<string, object> GetValues(Backer backer)
+        private Dictionary<string, object> GetValues(Identity id, Backer backer)
         {
             return Properties.Select(x =>
             {
@@ -153,6 +164,8 @@ namespace Modl.Metadata
 
                 if (x.IsLink)
                     value = backer.GetRelation(x.PropertyName).Get();
+                else if (x.IsId)
+                    value = id.Get();
                 else
                     value = backer.GetValue<object>(x.PropertyName);
 

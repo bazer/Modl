@@ -20,7 +20,7 @@ namespace Tests.Core
         public void Initialize()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
-            Settings.GlobalSettings.Endpoint = new FileModl();
+            Settings.GlobalSettings.Endpoint = new FileModl(Config.TestOutput);
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace Tests.Core
             Assert.IsTrue(id is Guid);
             Assert.AreNotEqual(Guid.Empty, id);
             
-            testClass.Id().Generate();
+            //testClass.Id().Generate();
             Assert.AreNotEqual(id, testClass.Id());
             Assert.IsNotNull(testClass.Id());
             Assert.IsTrue(testClass.Id().Get() is Guid);

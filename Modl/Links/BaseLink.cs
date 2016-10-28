@@ -3,14 +3,16 @@
 namespace Modl
 {
     public class BaseLink<M>
+        where M : IModl, new()
     {
         internal BaseLink(string name, IModl m)
         {
             this.Name = name;
-            this.Backer = m.Modl.Backer;
+            this.ModlInstance = m;
         }
 
-        internal Backer Backer { get; set; }
-        internal string Name { get; set; }
+        internal Backer Backer => ModlInstance.Modl.Backer;
+        internal string Name { get; }
+        protected IModl ModlInstance { get; }
     }
 }

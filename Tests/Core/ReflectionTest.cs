@@ -22,7 +22,7 @@ namespace Tests.Core
         public void Initialize()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
-            Settings.GlobalSettings.Endpoint = new FileModl();
+            Settings.GlobalSettings.Endpoint = new FileModl(Config.TestOutput);
         }
 
         [TestMethod]

@@ -17,7 +17,7 @@ namespace Modl.Metadata
     public class LinkProperty : Property
     {
         public LinkType LinkType { get; }
-        public Type[] LinkedModlType { get; }
+        public Type LinkedModlType { get; }
 
         public LinkProperty(PropertyInfo property, Type modlType) : base(property, modlType)
         {
@@ -30,7 +30,7 @@ namespace Modl.Metadata
             else
                 throw new InvalidLinkTypeException($"There is no link type for {PropertyType.GetGenericTypeDefinition()}");
 
-            LinkedModlType = PropertyType.GetGenericArguments();
+            LinkedModlType = PropertyType.GetGenericArguments().First();
         }
 
         public void SetLinkValue<M>(M m) where M : IModl

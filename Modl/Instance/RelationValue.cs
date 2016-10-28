@@ -8,8 +8,8 @@ namespace Modl.Instance
 {
     public class RelationValue : IValue
     {
-        private List<RelationIdValue> newIdValues { get; set; } = new List<RelationIdValue>();
-        private List<RelationIdValue> oldIdValues { get; set; } = new List<RelationIdValue>();
+        private List<Identity> newIdValues { get; set; } = new List<Identity>();
+        private List<Identity> oldIdValues { get; set; } = new List<Identity>();
 
         public bool IsModified
         {
@@ -25,16 +25,16 @@ namespace Modl.Instance
         {
         }
 
-        public RelationValue(IEnumerable<object> idValues)
+        public RelationValue(IEnumerable<Identity> idValues)
         {
             this.newIdValues = idValues
-                .Select(id => new RelationIdValue(id))
+                //.Select(id => new RelationIdValue(id))
                 .ToList();
 
             Reset();
         }
 
-        public void Add(RelationIdValue id)
+        public void Add(Identity id)
         {
             if (Has(id))
                 throw new InvalidIdException($"Id '{id}' already exists in relation.");
@@ -42,21 +42,26 @@ namespace Modl.Instance
             this.newIdValues.Add(id);
         }
 
-        public bool Has(RelationIdValue id) => this.newIdValues.Contains(id);
+        public bool Has(Identity id) => this.newIdValues.Contains(id);
 
         public object Get()
         {
-            return All();
+            return All().Select(x => x.Get());
         }
 
-        public IEnumerable<RelationIdValue> All()
+        public IEnumerable<Identity> All()
         {
             return newIdValues.AsEnumerable();
         }
 
-        public void Set(IEnumerable<RelationIdValue> idValues)
+        public void Set(IEnumerable<Identity> idValues)
         {
             this.newIdValues = idValues.ToList();
+        }
+
+        public void Set(Identity id)
+        {
+            this.newIdValues = new List<Identity> { id };
         }
 
         public void Reset()

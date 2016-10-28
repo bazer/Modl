@@ -47,9 +47,12 @@
     <Compile Include="Cache\ConcurrentHashSet.cs" />
     <Compile Include="Exceptions\InvalidLinkTypeException.cs" />
     <Compile Include="Exceptions\InvalidPropertyNameException.cs" />
+    <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\InvalidIdException.cs" />
+    <Compile Include="Helpers\IdConverter.cs" />
     <Compile Include="Identity.cs" />
+    <Compile Include="Instance\InstanceStore.cs" />
     <Compile Include="Instance\IValue.cs" />
     <Compile Include="Instance\RelationValue.cs" />
     <Compile Include="Instance\ValueBacker.cs" />

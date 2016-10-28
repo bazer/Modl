@@ -10,24 +10,31 @@ namespace Tests.Core
     [TestClass]
     public class CustomIdIntTest
     {
-        public class CustomIdClass : IModl
+        public class CustomIdIntClass : IModl
         {
             public IModlData Modl { get; set; }
             [Id]
             public int CustomId { get; set; }
         }
 
+        [TestCleanup]
+        public void Cleanup()
+        {
+            foreach (var obj in Modl<CustomIdIntClass>.GetAll())
+                obj.Delete();
+        }
+
         [TestInitialize]
         public void Initialize()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
-            Settings.GlobalSettings.Endpoint = new FileModl();
+            Settings.GlobalSettings.Endpoint = new FileModl(Config.TestOutput);
         }
 
         [TestMethod]
         public void CheckDefinitions()
         {
-            var definitions = Modl<CustomIdClass>.Definitions;
+            var definitions = Modl<CustomIdIntClass>.Definitions;
             Assert.IsTrue(definitions.HasIdProperty);
             Assert.IsFalse(definitions.HasAutomaticId);
             Assert.AreEqual(1, definitions.Properties.Count);
@@ -42,16 +49,16 @@ namespace Tests.Core
         [TestMethod]
         public void CreateNew()
         {
-            var testClass = new CustomIdClass();
+            var testClass = new CustomIdIntClass();
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
 
-            testClass = Modl<CustomIdClass>.New();
+            testClass = Modl<CustomIdIntClass>.New();
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
 
-            var id = 1;
-            testClass = Modl<CustomIdClass>.New(id);
+            var id = 3433;
+            testClass = Modl<CustomIdIntClass>.New(id);
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.IsTrue(id == testClass.Id());
@@ -62,19 +69,19 @@ namespace Tests.Core
         [TestMethod]
         public void SetId()
         {
-            var id = 1;
-            var testClass = new CustomIdClass();
+            var id = 644564;
+            var testClass = new CustomIdIntClass();
             Assert.AreEqual(0, testClass.CustomId);
             Assert.IsFalse(testClass.Id().IsSet);
-            testClass.Id().Set(id);
+            testClass.Id(id);
             Assert.IsTrue(testClass.Id().IsSet);
             Assert.AreEqual(id, testClass.Id().Get());
             Assert.IsTrue(testClass.IsNew());
             Assert.IsFalse(testClass.IsModified());
             Assert.AreEqual(id, testClass.CustomId);
 
-            id = 2;
-            testClass = new CustomIdClass();
+            id = 747474;
+            testClass = new CustomIdIntClass();
             Assert.AreEqual(0, testClass.CustomId);
             Assert.IsFalse(testClass.Id().IsSet);
             testClass.CustomId = id;
@@ -87,38 +94,38 @@ namespace Tests.Core
 
             try
             {
-                testClass.Id().Set(Guid.NewGuid());
+                testClass.Id(Guid.NewGuid());
                 Assert.Fail();
             }
             catch (InvalidIdException) { }
 
             try
             {
-                testClass.Id().Set("1");
+                testClass.Id("644563434");
             }
             catch (InvalidIdException) { }
         }
 
-        [TestMethod]
-        public void GenerateId()
-        {
-            var testClass = new CustomIdClass();
+        //[TestMethod]
+        //public void GenerateId()
+        //{
+        //    var testClass = new CustomIdClass();
 
-            try
-            {
-                testClass.Id().Generate();
-                Assert.Fail();
-            }
-            catch (InvalidIdException) { }
+        //    try
+        //    {
+        //        //testClass.Id().Generate();
+        //        Assert.Fail();
+        //    }
+        //    catch (InvalidIdException) { }
             
-            Assert.IsTrue(testClass.IsNew());
-            Assert.IsFalse(testClass.IsModified());
-        }
+        //    Assert.IsTrue(testClass.IsNew());
+        //    Assert.IsFalse(testClass.IsModified());
+        //}
 
         [TestMethod]
         public void Save()
         {
-            var testClass = new CustomIdClass();
+            var testClass = new CustomIdIntClass();
 
             try
             {
@@ -127,7 +134,7 @@ namespace Tests.Core
             }
             catch (InvalidIdException) { }
 
-            var id = 1;
+            var id = 2472;
             testClass.CustomId = id;
             testClass.Save();
 
@@ -136,7 +143,7 @@ namespace Tests.Core
             Assert.IsTrue(id == testClass.Id());
             Assert.AreEqual(id, testClass.CustomId);
 
-            var loadedTestClass = Modl<CustomIdClass>.Get(id);
+            var loadedTestClass = Modl<CustomIdIntClass>.Get(id);
             Assert.AreEqual(id, loadedTestClass.CustomId);
             Assert.IsTrue(id == loadedTestClass.Id());
             Assert.AreEqual(id, loadedTestClass.CustomId);
@@ -145,14 +152,14 @@ namespace Tests.Core
 
             try
             {
-                loadedTestClass.Id().Set(2);
+                loadedTestClass.Id(4544);
                 Assert.Fail();
             }
             catch (InvalidIdException) { }
 
             try
             {
-                loadedTestClass.CustomId = 2;
+                loadedTestClass.CustomId = 4544;
                 loadedTestClass.Save();
                 Assert.Fail();
             }
@@ -162,7 +169,7 @@ namespace Tests.Core
         [TestMethod]
         public void Delete()
         {
-            var testClass = new CustomIdClass();
+            var testClass = new CustomIdIntClass();
 
             var id = Guid.NewGuid();
             testClass.CustomId = 1;

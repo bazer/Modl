@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Modl.Instance;
+﻿using Modl.Instance;
 
 namespace Modl
 {
     public interface IModlData
     {
-        Backer Backer { get; set; }
+        Backer Backer { get; }
+        Identity Id { get; }
     }
 
     public class ModlData : IModlData
     {
-        public Backer Backer { get; set; }
+        internal ModlData(Identity id, Backer backer)
+        {
+            this.Id = id;
+            this.Backer = backer;
+        }
+
+        public Backer Backer { get; }
+        public Identity Id { get; }
     }
 }

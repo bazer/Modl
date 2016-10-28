@@ -31,7 +31,7 @@ namespace Modl
 
         public static M Get(object id)
         {
-            return Handler<M>.Get(id);
+            return Handler<M>.Get(id is Identity ? id as Identity : Identity.FromId(id, Definitions));
         }
 
         public static IEnumerable<M> GetAll()

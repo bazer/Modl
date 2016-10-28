@@ -38,9 +38,9 @@ namespace Modl.Metadata
             return FirstLayer.GetIdentities(id);
         }
 
-        internal IEnumerable<Container> GetStorage(Backer instance)
+        internal IEnumerable<Container> GetStorage(Identity id, Backer instance)
         {
-            return FirstLayer.GetStorage(instance);
+            return FirstLayer.GetStorage(id, instance);
         }
 
         internal void SetValuesFromStorage(Backer instance, IEnumerable<Container> storage)

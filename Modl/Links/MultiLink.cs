@@ -14,7 +14,7 @@ namespace Modl
 
         public void Add(M m)
         {
-            Backer.GetRelation(Name).Add(new RelationIdValue(m.Id().Get()));
+            Backer.GetRelation(Name).Add(m.Id());
         }
 
         public IEnumerator<M> GetEnumerator() =>

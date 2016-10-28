@@ -10,19 +10,21 @@ namespace Modl
 {
     public static class Extensions
     {
-        internal static Backer GetBacker<M>(this M m) where M : IModl, new()
+        public static M Delete<M>(this M m) where M : IModl, new()
         {
-            return Handler<M>.InitializeModl(m).Modl.Backer;
+            Handler<M>.Delete(m.Id());
+            return m;
         }
 
-        public static M Modl<M>(this M m) where M : IModl, new()
+        public static Identity Id<M>(this M m) where M : IModl, new()
         {
-            return Handler<M>.InitializeModl(m);
+            return m.Modl().Modl.Id;
         }
 
-        public static bool IsNew<M>(this M m) where M : IModl, new()
+        public static M Id<M>(this M m, object value) where M : IModl, new()
         {
-            return m.GetBacker().IsNew;
+            Handler<M>.ChangeId(m, value);
+            return m;
         }
 
         public static bool IsDeleted<M>(this M m) where M : IModl, new()
@@ -30,98 +32,36 @@ namespace Modl
             return m.GetBacker().IsDeleted;
         }
 
-        public static Identity<M> Id<M>(this M m) where M : IModl, new()
-        {
-            m.GetBacker();
-            return new Identity<M>(m);
-        }
-
-        public static M Id<M>(this M m, object value) where M : IModl, new()
-        {
-            m.Id().Set(value);
-            return m;
-        }
-
-        //public static bool HasId<M>(this M m) where M : IModl, new()
-        //{
-        //    var backer = m.GetBacker();
-        //    backer.ReadFromInstanceId(m);
-
-        //    return backer.IsSet;
-        //}
+        public static bool IsInitialized<M>(this M m) where M : IModl, new() => m.Modl != null;
 
         public static bool IsModified<M>(this M m) where M : IModl, new()
         {
             var backer = m.GetBacker();
-            backer.ReadFromInstance(m);
+            Handler<M>.Sync(m);
 
             return backer.IsModified();
         }
 
-        //public static M SetId<M>(this M m, object value) where M : IModl, new()
-        //{
-        //    var backer = m.GetBacker();
-        //    backer.SetId(value);
-        //    backer.WriteToInstanceId(m);
-
-        //    return m;
-        //}
-
-        //public static M GenerateId<M>(this M m) where M : IModl, new()
-        //{
-        //    var backer = m.GetBacker();
-        //    backer.GenerateId();
-        //    backer.WriteToInstanceId(m);
-
-        //    return m;
-        //}
-
-        //public static object Id<M>(this M m) where M : IModl, new()
-        //{
-        //    var backer = m.GetBacker();
-        //    backer.ReadFromInstanceId(m);
-
-        //    return backer.GetId();
-        //}
-
-        //public static Relation<M> Relation<M>(this M m, string name)
-        //    where M : IModl, new()
-        //{
-        //    return new Relation<M>
-        //    {
-        //        Name = name,
-        //        Backer = m.GetBacker()
-        //    };
-        //}
-
-        //public static T GetRelation<M, T>(this M m, string name) 
-        //    where M: IModl, new()
-        //    where T: IModl, new()
-        //{
-        //    return m.GetBacker().GetRelationValue<T>(name);
-        //}
-
-        //public static void SetRelation<M, T>(this M m, string name, T value)
-        //    where M : IModl, new()
-        //    where T : IModl, new()
-        //{
-        //    m.GetBacker().SetRelationValue(name, value);
-        //}
-
-        public static M Save<M>(this M m, bool includeRelations = true) where M : IModl, new()
+        public static bool IsNew<M>(this M m) where M : IModl, new()
         {
-            var backer = m.GetBacker();
-            backer.Save(m, includeRelations);
-
+            return m.GetBacker().IsNew;
+        }
+        public static M Modl<M>(this M m) where M : IModl, new()
+        {
+            Handler<M>.Sync(m);
             return m;
         }
 
-        public static M Delete<M>(this M m) where M : IModl, new()
+        public static M Save<M>(this M m) where M : IModl, new()
         {
-            var backer = m.GetBacker();
-            backer.Delete();
-
+            Handler<M>.Save(m);
             return m;
+        }
+
+        internal static Backer GetBacker<M>(this M m) where M : IModl, new()
+        {
+            Handler<M>.Sync(m);
+            return m.Modl.Backer;
         }
     }
 }

@@ -12,11 +12,15 @@ namespace Modl.Plugins
 {
     public class FileModl : IEndpoint
     {
-        string path = "test" + Path.DirectorySeparatorChar;
+        string savePath;
         string fileEnding = "json";
 
-        public FileModl()
+        public bool CanGenerateIds => false;
+
+        public FileModl(string path)
         {
+            this.savePath = path + Path.DirectorySeparatorChar;
+
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
@@ -78,7 +82,7 @@ namespace Modl.Plugins
         private string GetDirectory(StorageIdentity identity)
         {
 
-            return path + identity.Name + Path.DirectorySeparatorChar;
+            return savePath + identity.Name + Path.DirectorySeparatorChar;
         }
 
         private string GetFilename(StorageIdentity identity)

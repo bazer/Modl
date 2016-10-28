@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Modl.Exceptions;
 
 namespace Tests
 {
@@ -17,7 +18,7 @@ namespace Tests
         public void Initialize()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
-            Settings.GlobalSettings.Endpoint = new FileModl();
+            Settings.GlobalSettings.Endpoint = new FileModl(Config.TestOutput);
         }
 
         [TestMethod]
@@ -106,6 +107,7 @@ namespace Tests
             car.Save();
             Assert.IsFalse(car.IsNew());
             Assert.IsFalse(car.IsModified());
+            car.Manufacturer.Val.Save();
 
             Car car2 = GetModl<Car>(car.Id);
             AssertEqual(car, car2);
@@ -127,7 +129,7 @@ namespace Tests
                 Modl<Car>.Get(car.Id);
                 Assert.Fail();
             }
-            catch (FileNotFoundException) { }
+            catch (NotFoundException) { }
             //catch (Exception)
             //{
             //    Assert.Fail();
@@ -162,7 +164,7 @@ namespace Tests
                 var m4 = Modl<Manufacturer>.Get(m1.ManufacturerID);
                 Assert.Fail();
             }
-            catch (FileNotFoundException) { }
+            catch (NotFoundException) { }
             //catch (Exception)
             //{
             //    Assert.Fail();

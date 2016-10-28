@@ -11,6 +11,7 @@ namespace Modl.Interfaces
 {
     public interface IEndpoint
     {
+        bool CanGenerateIds { get; }
         IEnumerable<StorageIdentity> List(StorageIdentity identity);
         Stream Get(StorageIdentity identity);
         void Save(StorageIdentity identity, MemoryStream stream);
