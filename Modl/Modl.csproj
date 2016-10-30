@@ -56,8 +56,8 @@
     <Compile Include="Instance\IValue.cs" />
     <Compile Include="Instance\RelationValue.cs" />
     <Compile Include="Instance\ValueBacker.cs" />
-    <Compile Include="Links\BaseLink.cs" />
-    <Compile Include="Links\MultiLink.cs" />
+    <Compile Include="Relations\BaseCollection.cs" />
+    <Compile Include="Relations\ModlCollection.cs" />
     <Compile Include="Metadata\LinkProperty.cs" />
     <Compile Include="Metadata\PropertyFactory.cs" />
     <Compile Include="ModlReflect.cs" />
@@ -68,7 +68,7 @@
     <Compile Include="Plugins\ISerializer.cs" />
     <Compile Include="Plugins\IEndpoint.cs" />
     <Compile Include="Metadata\Property.cs" />
-    <Compile Include="Links\Link.cs" />
+    <Compile Include="Relations\ModlValue.cs" />
     <Compile Include="Storage\About.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="Metadata\Definitions.cs" />

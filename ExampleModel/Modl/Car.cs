@@ -24,7 +24,7 @@ namespace ExampleModel
         public CarType Type { get; set; }
         public List<string> Tags { get; set; }
 
-        public Link<Manufacturer> Manufacturer { get; set; }
+        public ModlValue<Manufacturer> Manufacturer { get; set; }
 
         //public Manufacturer Manufacturer { get { return this.Relation(nameof(Manufacturer)).GetValue<Manufacturer>(); } set { this.Relation(nameof(Manufacturer)).SetValue(value); } }
         //public Manufacturer Manufacturer { get { return this.GetRelation<Car, Manufacturer>(nameof(Manufacturer)); } set { this.SetRelation(nameof(Manufacturer), value); } }

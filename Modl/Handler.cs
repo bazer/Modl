@@ -1,48 +1,28 @@
-﻿using Modl.Cache;
-using Modl.Structure.Storage;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Modl.Metadata;
-using Modl.Instance;
-using Modl.Exceptions;
 using Modl.Helpers;
+using Modl.Instance;
+using Modl.Metadata;
+using Modl.Structure.Storage;
 
 namespace Modl
 {
     internal class Handler<M> where M : IModl, new()
     {
-        public static Settings Settings => Settings.Get(typeof(M));
-        public static Definitions Definitions => Definitions.Get(typeof(M));
-        public static InstanceStore<M> InstanceStore => InstanceStore<M>.ForThisModl;
-
         static Handler()
         {
         }
-        
-        //internal static M InitializeModl(M m)
-        //{
-        //    if (m.Modl == null)
-        //        InstanceStore.AddNewInstance(GetId(m), m);
 
-        //    return m;
-        //}
+        public static Definitions Definitions => Definitions.Get(typeof(M));
+        public static InstanceStore<M> InstanceStore => InstanceStore<M>.ForThisModl;
+        public static Settings Settings => Settings.Get(typeof(M));
 
-        private static Identity GetId(M m)
+        internal static void AddRelation(M from, IModl to)
         {
-            if (!Definitions.HasAutomaticId && Definitions.HasIdProperty)
-            {
-                var id = Definitions.IdProperty.GetValue(m);
-                if (IdConverter.HasValue(id))
-                    return Identity.FromId(id, Definitions);
-            }
-                
-            return Identity.GenerateNewId(Definitions);
-        }
+            Sync(from);
 
+            InstanceStore.Get(from.Modl.Id).AddRelation(to);
+        }
 
         internal static void ChangeId(M modl, object newId)
         {
@@ -54,21 +34,24 @@ namespace Modl
                 InstanceStore.ChangeId(modl, id);
         }
 
-        //internal static M AddFromStorage(IEnumerable<Container> storage)
-        //{
-        //    var m = New();
+        internal static void Delete(Identity id)
+        {
+            var collection = InstanceStore.Get(id);
+            collection.Delete();
+        }
 
-        //    var idValue = storage.First().About.Id;
-        //    var backer = m.Modl.Backer;
-        //    backer.SetId(idValue);
-        //    backer.WriteToInstanceId(m);
-        //    backer.SetValuesFromStorage(storage);
-        //    backer.ResetValuesToUnmodified();
-        //    backer.WriteToInstance(m);
-        //    backer.IsNew = false;
+        internal static M Get(Identity id)
+        {
+            if (InstanceStore.HasCollection(id))
+                return InstanceStore.GetInstance(id);
+            else
+                return InstanceStore.AddInstanceFromStorage(id, Materializer.Read(Definitions.GetIdentities(id), Settings).ToList()).GetInstance();
+        }
 
-        //    return m;
-        //}
+        internal static IEnumerable<object> List()
+        {
+            return Materializer.List(Definitions.GetIdentities("").First(), Settings);
+        }
 
         internal static M New()
         {
@@ -80,14 +63,12 @@ namespace Modl
             return New().Id(id);
         }
 
-        internal static M Get(Identity id)
+        internal static void Save(M modl)
         {
-            if (InstanceStore.HasCollection(id))
-                return InstanceStore.GetInstance(id);
-            else
-                return InstanceStore.AddInstanceFromStorage(id, Materializer.Read(Definitions.GetIdentities(id), Settings).ToList()).GetInstance();
+            Sync(modl);
 
-            //return AddFromStorage(Materializer.Read(Definitions.GetIdentities(id), Settings).ToList());
+            var collection = InstanceStore.Get(modl.Modl.Id);
+            collection.Save();
         }
 
         internal static void Sync(M modl)
@@ -99,7 +80,18 @@ namespace Modl
 
             if (HasIdChanged(modl))
                 InstanceStore.ChangeId(modl, Identity.FromId(Definitions.IdProperty.GetValue(modl), Definitions));
-            //ChangeId(modl, Definitions.IdProperty.GetValue(modl));
+        }
+
+        private static Identity GetId(M modl)
+        {
+            if (!Definitions.HasAutomaticId && Definitions.HasIdProperty)
+            {
+                var id = Definitions.IdProperty.GetValue(modl);
+                if (IdConverter.HasValue(id))
+                    return Identity.FromId(id, Definitions);
+            }
+
+            return Identity.GenerateNewId(Definitions);
         }
 
         private static bool HasIdChanged(M modl)
@@ -111,25 +103,6 @@ namespace Modl
             }
             else
                 return false;
-        }
-
-        internal static void Save(M modl)
-        {
-            Sync(modl);
-
-            var collection = InstanceStore.Get(modl.Modl.Id);
-            collection.Save();
-        }
-
-        internal static void Delete(Identity id)
-        {
-            var collection = InstanceStore.Get(id);
-            collection.Delete();
-        }
-
-        internal static IEnumerable<object> List()
-        {
-            return Materializer.List(Definitions.GetIdentities("").First(), Settings);
         }
     }
 }

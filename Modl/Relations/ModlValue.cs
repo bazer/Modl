@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Modl.Instance;
+﻿using System.Linq;
 
 namespace Modl
 {
-    public class Link<M> : BaseLink<M>
+    public class ModlValue<M> : BaseCollection<M>
         where M : IModl, new()
     {
-        internal Link(string name, IModl m) : base(name, m)
+        internal ModlValue(string name, IModl m) : base(name, m)
         {
         }
 
@@ -27,10 +25,9 @@ namespace Modl
             {
                 LinkValue = value;
                 Relation.Set(value.Id());
+                Handler<M>.AddRelation(value, ModlInstance);
             }
         }
-
-        private RelationValue Relation => Backer.GetRelation(Name);
 
         private bool HasLinkValue => LinkValue != null;
         private M LinkValue { get; set; }

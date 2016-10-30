@@ -20,7 +20,7 @@ namespace Modl.Metadata
         }
 
         private static bool IsLink(Type propertyType) => propertyType.IsGenericType &&
-            (propertyType.GetGenericTypeDefinition() == typeof(Link<>) ||
-             propertyType.GetGenericTypeDefinition() == typeof(MultiLink<>));
+            (propertyType.GetGenericTypeDefinition() == typeof(ModlValue<>) ||
+             propertyType.GetGenericTypeDefinition() == typeof(ModlCollection<>));
     }
 }

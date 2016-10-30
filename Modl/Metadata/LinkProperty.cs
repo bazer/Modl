@@ -23,9 +23,9 @@ namespace Modl.Metadata
         {
             this.IsLink = true;
 
-            if (PropertyType.GetGenericTypeDefinition() == typeof(Link<>))
+            if (PropertyType.GetGenericTypeDefinition() == typeof(ModlValue<>))
                 LinkType = LinkType.Link;
-            else if (PropertyType.GetGenericTypeDefinition() == typeof(MultiLink<>))
+            else if (PropertyType.GetGenericTypeDefinition() == typeof(ModlCollection<>))
                 LinkType = LinkType.MultiLink;
             else
                 throw new InvalidLinkTypeException($"There is no link type for {PropertyType.GetGenericTypeDefinition()}");

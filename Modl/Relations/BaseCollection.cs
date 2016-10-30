@@ -2,10 +2,10 @@
 
 namespace Modl
 {
-    public class BaseLink<M>
+    public class BaseCollection<M>
         where M : IModl, new()
     {
-        internal BaseLink(string name, IModl m)
+        internal BaseCollection(string name, IModl m)
         {
             this.Name = name;
             this.ModlInstance = m;
@@ -14,5 +14,6 @@ namespace Modl
         internal Backer Backer => ModlInstance.Modl.Backer;
         internal string Name { get; }
         protected IModl ModlInstance { get; }
+        protected RelationValue Relation => Backer.GetRelation(Name);
     }
 }

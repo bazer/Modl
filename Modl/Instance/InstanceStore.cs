@@ -230,11 +230,25 @@ namespace Modl.Instance
                 Definitions.IdProperty.SetValue(m, Id.Get());
         }
 
+        internal void WriteRelationsToAllInstances()
+        {
+            foreach (var instance in Instances)
+                WriteRelationsToInstance(instance);
+        }
+
         internal void WriteRelationsToInstance(M m)
         {
             foreach (LinkProperty property in Definitions.Properties.Where(x => x.IsLink))
                 property.SetLinkValue(m);
         }
+
+        internal void AddRelation(IModl to)
+        {
+            foreach (LinkProperty property in Definitions.Properties.Where(x => x.IsLink && to.GetType() == (x as LinkProperty).LinkedModlType))
+                Backer.GetRelation(property.PropertyName).Add(to.Modl.Id);
+
+            WriteRelationsToAllInstances();
+    }
 
         internal bool Save()
         {
