@@ -19,7 +19,7 @@ namespace Modl.Instance
         private Definitions Definitions => Handler<M>.Definitions;
         private Backer Backer { get; }
         private Identity Id { get; set; }
-        private List<M> Instances { get; } = new List<M>();
+        private Instances<M> Instances { get; } = new Instances<M>();
 
         internal static UniqueInstancesCollection<M> FromNew(Identity id, M modl)
         {
@@ -136,7 +136,7 @@ namespace Modl.Instance
             WriteRelationsToInstance(modl);
 
             modl.Modl = new ModlData(Id, Backer);
-            Instances.Add(modl);
+            Instances.AddInstance(modl);
         }
 
         private void ReadFromInstance(M m)
@@ -147,7 +147,7 @@ namespace Modl.Instance
 
         private void WriteIdToAllInstances()
         {
-            foreach (var instance in Instances)
+            foreach (var instance in Instances.GetInstances())
                 WriteIdToInstance(instance);
         }
 
@@ -161,13 +161,13 @@ namespace Modl.Instance
         {
             var data = new ModlData(Id, Backer);
 
-            foreach (var instance in Instances)
+            foreach (var instance in Instances.GetInstances())
                 instance.Modl = data;
         }
 
         private void WriteRelationsToAllInstances()
         {
-            foreach (var instance in Instances)
+            foreach (var instance in Instances.GetInstances())
                 WriteRelationsToInstance(instance);
         }
 
@@ -179,7 +179,7 @@ namespace Modl.Instance
 
         private void WriteToAllInstances(string propertyName = null)
         {
-            foreach (var instance in Instances)
+            foreach (var instance in Instances.GetInstances())
                 WriteToInstance(instance, propertyName);
         }
 

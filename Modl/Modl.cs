@@ -12,42 +12,33 @@ namespace Modl
 
     public class Modl<M> where M : IModl, new()
     {
-        public static Settings Settings { get { return Handler<M>.Settings; } }
-        public static Definitions Definitions { get { return Handler<M>.Definitions; } }
-
         static Modl()
         {
         }
 
-        public static M New()
-        {
-            return Handler<M>.New();
-        }
+        public static Definitions Definitions => Handler<M>.Definitions;
+        public static Settings Settings => Handler<M>.Settings;
 
-        public static M New(object id)
-        {
-            return Handler<M>.New(id);
-        }
+        public static bool Exists(object id) => 
+            List().Any(x => x.Equals(id));
 
-        public static M Get(object id)
-        {
-            return Handler<M>.Get(id is Identity ? id as Identity : Identity.FromId(id, Definitions));
-        }
+        public static M Get(object id) => 
+            Handler<M>.Get(id is Identity ? id as Identity : Identity.FromId(id, Definitions));
 
-        public static IEnumerable<M> GetAll()
-        {
-            return Handler<M>.List().Select(id => Get(id));
-        }
+        public static IEnumerable<M> GetAll() => 
+            Handler<M>.List().Select(id => Get(id));
 
-        public static IEnumerable<object> List()
-        {
-            return Handler<M>.List();
-        }
+        public static IEnumerable<object> List() => 
+            Handler<M>.List();
 
-        public static IEnumerable<T> List<T>()
-        {
-            return Handler<M>.List().Select(id => (T)id);
-        }
+        public static IEnumerable<T> List<T>() => 
+            Handler<M>.List().Select(id => (T)id);
+
+        public static M New() => 
+            Handler<M>.New();
+
+        public static M New(object id) => 
+            Handler<M>.New(id);
 
         public static IQueryable<M> Query()
         {
@@ -58,4 +49,3 @@ namespace Modl
         }
     }
 }
-

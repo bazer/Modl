@@ -52,6 +52,7 @@
     <Compile Include="Exceptions\InvalidIdException.cs" />
     <Compile Include="Helpers\IdConverter.cs" />
     <Compile Include="Identity.cs" />
+    <Compile Include="Instance\Instances.cs" />
     <Compile Include="Instance\InstanceStore.cs" />
     <Compile Include="Instance\IValue.cs" />
     <Compile Include="Instance\RelationValue.cs" />
