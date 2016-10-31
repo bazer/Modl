@@ -55,6 +55,7 @@
     <Compile Include="Instance\InstanceStore.cs" />
     <Compile Include="Instance\IValue.cs" />
     <Compile Include="Instance\RelationValue.cs" />
+    <Compile Include="Instance\UniqueInstancesCollection.cs" />
     <Compile Include="Instance\ValueBacker.cs" />
     <Compile Include="Relations\BaseCollection.cs" />
     <Compile Include="Relations\ModlCollection.cs" />

@@ -14,9 +14,10 @@ namespace ExampleModel
         [Id]
         public Guid ManufacturerID { get; set; }
         public string Name { get; set; }
+        public ModlCollection<Car> Cars { get; set; }
 
         [ForeignKey(typeof(Vehicle), "Manufacturer_fk")]
-        public List<Vehicle> Vehicles { get; set; }
+        public ModlCollection<Vehicle> Vehicles { get; set; }
         //public List<Vehicle> Vehicles { get { return this.GetFk("Manufacturer"); } set { SetFk(value); } }
 
 
