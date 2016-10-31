@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using Modl;
 using Modl.Exceptions;
 using Modl.Json;
@@ -10,7 +10,7 @@ using Modl.Plugins;
 
 namespace Tests.Core
 {
-    [TestClass]
+    
     public class RelationsTest
     {
         public class Class1 : IModl
@@ -28,26 +28,26 @@ namespace Tests.Core
             public ModlValue<Class1> SingleRelation { get; set; }
         }
 
-        [TestInitialize]
-        public void Initialize()
+        
+        public RelationsTest()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
             Settings.GlobalSettings.Endpoint = new FileModl(Config.TestOutput);
         }
 
-        [TestMethod]
+        [Fact]
         public void CheckDefinitions()
         {
             var definitions1 = Modl<Class1>.Definitions;
-            Assert.AreEqual(1, definitions1.Properties.Count);
-            Assert.IsTrue(definitions1.Properties.First().IsLink);
+            Assert.Equal(1, definitions1.Properties.Count);
+            Assert.True(definitions1.Properties.First().IsLink);
 
             var definitions2 = Modl<Class2>.Definitions;
-            Assert.AreEqual(1, definitions2.Properties.Count);
-            Assert.IsTrue(definitions2.Properties.First().IsLink);
+            Assert.Equal(1, definitions2.Properties.Count);
+            Assert.True(definitions2.Properties.First().IsLink);
         }
 
-        [TestMethod]
+        [Fact]
         public void AddMultipleRelations()
         {
             var class1 = new Class1().Modl();
@@ -57,26 +57,26 @@ namespace Tests.Core
             foreach (var class2 in class1.MultipleRelation)
                 class2.Save();
 
-            Assert.AreEqual(2, class1.MultipleRelation.Count());
-            Assert.AreEqual(class1.Id(), class1.MultipleRelation.First().SingleRelation.Id);
-            Assert.AreEqual(class1.Id(), class1.MultipleRelation.First().SingleRelation.Val.Id());
+            Assert.Equal(2, class1.MultipleRelation.Count());
+            Assert.Equal(class1.Id(), class1.MultipleRelation.First().SingleRelation.Id);
+            Assert.Equal(class1.Id(), class1.MultipleRelation.First().SingleRelation.Val.Id());
 
 
             var loadedClass1 = Modl<Class1>.Get(class1.Id());
-            Assert.AreEqual(2, loadedClass1.MultipleRelation.Count());
-            Assert.AreEqual(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Id);
-            Assert.AreEqual(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Val.Id());
+            Assert.Equal(2, loadedClass1.MultipleRelation.Count());
+            Assert.Equal(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Id);
+            Assert.Equal(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Val.Id());
 
             foreach (var class2 in class1.MultipleRelation)
             {
                 var loadedClass2 = Modl<Class2>.Get(class2.Id());
-                Assert.IsNotNull(loadedClass2.SingleRelation.Val);
-                Assert.AreEqual(2, loadedClass2.SingleRelation.Val.MultipleRelation.Count());
-                Assert.IsTrue(loadedClass2.SingleRelation.Val.MultipleRelation.Any(x => x.Id() == loadedClass2.Id()));
+                Assert.NotNull(loadedClass2.SingleRelation.Val);
+                Assert.Equal(2, loadedClass2.SingleRelation.Val.MultipleRelation.Count());
+                Assert.True(loadedClass2.SingleRelation.Val.MultipleRelation.Any(x => x.Id() == loadedClass2.Id()));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void AddSingleRelation()
         {
             var class2 = new Class2().Modl();
@@ -84,20 +84,20 @@ namespace Tests.Core
             class2.Save();
             class2.SingleRelation.Val.Save();
 
-            Assert.IsNotNull(class2.SingleRelation.Val);
-            Assert.AreEqual(1, class2.SingleRelation.Val.MultipleRelation.Count());
-            Assert.AreEqual(class2.Id(), class2.SingleRelation.Val.MultipleRelation.First().Id());
+            Assert.NotNull(class2.SingleRelation.Val);
+            Assert.Equal(1, class2.SingleRelation.Val.MultipleRelation.Count());
+            Assert.Equal(class2.Id(), class2.SingleRelation.Val.MultipleRelation.First().Id());
 
             var loadedClass2 = Modl<Class2>.Get(class2.Id());
-            Assert.IsNotNull(loadedClass2.SingleRelation.Val);
-            Assert.AreEqual(1, loadedClass2.SingleRelation.Val.MultipleRelation.Count());
-            Assert.AreEqual(loadedClass2.Id(), loadedClass2.SingleRelation.Val.MultipleRelation.First().Id());
+            Assert.NotNull(loadedClass2.SingleRelation.Val);
+            Assert.Equal(1, loadedClass2.SingleRelation.Val.MultipleRelation.Count());
+            Assert.Equal(loadedClass2.Id(), loadedClass2.SingleRelation.Val.MultipleRelation.First().Id());
 
 
             var loadedClass1 = Modl<Class1>.Get(class2.SingleRelation.Val.Id());
-            Assert.AreEqual(1, loadedClass1.MultipleRelation.Count());
-            Assert.AreEqual(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Id);
-            Assert.AreEqual(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Val.Id());
+            Assert.Equal(1, loadedClass1.MultipleRelation.Count());
+            Assert.Equal(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Id);
+            Assert.Equal(loadedClass1.Id(), loadedClass1.MultipleRelation.First().SingleRelation.Val.Id());
         }
     }
 }

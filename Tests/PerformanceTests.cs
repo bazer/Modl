@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using System.Collections.Generic;
 
 namespace Tests
 {
-    [TestClass]
+    
     public class PerformanceTests
     {
         //List<Database> databases;
@@ -21,7 +21,7 @@ namespace Tests
         //    };
         //}
         
-        ////[TestMethod]
+        ////[Fact]
         //public void RunAllTest()
         //{
         //    var watch = Stopwatch.StartNew();
@@ -36,7 +36,7 @@ namespace Tests
         //}
         
 
-        ////[TestMethod]
+        ////[Fact]
         //public void CRUDPerformanceTest(int iterations = 100)
         //{
         //    foreach (var db in databases)
@@ -46,7 +46,7 @@ namespace Tests
         //    }
         //}
 
-        ////[TestMethod]
+        ////[Fact]
         //public void AsyncCRUDPerformanceTest(int iterations = 100, int threads = 10)
         //{
         //    foreach (var db in databases)
@@ -56,28 +56,28 @@ namespace Tests
         //    }
         //}
 
-        //public TimeSpan TimeMethod(Database db, int iterations, CacheLevel cache, Action<Database> testMethod)
+        //public TimeSpan TimeMethod(Database db, int iterations, CacheLevel cache, Action<Database> Fact)
         //{
         //    Config.DefaultCacheLevel = cache;
         //    var watch = Stopwatch.StartNew();
 
         //    for (int i = 0; i < iterations; i++)
-        //        testMethod.Invoke(db);
+        //        Fact.Invoke(db);
 
         //    watch.Stop();
-        //    Console.WriteLine(string.Format("{4}, {0} iterations, {1}: {2} ms. (cache {3})", iterations, db.Name, watch.Elapsed.TotalMilliseconds, cache, testMethod.Method.Name));
+        //    Console.WriteLine(string.Format("{4}, {0} iterations, {1}: {2} ms. (cache {3})", iterations, db.Name, watch.Elapsed.TotalMilliseconds, cache, Fact.Method.Name));
 
         //    return watch.Elapsed;
         //}
 
-        //public void TimeMethodAsync(Database db, int iterations, CacheLevel cache, Action<Database> testMethod, int threads)
+        //public void TimeMethodAsync(Database db, int iterations, CacheLevel cache, Action<Database> Fact, int threads)
         //{
         //    Config.DefaultCacheLevel = cache;
         //    var watch = Stopwatch.StartNew();
 
         //    Parallel.For(0, threads, i =>
         //    {
-        //        TimeMethod(db, iterations, cache, testMethod);
+        //        TimeMethod(db, iterations, cache, Fact);
         //    });
 
         //    watch.Stop();

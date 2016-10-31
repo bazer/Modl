@@ -10,12 +10,12 @@
 //using System.Collections.Generic;
 //using System.Linq;
 //using ExampleModel.Northwind;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
+//using Xunit;
 //using Modl;
 
 //namespace Tests
 //{
-//    [TestClass]
+//    
 //    public class LinqSuite
 //    {
 //        protected NorthwindContext db;
@@ -31,7 +31,7 @@
 //        //public override string SourceFileName {
 //        //  get { return @"EFTest.generated.cs"; }
 //        //}
-//        //[TestInitialize]
+//        //
 //        public LinqSuite()
 //        {
 //            db = new NorthwindContext(Database.Get("Northwind"));
@@ -62,7 +62,7 @@
 
 //        #region Filtering tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereTest()
@@ -74,11 +74,11 @@
 //                           where o.ShipCity == "Seattle"
 //                           select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(14, list.Count);
-//            Assert.AreEqual(0, expected.Except(list).Count());
+//            Assert.Equal(14, list.Count);
+//            Assert.Equal(0, expected.Except(list).Count());
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereParameterTest()
@@ -91,16 +91,16 @@
 //                           where o.ShipCity == city
 //                           select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(14, list.Count);
-//            Assert.AreEqual(0, expected.Except(list).Count());
+//            Assert.Equal(14, list.Count);
+//            Assert.Equal(0, expected.Except(list).Count());
 
 //            city = "Rio de Janeiro";
 //            list = result.ToList();
-//            Assert.AreEqual(34, list.Count);
-//            Assert.AreEqual(0, expected.Except(list).Count());
+//            Assert.Equal(34, list.Count);
+//            Assert.Equal(0, expected.Except(list).Count());
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereConditionsTest()
@@ -109,10 +109,10 @@
 //                         where p.UnitsInStock < p.ReorderLevel && p.UnitsOnOrder == 0
 //                         select p;
 //            var list = result.ToList();
-//            Assert.AreEqual(1, list.Count);
+//            Assert.Equal(1, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereNullTest()
@@ -121,10 +121,10 @@
 //                         where o.ShipRegion == null
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(507, list.Count);
+//            Assert.Equal(507, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Failed with assertion.
 //        // Exception: AssertionException
@@ -138,14 +138,14 @@
 //                         where o.ShipRegion == region
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(507, list.Count);
+//            Assert.Equal(507, list.Count);
 
 //            region = "WA";
 //            list = result.ToList();
-//            Assert.AreEqual(19, list.Count);
+//            Assert.Equal(19, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereNullableTest()
@@ -154,10 +154,10 @@
 //                         where !o.ShippedDate.HasValue
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(21, list.Count);
+//            Assert.Equal(21, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Failed with assertion.
 //        // Exception: AssertionException
@@ -171,10 +171,10 @@
 //                         where o.ShippedDate == shippedDate
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(21, list.Count);
+//            Assert.Equal(21, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereCoalesceTest()
@@ -183,10 +183,10 @@
 //                         where (o.ShipRegion ?? "N/A") == "N/A"
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(507, list.Count);
+//            Assert.Equal(507, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereConditionalTest()
@@ -195,10 +195,10 @@
 //                         where (o.ShipCity == "Seattle" ? "Home" : "Other") == "Home"
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(14, list.Count);
+//            Assert.Equal(14, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Passed.
 //        public void WhereConditionalBooleanTest()
@@ -207,10 +207,10 @@
 //                         where o.ShipCity == "Seattle" ? true : false
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(14, list.Count);
+//            Assert.Equal(14, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -223,10 +223,10 @@
 //                         where new { City = o.ShipCity, Region = o.ShipRegion } == cityRegion
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(14, list.Count);
+//            Assert.Equal(14, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Filtering")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -239,8 +239,8 @@
 //                         where o == order
 //                         select o;
 //            var list = result.ToList();
-//            Assert.AreEqual(1, list.Count);
-//            Assert.AreEqual(order, list[0]);
+//            Assert.Equal(1, list.Count);
+//            Assert.Equal(order, list[0]);
 //            Assert.AreSame(order, list[0]);
 //        }
 
@@ -248,7 +248,7 @@
 
 //        #region Projection tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectTest()
@@ -258,11 +258,11 @@
 //            var expected = from o in Orders
 //                           select o.ShipRegion;
 //            var list = result.ToList();
-//            Assert.AreEqual(expected.Count(), list.Count);
-//            Assert.AreEqual(0, expected.Except(list).Count());
+//            Assert.Equal(expected.Count(), list.Count);
+//            Assert.Equal(0, expected.Except(list).Count());
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Failed.
 //        // Exception: InvalidOperationException
@@ -275,11 +275,11 @@
 //            var expected = from o in Orders
 //                           select o.ShipRegion == "WA";
 //            var list = result.ToList();
-//            Assert.AreEqual(expected.Count(), list.Count);
-//            Assert.AreEqual(0, expected.Except(list).Count());
+//            Assert.Equal(expected.Count(), list.Count);
+//            Assert.Equal(0, expected.Except(list).Count());
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectCalculatedTest()
@@ -293,15 +293,15 @@
 //            list.Sort();
 //            expectedList.Sort();
 
-//            // Assert.AreEqual(expectedList.Count, list.Count);
+//            // Assert.Equal(expectedList.Count, list.Count);
 //            // expectedList.Zip(list, (i, j) => {
-//            //                       Assert.AreEqual(i,j);
+//            //                       Assert.Equal(i,j);
 //            //                       return true;
 //            //                     });
 //            CollectionAssert.AreEquivalent(expectedList, list);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectNestedCalculatedTest()
@@ -318,16 +318,16 @@
 //            var expectedList = expected.ToList();
 //            list.Sort();
 //            expectedList.Sort();
-//            Assert.AreEqual(187, list.Count);
-//            // Assert.AreEqual(expectedList.Count, list.Count);
+//            Assert.Equal(187, list.Count);
+//            // Assert.Equal(expectedList.Count, list.Count);
 //            // expectedList.Zip(list, (i, j) => {
-//            //                       Assert.AreEqual(i,j);
+//            //                       Assert.Equal(i,j);
 //            //                       return true;
 //            //                     });
 //            CollectionAssert.AreEquivalent(expectedList, list);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectAnonymousTest()
@@ -337,11 +337,11 @@
 //            var expected = from o in Orders
 //                           select new { OrderID = o.OrderId, o.OrderDate, o.Freight };
 //            var list = result.ToList();
-//            Assert.AreEqual(expected.Count(), list.Count);
-//            Assert.AreEqual(0, expected.Except(list).Count());
+//            Assert.Equal(expected.Count(), list.Count);
+//            Assert.Equal(0, expected.Except(list).Count());
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectSubqueryTest()
@@ -356,7 +356,7 @@
 //            CollectionAssert.AreEquivalent(expectedList, list);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectDtoTest()
@@ -364,10 +364,10 @@
 //            var result = from o in db.Orders
 //                         select new OrderDTO { Id = o.OrderId, CustomerId = o.Customer.CustomerId, OrderDate = o.OrderDate };
 //            var list = result.ToList();
-//            Assert.AreEqual(Orders.Count(), list.Count);
+//            Assert.Equal(Orders.Count(), list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectNestedDtoTest()
@@ -378,10 +378,10 @@
 //                         where r.OrderDate > new DateTime(1998, 01, 01)
 //                         select r;
 //            var list = result.ToList();
-//            Assert.AreEqual(267, list.Count);
+//            Assert.Equal(267, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectManyAnonymousTest()
@@ -391,10 +391,10 @@
 //                         where o.Freight < 500.00M
 //                         select new { CustomerId = c.CustomerId, o.OrderId, o.Freight };
 //            var list = result.ToList();
-//            Assert.AreEqual(817, list.Count);
+//            Assert.Equal(817, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectManyLetTest()
@@ -405,10 +405,10 @@
 //                         where freight < 500.00M
 //                         select new { CustomerId = c.CustomerId, o.OrderId, freight };
 //            var list = result.ToList();
-//            Assert.AreEqual(817, list.Count);
+//            Assert.Equal(817, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectManyGroupByTest()
@@ -419,10 +419,10 @@
 //              .SelectMany(g => g.Select(o => o.Customer));
 
 //            var list = result.ToList();
-//            Assert.AreEqual(89, list.Count);
+//            Assert.Equal(89, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectManyOuterProjectionTest()
@@ -430,10 +430,10 @@
 //            var result = db.Customers.SelectMany(i => i.Orders.Select(t => i));
 
 //            var list = result.ToList();
-//            Assert.AreEqual(830, list.Count);
+//            Assert.Equal(830, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Projections")]
 //        // Passed.
 //        public void SelectManyLeftJoinTest()
@@ -444,14 +444,14 @@
 //              select new { c.ContactName, o };
 
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
 //        #endregion
 
 //        #region Take / Skip tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Take/Skip")]
 //        // Passed.
 //        public void TakeTest()
@@ -463,11 +463,11 @@
 //                            orderby o.OrderDate, o.OrderId
 //                            select o).Take(10);
 //            var list = result.ToList();
-//            Assert.AreEqual(10, list.Count);
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.Equal(10, list.Count);
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Take/Skip")]
 //        // Passed.
 //        public void SkipTest()
@@ -479,12 +479,12 @@
 //                            orderby o.OrderDate, o.OrderId
 //                            select o).Skip(10);
 //            var list = result.ToList();
-//            Assert.AreEqual(820, list.Count);
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.Equal(820, list.Count);
+//            Assert.True(expected.SequenceEqual(result));
 
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Take/Skip")]
 //        // Passed.
 //        public void TakeSkipTest()
@@ -496,11 +496,11 @@
 //                            orderby o.OrderDate, o.OrderId
 //                            select o).Skip(10).Take(10);
 //            var list = result.ToList();
-//            Assert.AreEqual(10, list.Count);
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.Equal(10, list.Count);
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Take/Skip")]
 //        // Passed.
 //        public void TakeNestedTest()
@@ -512,16 +512,16 @@
 //              from c in Customers
 //              select new { Customer = c, TopOrders = c.Orders.OrderByDescending(o => o.OrderDate).Take(5) };
 //            var list = result.ToList();
-//            Assert.AreEqual(expected.Count(), list.Count);
+//            Assert.Equal(expected.Count(), list.Count);
 //            foreach (var anonymous in list)
 //            {
 //                var count = anonymous.TopOrders.ToList().Count;
-//                Assert.IsTrue(count >= 0);
-//                Assert.IsTrue(count <= 5);
+//                Assert.True(count >= 0);
+//                Assert.True(count <= 5);
 //            }
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Take/Skip")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -549,15 +549,15 @@
 //              .Skip(10);
 //            var originalList = original.ToList();
 //            var resultList = result.ToList();
-//            Assert.AreEqual(originalList.Count, resultList.Count);
-//            Assert.IsTrue(originalList.SequenceEqual(resultList));
+//            Assert.Equal(originalList.Count, resultList.Count);
+//            Assert.True(originalList.SequenceEqual(resultList));
 //        }
 
 //        #endregion
 
 //        #region Ordering tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Passed.
 //        public void OrderByTest()
@@ -573,11 +573,11 @@
 
 //            var list = result.ToList();
 //            var expectedList = expected.ToList();
-//            Assert.AreEqual(expectedList.Count, list.Count);
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.Equal(expectedList.Count, list.Count);
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Passed.
 //        public void OrderByWhereTest()
@@ -591,11 +591,11 @@
 //                            orderby o.OrderDate, o.OrderId
 //                            select o).Take(10);
 //            var list = result.ToList();
-//            Assert.AreEqual(10, list.Count);
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.Equal(10, list.Count);
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Passed.
 //        public void OrderByCalculatedColumnTest()
@@ -608,10 +608,10 @@
 //              from o in Orders
 //              orderby o.Freight * o.OrderId descending
 //              select o;
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Failed.
 //        // Exception: ArgumentException
@@ -628,10 +628,10 @@
 //              from o in Orders
 //              orderby o.OrderId
 //              select o;
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Passed.
 //        public void OrderByAnonymousTest()
@@ -644,10 +644,10 @@
 //              from o in Orders
 //              orderby o.OrderDate, o.ShippedDate, o.OrderId
 //              select o;
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Passed.
 //        public void OrderByDistinctTest()
@@ -664,10 +664,10 @@
 //              .Distinct()
 //              .OrderBy(c => c)
 //              .Select(c => c);
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Failed with assertion.
 //        // Exception: AssertionException
@@ -686,10 +686,10 @@
 //              from o in Orders.OrderBy(o => o.OrderDate)
 //              where c == o.Customer
 //              select new { c.ContactName, o.OrderDate };
-//            Assert.IsTrue(expected.SequenceEqual(result));
+//            Assert.True(expected.SequenceEqual(result));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Ordering")]
 //        // Passed.
 //        public void OrderByPredicateTest()
@@ -697,14 +697,14 @@
 //            var result = db.Orders.OrderBy(o => o.Freight > 0 && o.ShippedDate != null).ThenBy(o => o.OrderId).Select(o => o.OrderId);
 //            var list = result.ToList();
 //            var original = Orders.OrderBy(o => o.Freight > 0 && o.ShippedDate != null).ThenBy(o => o.OrderId).Select(o => o.OrderId).ToList();
-//            Assert.IsTrue(list.SequenceEqual(original));
+//            Assert.True(list.SequenceEqual(original));
 //        }
 
 //        #endregion
 
 //        #region Grouping tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByTest()
@@ -712,10 +712,10 @@
 //            var result = from o in db.Orders
 //                         group o by o.OrderDate;
 //            var list = result.ToList();
-//            Assert.AreEqual(480, list.Count);
+//            Assert.Equal(480, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByReferenceTest()
@@ -723,10 +723,10 @@
 //            var result = from o in db.Orders
 //                         group o by o.Customer;
 //            var list = result.ToList();
-//            Assert.AreEqual(89, list.Count);
+//            Assert.Equal(89, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByWhereTest()
@@ -737,10 +737,10 @@
 //              where g.Count() > 5
 //              select g;
 //            var list = result.ToList();
-//            Assert.AreEqual(1, list.Count);
+//            Assert.Equal(1, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByTestAnonymous()
@@ -748,10 +748,10 @@
 //            var result = from c in db.Customers
 //                         group c by new { c.Region, c.City };
 //            var list = result.ToList();
-//            Assert.AreEqual(69, list.Count);
+//            Assert.Equal(69, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByCalculatedTest()
@@ -761,10 +761,10 @@
 //              group o by o.Freight > 50 ? o.Freight > 100 ? "expensive" : "average" : "cheap" into g
 //              select g;
 //            var list = result.ToList();
-//            Assert.AreEqual(3, list.Count);
+//            Assert.Equal(3, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupBySelectManyTest()
@@ -774,10 +774,10 @@
 //              .SelectMany(g => g);
 
 //            var list = result.ToList();
-//            Assert.AreEqual(91, list.Count);
+//            Assert.Equal(91, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByCalculateAggregateTest()
@@ -788,10 +788,10 @@
 //              select g.Sum(o => o.Freight);
 
 //            var list = result.ToList();
-//            Assert.AreEqual(89, list.Count);
+//            Assert.Equal(89, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void GroupByCalculateManyAggreagetes()
@@ -808,10 +808,10 @@
 //                      };
 
 //            var list = result.ToList();
-//            Assert.AreEqual(89, list.Count);
+//            Assert.Equal(89, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Failed.
 //        // Exception: InvalidOperationException
@@ -823,12 +823,12 @@
 //              from c in db.Customers
 //              group c by c.Orders.Average(o => o.Freight) >= 80;
 //            var list = result.ToList();
-//            Assert.AreEqual(2, list.Count);
+//            Assert.Equal(2, list.Count);
 //            var firstGroupList = list.First(g => !g.Key).ToList();
-//            Assert.AreEqual(71, firstGroupList.Count);
+//            Assert.Equal(71, firstGroupList.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Grouping")]
 //        // Passed.
 //        public void ComplexGroupingTest()
@@ -854,7 +854,7 @@
 //            foreach (var customer in list)
 //            {
 //                var ordersList = customer.YearGroups.ToList();
-//                Assert.IsTrue(ordersList.Count <= 3);
+//                Assert.True(ordersList.Count <= 3);
 //            }
 //        }
 
@@ -862,17 +862,17 @@
 
 //        #region Set operations / Distinct tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void ConcatTest()
 //        {
 //            var result = db.Customers.Where(c => c.Orders.Count <= 1).Concat(db.Customers.Where(c => c.Orders.Count > 1));
 //            var list = result.ToList();
-//            Assert.AreEqual(91, list.Count);
+//            Assert.Equal(91, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void UnionTest()
@@ -889,10 +889,10 @@
 //              );
 
 //            var list = result.ToList();
-//            Assert.AreEqual(167, list.Count);
+//            Assert.Equal(167, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void ExceptTest()
@@ -900,10 +900,10 @@
 //            var result =
 //              db.Customers.Except(db.Customers.Where(c => c.Orders.Count() > 0));
 //            var list = result.ToList();
-//            Assert.AreEqual(2, list.Count);
+//            Assert.Equal(2, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void IntersectTest()
@@ -911,20 +911,20 @@
 //            var result =
 //              db.Customers.Intersect(db.Customers.Where(c => c.Orders.Count() > 0));
 //            var list = result.ToList();
-//            Assert.AreEqual(89, list.Count);
+//            Assert.Equal(89, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void DistinctTest()
 //        {
 //            var result = db.Orders.Select(c => c.Freight).Distinct();
 //            var list = result.ToList();
-//            Assert.AreEqual(799, list.Count);
+//            Assert.Equal(799, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void DistinctTakeLastTest()
@@ -934,10 +934,10 @@
 //               orderby o.OrderDate
 //               select o.OrderDate).Distinct().Take(5);
 //            var list = result.ToList();
-//            Assert.AreEqual(5, list.Count);
+//            Assert.Equal(5, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void DistinctTakeFirstTest()
@@ -947,34 +947,34 @@
 //               orderby o.OrderDate
 //               select o.OrderDate).Take(5).Distinct();
 //            var list = result.ToList();
-//            Assert.AreEqual(4, list.Count);
+//            Assert.Equal(4, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void DistinctEntityTest()
 //        {
 //            var result = db.Customers.Distinct();
 //            var list = result.ToList();
-//            Assert.AreEqual(91, list.Count);
+//            Assert.Equal(91, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Set operations")]
 //        // Passed.
 //        public void DistinctAnonymousTest()
 //        {
 //            var result = db.Customers.Select(c => new { c.Region, c.City }).Distinct();
 //            var list = result.ToList();
-//            Assert.AreEqual(69, list.Count);
+//            Assert.Equal(69, list.Count);
 //        }
 
 //        #endregion
 
 //        #region Type casts
 
-//        //[TestMethod]
+//        //[Fact]
 //        //[TestCategory("Type casts")]
 //        //// Passed.
 //        //public void TypeCastIsChildTest()
@@ -982,11 +982,11 @@
 //        //    var result = db.Products.Where(p => p is DiscontinuedProduct);
 //        //    var expected = db.Products.ToList().Where(p => p is DiscontinuedProduct);
 //        //    var list = result.ToList();
-//        //    Assert.IsTrue(list.Count > 0);
-//        //    Assert.AreEqual(expected.Count(), list.Count);
+//        //    Assert.True(list.Count > 0);
+//        //    Assert.Equal(expected.Count(), list.Count);
 //        //}
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Type casts")]
 //        // Passed.
 //        public void TypeCastIsParentTest()
@@ -994,11 +994,11 @@
 //            var result = db.Products.Where(p => p is Product);
 //            var expected = db.Products.ToList();
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
-//            Assert.AreEqual(expected.Count(), list.Count);
+//            Assert.True(list.Count > 0);
+//            Assert.Equal(expected.Count(), list.Count);
 //        }
 
-//        //[TestMethod]
+//        //[Fact]
 //        //[TestCategory("Type casts")]
 //        //// Passed.
 //        //public void TypeCastIsChildConditionalTest()
@@ -1014,13 +1014,13 @@
 //        //                     : null);
 
 //        //    var list = result.ToList();
-//        //    Assert.IsTrue(list.Count > 0);
-//        //    Assert.AreEqual(expected.Count(), list.Count);
-//        //    Assert.IsTrue(list.Except(expected).Count() == 0);
-//        //    Assert.IsTrue(list.Contains(null));
+//        //    Assert.True(list.Count > 0);
+//        //    Assert.Equal(expected.Count(), list.Count);
+//        //    Assert.True(list.Except(expected).Count() == 0);
+//        //    Assert.True(list.Contains(null));
 //        //}
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Type casts")]
 //        // Passed.
 //        public void TypeCastOfTypeTest()
@@ -1028,11 +1028,11 @@
 //            var result = db.Products.OfType<DiscontinuedProduct>();
 //            var expected = db.Products.ToList().OfType<DiscontinuedProduct>();
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
-//            Assert.AreEqual(expected.Count(), list.Count);
+//            Assert.True(list.Count > 0);
+//            Assert.Equal(expected.Count(), list.Count);
 //        }
 
-//        //[TestMethod]
+//        //[Fact]
 //        //[TestCategory("Type casts")]
 //        //// Failed.
 //        //// Exception: InvalidOperationException
@@ -1056,15 +1056,15 @@
 
 //        //    var list = result.ToList();
 //        //    Assert.Greater(list.Count, 0);
-//        //    Assert.AreEqual(expected.Count(), list.Count);
-//        //    Assert.IsTrue(list.Except(expected).Count() == 0);
+//        //    Assert.Equal(expected.Count(), list.Count);
+//        //    Assert.True(list.Except(expected).Count() == 0);
 //        //}
 
 //        #endregion
 
 //        #region Element operations
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Passed.
 //        public void FirstTest()
@@ -1073,7 +1073,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Passed.
 //        public void FirstOrDefaultTest()
@@ -1082,7 +1082,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Passed.
 //        public void FirstPredicateTest()
@@ -1091,7 +1091,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Passed.
 //        public void NestedFirstOrDefaultTest()
@@ -1108,10 +1108,10 @@
 //                    .Order
 //              };
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Passed.
 //        public void FirstOrDefaultEntitySetTest()
@@ -1119,10 +1119,10 @@
 //            var customersCount = Customers.Count;
 //            var result = db.Customers.Select(c => c.Orders.FirstOrDefault());
 //            var list = result.ToList();
-//            Assert.AreEqual(customersCount, list.Count);
+//            Assert.Equal(customersCount, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1133,10 +1133,10 @@
 //            var customersCount = Customers.Count;
 //            var result = db.Customers.Select(c => c.Orders.Take(1).SingleOrDefault());
 //            var list = result.ToList();
-//            Assert.AreEqual(customersCount, list.Count);
+//            Assert.Equal(customersCount, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1146,10 +1146,10 @@
 //        {
 //            var result = db.Customers.Where(c => c.Orders.Count() > 0).Select(c => c.Orders.Take(1).Single());
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1159,10 +1159,10 @@
 //        {
 //            var customer = db.Customers.OrderBy(c => c.CustomerId).ElementAt(15);
 //            Assert.IsNotNull(customer);
-//            Assert.AreEqual("CONSH", customer.CustomerId);
+//            Assert.Equal("CONSH", customer.CustomerId);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Element operations")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1176,7 +1176,7 @@
 //              select c.Orders.ElementAt(3);
 
 //            var list = result.ToList();
-//            Assert.AreEqual(63, list.Count);
+//            Assert.Equal(63, list.Count);
 //        }
 
 //        #endregion
@@ -1184,7 +1184,7 @@
 
 //        #region Contains / Any / All tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("All/Any/Contains")]
 //        // Passed.
 //        public void AllNestedTest()
@@ -1194,10 +1194,10 @@
 //              where db.Orders.Where(o => o.Customer == c).All(o => db.Employees.Where(e => o.Employee == e).Any(e => e.FirstName.StartsWith("A")))
 //              select c;
 //            var list = result.ToList();
-//            Assert.AreEqual(2, list.Count);
+//            Assert.Equal(2, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("All/Any/Contains")]
 //        // Passed.
 //        public void ComplexAllTest()
@@ -1215,11 +1215,11 @@
 //                Employees.Where(e => e == o.Employee).All(e => e.FirstName.EndsWith("t"))
 //              select o;
 
-//            Assert.AreEqual(0, expected.Except(result).Count());
-//            Assert.AreEqual(result.ToList().Count, 366);
+//            Assert.Equal(0, expected.Except(result).Count());
+//            Assert.Equal(result.ToList().Count, 366);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("All/Any/Contains")]
 //        // Passed.
 //        public void ContainsNestedTest()
@@ -1244,22 +1244,22 @@
 //                  .Select(o => o.Customer)
 //                  .Contains(c)
 //                     };
-//            Assert.AreEqual(0, expected.Except(result).Count());
-//            Assert.AreEqual(0, result.ToList().Count(i => i.HasNewOrders));
+//            Assert.Equal(0, expected.Except(result).Count());
+//            Assert.Equal(0, result.ToList().Count(i => i.HasNewOrders));
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("All/Any/Contains")]
 //        // Passed.
 //        public void AnyTest()
 //        {
 //            var result = db.Customers.Where(c => c.Orders.Any(o => o.Freight > 400));
 //            var expected = Customers.Where(c => c.Orders.Any(o => o.Freight > 400));
-//            Assert.AreEqual(0, expected.Except(result).Count());
-//            Assert.AreEqual(10, result.ToList().Count);
+//            Assert.Equal(0, expected.Except(result).Count());
+//            Assert.Equal(10, result.ToList().Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("All/Any/Contains")]
 //        // Passed.
 //        public void AnyParameterizedTest()
@@ -1267,10 +1267,10 @@
 //            var ids = new[] { "ABCDE", "ALFKI" };
 //            var result = db.Customers.Where(c => ids.Any(id => c.CustomerId == id));
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("All/Any/Contains")]
 //        // Passed.
 //        public void ContainsParameterizedTest()
@@ -1278,35 +1278,35 @@
 //            var customerIDs = new[] { "ALFKI", "ANATR", "AROUT", "BERGS" };
 //            var result = db.Orders.Where(o => customerIDs.Contains(o.Customer.CustomerId));
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
-//            Assert.AreEqual(41, list.Count);
+//            Assert.True(list.Count > 0);
+//            Assert.Equal(41, list.Count);
 //        }
 
 //        #endregion
 
 //        #region Aggregates tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Aggregates")]
 //        // Passed.
 //        public void SumTest()
 //        {
 //            var sum = db.Orders.Select(o => o.Freight).Sum();
 //            var sum1 = Orders.Select(o => o.Freight).Sum();
-//            Assert.AreEqual(sum1, sum);
+//            Assert.Equal(sum1, sum);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Aggregates")]
 //        // Passed.
 //        public void CountPredicateTest()
 //        {
 //            var count = db.Orders.Count(o => o.OrderId > 10);
 //            var count1 = Orders.Count(o => o.OrderId > 10);
-//            Assert.AreEqual(count1, count);
+//            Assert.Equal(count1, count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Aggregates")]
 //        // Passed.
 //        public void NestedCountTest()
@@ -1314,34 +1314,34 @@
 //            var result = db.Customers.Where(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId) > 5);
 //            var expected = Customers.Where(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId) > 5);
 
-//            Assert.IsTrue(expected.Except(result).Count() == 0);
+//            Assert.True(expected.Except(result).Count() == 0);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Aggregates")]
 //        // Passed.
 //        public void NullableSumTest()
 //        {
 //            var sum = db.Orders.Select(o => (int?)o.OrderId).Sum();
 //            var sum1 = Orders.Select(o => (int?)o.OrderId).Sum();
-//            Assert.AreEqual(sum1, sum);
+//            Assert.Equal(sum1, sum);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Aggregates")]
 //        // Passed.
 //        public void MaxCountTest()
 //        {
 //            var max = db.Customers.Max(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId));
 //            var max1 = Customers.Max(c => db.Orders.Count(o => o.Customer.CustomerId == c.CustomerId));
-//            Assert.AreEqual(max1, max);
+//            Assert.Equal(max1, max);
 //        }
 
 //        #endregion
 
 //        #region Join tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Join")]
 //        // Passed.
 //        public void GroupJoinTest()
@@ -1356,10 +1356,10 @@
 //                  EmployeesCount = ge.Count()
 //              };
 //            var list = result.ToList();
-//            Assert.AreEqual(91, list.Count);
+//            Assert.Equal(91, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Join")]
 //        // Passed.
 //        public void JoinTest()
@@ -1370,10 +1370,10 @@
 //              select new { p.ProductName, s.ContactName, s.Phone };
 
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Join")]
 //        // Passed.
 //        public void JoinByAnonymousTest()
@@ -1385,10 +1385,10 @@
 //              select new { c.ContactName, o.OrderDate };
 
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Join")]
 //        // Passed.
 //        public void LeftJoinTest()
@@ -1400,14 +1400,14 @@
 //              select new { Name = p == null ? "Nothing!" : p.ProductName, c.CategoryName };
 
 //            var list = result.ToList();
-//            Assert.AreEqual(77, list.Count);
+//            Assert.Equal(77, list.Count);
 //        }
 
 //        #endregion
 
 //        #region References tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("References")]
 //        // Passed.
 //        public void JoinByReferenceTest()
@@ -1418,10 +1418,10 @@
 //              select new { c.ContactName, o.OrderDate };
 
 //            var list = result.ToList();
-//            Assert.AreEqual(830, list.Count);
+//            Assert.Equal(830, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("References")]
 //        // Passed.
 //        public void CompareReferenceTest()
@@ -1433,10 +1433,10 @@
 //              select new { c.ContactName, o.OrderDate };
 
 //            var list = result.ToList();
-//            Assert.AreEqual(830, list.Count);
+//            Assert.Equal(830, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("References")]
 //        // Passed.
 //        public void ReferenceNavigationTestTest()
@@ -1447,7 +1447,7 @@
 //              select new { od.Order, od.Product };
 
 //            var list = result.ToList();
-//            Assert.AreEqual(330, list.Count);
+//            Assert.Equal(330, list.Count);
 //            foreach (var anonymous in list)
 //            {
 //                Assert.IsNotNull(anonymous);
@@ -1456,14 +1456,14 @@
 //            }
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("References")]
 //        // Passed.
 //        public void EntitySetCountTest()
 //        {
 //            var result = db.Categories.Where(c => c.Products.Count > 10);
 //            var list = result.ToList();
-//            Assert.AreEqual(4, list.Count);
+//            Assert.Equal(4, list.Count);
 //        }
 
 //        #endregion
@@ -1471,7 +1471,7 @@
 
 //        #region Complex tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Complex")]
 //        // Passed.
 //        public void ComplexTest1()
@@ -1480,7 +1480,7 @@
 //              supplier => db.Products.Select(
 //                            product => db.Products.Where(p => p.ProductId == product.ProductId && p.Supplier.SupplierId == supplier.SupplierId)));
 //            var count = result.ToList().Count;
-//            Assert.IsTrue(count > 0);
+//            Assert.True(count > 0);
 //            foreach (var queryable in result)
 //            {
 //                foreach (var queryable1 in queryable)
@@ -1493,7 +1493,7 @@
 //            }
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Complex")]
 //        // Passed.
 //        public void ComplexTest2()
@@ -1505,10 +1505,10 @@
 //              .GroupBy(c => c.Country, (country, customers) => customers.Where(k => k.CompanyName.Substring(0, 1) == country.Substring(0, 1)))
 //              .SelectMany(k => k);
 
-//            Assert.AreEqual(0, expected.Except(result).Count());
+//            Assert.Equal(0, expected.Except(result).Count());
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Complex")]
 //        // Passed.
 //        public void ComplexTest3()
@@ -1524,13 +1524,13 @@
 //                             .Select(s => s.CompanyName)
 //                                };
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //            foreach (var p in list)
 //                foreach (var companyName in p.Suppliers)
 //                    Assert.IsNotNull(companyName);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Complex")]
 //        // Passed.
 //        public void ComplexTest4()
@@ -1541,13 +1541,13 @@
 //              .Select(os => os);
 
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 
 //            foreach (var item in list)
 //                item.ToList();
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Complex")]
 //        // Passed.
 //        public void ComplexTest5()
@@ -1557,13 +1557,13 @@
 //              .Select(i => i.Customer.Orders);
 
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 
 //            foreach (var item in list)
 //                item.ToList();
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Complex")]
 //        // Passed.
 //        public void ComplexTest6()
@@ -1573,14 +1573,14 @@
 //              .SelectMany(i => i.Orders.Select(o => new { i.Customer, Order = o }));
 
 //            var list = result.ToList();
-//            Assert.IsTrue(list.Count > 0);
+//            Assert.True(list.Count > 0);
 //        }
 
 //        #endregion
 
 //        #region Standard functions tests
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringStartsWithTest()
@@ -1588,10 +1588,10 @@
 //            var result = db.Customers.Where(c => c.CustomerId.StartsWith("A") || c.CustomerId.StartsWith("L"));
 
 //            var list = result.ToList();
-//            Assert.AreEqual(13, list.Count);
+//            Assert.Equal(13, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringStartsWithParameterizedTest()
@@ -1601,10 +1601,10 @@
 //            var result = db.Customers.Where(c => c.CustomerId.StartsWith(likeA) || c.CustomerId.StartsWith(likeL));
 
 //            var list = result.ToList();
-//            Assert.AreEqual(13, list.Count);
+//            Assert.Equal(13, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringLengthTest()
@@ -1613,7 +1613,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringContainsTest()
@@ -1622,7 +1622,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringToLowerTest()
@@ -1631,7 +1631,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringRemoveTest()
@@ -1640,7 +1640,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringIndexOfTest()
@@ -1649,7 +1649,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1661,7 +1661,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1673,7 +1673,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1685,7 +1685,7 @@
 //            Assert.IsNotNull(order);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void DateTimeDayTest()
@@ -1694,7 +1694,7 @@
 //            Assert.IsNotNull(order);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1706,7 +1706,7 @@
 //            Assert.IsNotNull(order);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1718,7 +1718,7 @@
 //            Assert.IsNotNull(order);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void MathAbsTest()
@@ -1727,7 +1727,7 @@
 //            Assert.IsNotNull(order);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1739,27 +1739,27 @@
 //            Assert.IsNotNull(order);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void MathFloorTest()
 //        {
 //            var result = db.Orders.Where(o => Math.Floor(o.Freight) == 140);
 //            var list = result.ToList();
-//            Assert.AreEqual(2, list.Count);
+//            Assert.Equal(2, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void MathCeilingTest()
 //        {
 //            var result = db.Orders.Where(o => Math.Ceiling(o.Freight) == 141);
 //            var list = result.ToList();
-//            Assert.AreEqual(2, list.Count);
+//            Assert.Equal(2, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1769,10 +1769,10 @@
 //        {
 //            var result = db.Orders.Where(o => Math.Truncate(o.Freight) == 141);
 //            var list = result.ToList();
-//            Assert.AreEqual(2, list.Count);
+//            Assert.Equal(2, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1782,10 +1782,10 @@
 //        {
 //            var result = db.Orders.Where(o => Math.Round(o.Freight / 10, 1, MidpointRounding.AwayFromZero) == 6.5m);
 //            var list = result.ToList();
-//            Assert.AreEqual(7, list.Count);
+//            Assert.Equal(7, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1795,10 +1795,10 @@
 //        {
 //            var result = db.Orders.Where(o => Math.Round(o.Freight / 10, 1, MidpointRounding.ToEven) == 6.5m);
 //            var list = result.ToList();
-//            Assert.AreEqual(6, list.Count);
+//            Assert.Equal(6, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed with assertion.
 //        // Exception: AssertionException
@@ -1809,10 +1809,10 @@
 //        {
 //            var result = db.Orders.Where(o => Math.Round(o.Freight / 10, 1) == 6.5m);
 //            var list = result.ToList();
-//            Assert.AreEqual(6, list.Count);
+//            Assert.Equal(6, list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Failed.
 //        // Exception: NotSupportedException
@@ -1823,10 +1823,10 @@
 //            var expected = Orders.Where(o => Convert.ToInt32(o.Freight * 10) == 592);
 //            var result = db.Orders.Where(o => Convert.ToInt32(o.Freight * 10) == 592);
 //            var list = result.ToList();
-//            Assert.AreEqual(expected.Count(), list.Count);
+//            Assert.Equal(expected.Count(), list.Count);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void StringCompareToTest()
@@ -1835,7 +1835,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void ComparisonWithNullTest()
@@ -1844,7 +1844,7 @@
 //            Assert.IsNotNull(customer);
 //        }
 
-//        [TestMethod]
+//        [Fact]
 //        [TestCategory("Standard functions")]
 //        // Passed.
 //        public void EqualsWithNullTest()

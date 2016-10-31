@@ -2,7 +2,7 @@
 //using System.Text;
 //using System.Collections.Generic;
 //using System.Linq;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
+//using Xunit;
 //using ExampleModel;
 //using Modl;
 //using System.Diagnostics;
@@ -10,7 +10,7 @@
 
 //namespace Tests
 //{
-//    [TestClass]
+//    
 //    public class MySQL
 //    {
 //        //string databaseName = "MySQLDb";
@@ -22,7 +22,7 @@
 //            Database.DisposeAll();
 //        }
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void PerformanceTest()
 //        //{
 //        //    int iterations = 100;
@@ -33,7 +33,7 @@
 //        //    basics.TestPerformance(databaseName, iterations, CacheLevel.On, basics.CRUDExplicitId);
 //        //}
 
-//        ////[TestMethod]
+//        ////[Fact]
 //        //public void AsyncPerformanceTest()
 //        //{
 //        //    //GlobalCRUD();
@@ -49,35 +49,35 @@
 
 
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void GlobalCRUD()
 //        //{
 //        //    basics.SwitchDatabase(databaseName);
 //        //    basics.CRUD();
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void StaticCRUD()
 //        //{
 //        //    basics.SwitchDatabase("SqlServerDb");
 //        //    basics.SwitchStaticDatabaseAndCRUD(databaseName);
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void InstanceCRUD()
 //        //{
 //        //    basics.SwitchDatabase("SqlServerDb");
 //        //    basics.SwitchInstanceDatabaseAndCRUD(databaseName);
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void GetFromDatabaseProvider()
 //        //{
 //        //    basics.SwitchDatabase("SqlServerDb");
 //        //    basics.GetFromDatabaseProvider(databaseName);
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void GetFromLinq()
 //        //{
 //        //    basics.SwitchDatabase(databaseName);
@@ -86,27 +86,27 @@
 //        //    basics.GetFromLinqInstance(databaseName);
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void StaticDelete()
 //        //{
 //        //    basics.SwitchDatabase(databaseName);
 //        //    basics.StaticDelete();
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void SetIdExplicit()
 //        //{
 //        //    basics.SwitchDatabase(databaseName);
 //        //    basics.SetIdExplicit();
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void CRUDIdExplicit()
 //        //{
 //        //    basics.CRUDExplicitId(Database.Get(databaseName));
 //        //}
 
-//        //[TestMethod]
+//        //[Fact]
 //        //public void GetAllAsync()
 //        //{
 //        //    basics.SwitchDatabase(databaseName);
