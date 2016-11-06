@@ -1,10 +1,4 @@
-﻿using Modl.Structure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Modl.Instance;
+﻿using Modl.Instance;
 
 namespace Modl
 {
@@ -16,10 +10,8 @@ namespace Modl
             return m;
         }
 
-        public static Identity Id<M>(this M m) where M : IModl, new()
-        {
-            return m.Modl().Modl.Id;
-        }
+        public static Identity Id<M>(this M m) where M : IModl, new() =>
+            m.Modl().Modl.Id;
 
         public static M Id<M>(this M m, object value) where M : IModl, new()
         {
@@ -27,25 +19,18 @@ namespace Modl
             return m;
         }
 
-        public static bool IsDeleted<M>(this M m) where M : IModl, new()
-        {
-            return m.GetBacker().IsDeleted;
-        }
+        public static bool IsDeleted<M>(this M m) where M : IModl, new() =>
+            m.GetBacker().IsDeleted;
 
-        public static bool IsInitialized<M>(this M m) where M : IModl, new() => m.Modl != null;
+        public static bool IsInitialized<M>(this M m) where M : IModl, new() =>
+            m.Modl != null;
 
-        public static bool IsModified<M>(this M m) where M : IModl, new()
-        {
-            var backer = m.GetBacker();
-            Handler<M>.Sync(m);
+        public static bool IsModified<M>(this M m) where M : IModl, new() =>
+            m.Modl().GetBacker().IsModified();
 
-            return backer.IsModified();
-        }
+        public static bool IsNew<M>(this M m) where M : IModl, new() =>
+            m.GetBacker().IsNew;
 
-        public static bool IsNew<M>(this M m) where M : IModl, new()
-        {
-            return m.GetBacker().IsNew;
-        }
         public static M Modl<M>(this M m) where M : IModl, new()
         {
             Handler<M>.Sync(m);
@@ -58,10 +43,7 @@ namespace Modl
             return m;
         }
 
-        internal static Backer GetBacker<M>(this M m) where M : IModl, new()
-        {
-            Handler<M>.Sync(m);
-            return m.Modl.Backer;
-        }
+        internal static Backer GetBacker<M>(this M m) where M : IModl, new() =>
+            m.Modl().Modl.Backer;
     }
 }

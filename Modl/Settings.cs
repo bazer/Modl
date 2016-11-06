@@ -3,6 +3,8 @@ using Modl.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Concurrent;
+using Modl.Exceptions;
 
 namespace Modl
 {
@@ -23,16 +25,28 @@ namespace Modl
         OneDay = 1440
     }
 
+    public enum InstanceSeparation
+    {
+        None,
+        Thread,
+        Custom
+    }
+
     public class Settings
     {
-        public static Settings GlobalSettings { get; private set; } = new Settings();
-        static Dictionary<Type, Settings> AllSettings = new Dictionary<Type, Settings>();
-
-        //public Type Type { get; set; }
         public CacheLevel CacheLevel;
-        public int CacheTimeout;
 
+        public int CacheTimeout;
+        static Dictionary<Type, Settings> AllSettings = new Dictionary<Type, Settings>();
         private IEndpoint endpoint;
+        private ISerializer serializer;
+        public Settings()
+        {
+            CacheLevel = CacheConfig.DefaultCacheLevel;
+            CacheTimeout = CacheConfig.DefaultCacheTimeout;
+        }
+
+        public static Settings GlobalSettings { get; private set; } = new Settings();
         public IEndpoint Endpoint
         {
             get
@@ -52,7 +66,23 @@ namespace Modl
             }
         }
 
-        private ISerializer serializer;
+        public InstanceSeparation InstanceSeparation { get; set; } = InstanceSeparation.None;
+        private Func<ConcurrentDictionary<Type, object>> customInstanceSeparationDictionary;
+        public Func<ConcurrentDictionary<Type, object>> CustomInstanceSeparationDictionary
+        {
+            get
+            {
+                if (customInstanceSeparationDictionary == null)
+                    throw new InvalidConfigurationException("Custom instance separation mode is being used but CustomInstanceSeparationDictionary is not set");
+
+                return customInstanceSeparationDictionary;
+            }
+            set
+            {
+                customInstanceSeparationDictionary = value;
+            }
+        }
+
         public ISerializer Serializer
         {
             get
@@ -71,15 +101,6 @@ namespace Modl
                 serializer = value;
             }
         }
-
-
-        public Settings()
-        {
-            //Type = type;
-            CacheLevel = CacheConfig.DefaultCacheLevel;
-            CacheTimeout = CacheConfig.DefaultCacheTimeout;
-        }
-
         public static Settings Get(Type type)
         {
             if (!AllSettings.ContainsKey(type))

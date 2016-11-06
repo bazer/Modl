@@ -45,6 +45,7 @@
     <Compile Include="Attributes\NameAttribute.cs" />
     <Compile Include="Attributes\IdAttribute.cs" />
     <Compile Include="Cache\ConcurrentHashSet.cs" />
+    <Compile Include="Exceptions\InvalidConfigurationException.cs" />
     <Compile Include="Exceptions\InvalidLinkTypeException.cs" />
     <Compile Include="Exceptions\InvalidPropertyNameException.cs" />
     <Compile Include="Exceptions\AlreadyExistsException.cs" />

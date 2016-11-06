@@ -7,8 +7,8 @@ using Modl.Plugins;
 
 namespace Tests.Core
 {
-    
-    public class CustomIdIntTest
+
+    public class CustomIdIntTest: IDisposable
     {
         public class CustomIdIntClass : IModl
         {
@@ -24,7 +24,12 @@ namespace Tests.Core
         //        obj.Delete();
         //}
 
-        
+        private void Cleanup(int id)
+        {
+            if (Modl<CustomIdIntClass>.Exists(id))
+                Modl<CustomIdIntClass>.Get(id).Delete();
+        }
+
         public CustomIdIntTest()
         {
             Settings.GlobalSettings.Serializer = new JsonModl();
@@ -49,6 +54,8 @@ namespace Tests.Core
         [Fact]
         public void CreateNew()
         {
+
+
             var testClass = new CustomIdIntClass();
             Assert.True(testClass.IsNew());
             Assert.False(testClass.IsModified());
@@ -109,7 +116,7 @@ namespace Tests.Core
         //        Assert.Fail();
         //    }
         //    catch (InvalidIdException) { }
-            
+
         //    Assert.True(testClass.IsNew());
         //    Assert.False(testClass.IsModified());
         //}
@@ -136,7 +143,7 @@ namespace Tests.Core
             Assert.False(loadedTestClass.IsNew());
             Assert.False(loadedTestClass.IsModified());
             Assert.Throws<InvalidIdException>(() => loadedTestClass.Id(4544));
-            Assert.Throws<InvalidIdException>(() => 
+            Assert.Throws<InvalidIdException>(() =>
             {
                 loadedTestClass.CustomId = 4544;
                 loadedTestClass.Save();
@@ -158,6 +165,16 @@ namespace Tests.Core
             Assert.True(testClass.IsDeleted());
             Assert.Throws<NotFoundException>(() => testClass.Save());
             Assert.Throws<NotFoundException>(() => testClass.Delete());
+        }
+
+        public void Dispose()
+        {
+            Cleanup(3433);
+            Cleanup(644564);
+            Cleanup(747474);
+            Cleanup(644563434);
+            Cleanup(2472);
+            Cleanup(4544);
         }
     }
 }
