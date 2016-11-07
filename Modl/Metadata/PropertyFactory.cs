@@ -19,8 +19,10 @@ namespace Modl.Metadata
                 return new Property(propertyInfo, modlType);
         }
 
-        private static bool IsLink(Type propertyType) => propertyType.IsGenericType &&
+        private static bool IsLink(Type propertyType) => 
+            typeof(IModl).IsAssignableFrom(propertyType) ||
+            (propertyType.IsGenericType &&
             (propertyType.GetGenericTypeDefinition() == typeof(ModlValue<>) ||
-             propertyType.GetGenericTypeDefinition() == typeof(ModlCollection<>));
+             propertyType.GetGenericTypeDefinition() == typeof(ModlCollection<>)));
     }
 }
