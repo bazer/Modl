@@ -5,7 +5,7 @@ using System.Linq;
 namespace Modl.Instance
 {
     public class Instances<M>
-         where M : IModl
+         where M : class, IModl
     {
         private List<WeakReference> References { get; } = new List<WeakReference>();
 

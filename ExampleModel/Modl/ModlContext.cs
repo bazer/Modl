@@ -9,6 +9,22 @@ namespace ExampleModel
 {
     public class ModlContext
     {
+        public class ImmutableContext<T> where T : class, IModl
+        {
+            public T Get(object id) => M.Get<T>(id);
+        }
+
+        public class MutableContext<T> : ImmutableContext<T> where T : class, IMutable
+        {
+            public T New() => M.New<T>();
+        }
+
+        public static MutableContext<ICar> Car => new MutableContext<ICar>();
+        public static MutableContext<IManufacturer> Manufacturer => new MutableContext<IManufacturer>();
+        public static ImmutableContext<IVehicle> Vehicle => new ImmutableContext<IVehicle>();
+
+
+
         //Database db;
 
         //public ModlContext(Database database)

@@ -59,7 +59,7 @@ namespace Modl.Metadata
         }
 
         object getter = null;
-        public object GetValue<M>(M m) where M : IModl
+        public object GetValue<M>(M m) where M : class, IModl
         {
             if (getter == null)
                 getter = (Func<M, object>)typeof(Property)
@@ -71,7 +71,7 @@ namespace Modl.Metadata
         }
 
         object setter = null;
-        public void SetValue<M>(M m, object value) where M : IModl
+        public void SetValue<M>(M m, object value) where M : class, IModl
         {
             if (setter == null)
                 setter = (Action<M, object>)typeof(Property)
@@ -82,13 +82,13 @@ namespace Modl.Metadata
             (setter as Action<M, object>)(m, value);
         }
 
-        private static Func<M, object> MakeGetDelegate<M, T>(MethodInfo method) where M : IModl
+        private static Func<M, object> MakeGetDelegate<M, T>(MethodInfo method) where M : class, IModl
         {
             var f = (Func<M, T>)Delegate.CreateDelegate(typeof(Func<M, T>), null, method);
             return m => f(m);
         }
 
-        private static Action<M, object> MakeSetDelegate<M, T>(MethodInfo method) where M : IModl
+        private static Action<M, object> MakeSetDelegate<M, T>(MethodInfo method) where M : class, IModl
         {
             var f = (Action<M, T>)Delegate.CreateDelegate(typeof(Action<M, T>), null, method);
             return (m, t) => f(m, (T)Convert.ChangeType(t, typeof(T)));

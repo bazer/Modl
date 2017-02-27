@@ -48,7 +48,7 @@ namespace Modl.Metadata
 
             foreach (PropertyInfo info in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (info.CanWrite && !typeof(IModlData).IsAssignableFrom(info.PropertyType) && !info.GetMethod.IsAbstract)
+                if (!typeof(IModlData).IsAssignableFrom(info.PropertyType))
                 {
                     Properties.Add(PropertyFactory.Create(info, Type));
                 }

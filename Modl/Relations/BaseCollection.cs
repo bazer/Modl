@@ -3,7 +3,7 @@
 namespace Modl
 {
     public class BaseCollection<M>
-        where M : IModl, new()
+        where M : class, IModl
     {
         internal BaseCollection(string name, IModl m)
         {

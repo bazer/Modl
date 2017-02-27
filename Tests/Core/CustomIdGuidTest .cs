@@ -15,6 +15,8 @@ namespace Tests.Core
             public IModlData Modl { get; set; }
             [Id]
             public Guid CustomId { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         

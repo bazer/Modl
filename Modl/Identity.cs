@@ -16,7 +16,7 @@ namespace Modl
     //}
 
     public class Identity : IEquatable<Identity>, IComparable<Identity>
-        //where M : IModl, new()
+        //where M : class, IModl, new()
     {
         //internal Identity(M modl)
         //{

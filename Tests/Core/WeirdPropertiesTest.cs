@@ -23,7 +23,7 @@ namespace Tests.Core
 
             public IModlData Modl { get; set; }
 
-
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         

@@ -4,10 +4,11 @@ using Modl.Helpers;
 using Modl.Instance;
 using Modl.Metadata;
 using Modl.Structure.Storage;
+using System;
 
 namespace Modl
 {
-    internal class Handler<M> where M : IModl, new()
+    internal class Handler<M> where M : class, IModl
     {
         static Handler()
         {
@@ -19,14 +20,14 @@ namespace Modl
 
         internal static void AddRelation(M from, IModl to)
         {
-            Sync(from);
+            //Sync(from);
 
             InstanceStore.Get(from.Modl.Id).AddRelation(to);
         }
 
         internal static void ChangeId(M modl, object newId)
         {
-            Sync(modl);
+            //Sync(modl);
 
             var id = Identity.FromId(newId, Definitions);
 
@@ -55,7 +56,12 @@ namespace Modl
 
         internal static M New()
         {
-            return new M().Modl();
+            var collection = InstanceStore.AddNewInstance(Identity.GenerateNewId(Definitions));
+
+            return collection.GetInstance();
+            //throw new NotImplementedException();
+            //return InstanceCreator<M>.NewInstance()
+            //return new M().Modl();
         }
 
         internal static M New(object id)
@@ -63,24 +69,29 @@ namespace Modl
             return New().Id(id);
         }
 
+        //internal static T AsMutable<T>(T modl) where T : class, IMutable
+        //{
+        //    return MutableInstanceCreator<T>.NewInstance(modl);
+        //}
+
         internal static void Save(M modl)
         {
-            Sync(modl);
+            //Sync(modl);
 
             var collection = InstanceStore.Get(modl.Modl.Id);
             collection.Save();
         }
 
-        internal static void Sync(M modl)
-        {
-            if (modl.Modl == null)
-                InstanceStore.AddNewInstance(GetId(modl), modl);
+        //internal static void Sync(M modl)
+        //{
+        //    //if (modl.Modl == null)
+        //    //    InstanceStore.AddNewInstance(GetId(modl), modl);
 
-            InstanceStore.Get(modl.Modl.Id).Sync(modl);
+        //    InstanceStore.Get(modl.Modl.Id).Sync(modl);
 
-            if (HasIdChanged(modl))
-                InstanceStore.ChangeId(modl, Identity.FromId(Definitions.IdProperty.GetValue(modl), Definitions));
-        }
+        //    if (HasIdChanged(modl))
+        //        InstanceStore.ChangeId(modl, Identity.FromId(Definitions.IdProperty.GetValue(modl), Definitions));
+        //}
 
         private static Identity GetId(M modl)
         {

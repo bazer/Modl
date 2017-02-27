@@ -11,7 +11,7 @@ namespace Modl
     //    Guid
     //}
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Interface)]
     public class NameAttribute : Attribute
     {
         public string Name { get; private set; }

@@ -25,6 +25,8 @@ namespace Tests.Threading
             public IModlData Modl { get; set; }
             public int Property1 { get; set; }
             public int Property2 { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         [Fact]

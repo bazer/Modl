@@ -146,14 +146,14 @@ namespace Modl.Instance
         }
 
 
-        //internal void ReadFromInstance<M>(M m) where M : IModl
+        //internal void ReadFromInstance<M>(M m) where M : class, IModl
         //{
         //    foreach (var property in Definitions.Properties.Where(x => !x.IsLink && !x.IsId))
         //        SetValue(property.PropertyName, property.GetValue(m));
 
         //}
 
-        //internal void ReadFromInstanceId<M>(M m) where M : IModl
+        //internal void ReadFromInstanceId<M>(M m) where M : class, IModl
         //{
         //    if (Definitions.HasIdProperty)
         //    {
@@ -171,20 +171,20 @@ namespace Modl.Instance
 
         
 
-        //internal void WriteToInstance<M>(M m, string propertyName = null) where M : IModl
+        //internal void WriteToInstance<M>(M m, string propertyName = null) where M : class, IModl
         //{
         //    foreach (var property in Definitions.Properties.Where(x => !x.IsLink && !x.IsId))
         //        if (propertyName == null || property.PropertyName == propertyName)
         //            property.SetValue(m, GetValue<object>(property.PropertyName));
         //}
 
-        //internal void WriteToInstanceId<M>(M m) where M : IModl
+        //internal void WriteToInstanceId<M>(M m) where M : class, IModl
         //{
         //    if (Definitions.HasIdProperty)
         //        Definitions.IdProperty.SetValue(m, IdValue.Get());
         //}
 
-        //internal void WriteRelationsToInstance<M>(M m) where M : IModl, new()
+        //internal void WriteRelationsToInstance<M>(M m) where M : class, IModl, new()
         //{
         //    foreach (LinkProperty property in Definitions.Properties.Where(x => x.IsLink))
         //        property.SetLinkValue(m);
@@ -198,7 +198,7 @@ namespace Modl.Instance
                 return Activator.CreateInstance(type);
         }
 
-        //internal bool Save<M>(M m, bool includeRelations) where M : IModl, new()
+        //internal bool Save<M>(M m, bool includeRelations) where M : class, IModl, new()
         //{
         //    if (IsDeleted)
         //        throw new NotFoundException(string.Format("Trying to save a deleted object. Class: {0}, Id: {1}", ModlType, GetId()));

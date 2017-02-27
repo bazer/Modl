@@ -22,38 +22,94 @@ namespace Tests
         [Fact]
         public void CoreStuff()
         {
-            Assert.Equal("Id", Modl<Car>.Definitions.IdProperty.PropertyName);
+            Assert.Equal("Id", Modl<ICar>.Definitions.IdProperty.PropertyName);
 
-            var car = Modl<Car>.New();
-            Assert.True(car.IsNew());
-            Assert.False(car.IsModified());
-            car.Name = "Audi";
-            Assert.True(car.IsNew());
-            Assert.True(car.IsModified());
+            //var car = ModlContext.Car.New();
 
-            car = new Car();
-            Assert.True(car.IsNew());
-            Assert.False(car.IsModified());
-            car.Name = "Audi";
-            Assert.True(car.IsNew());
-            Assert.True(car.IsModified());
+            //var car4 = M.Get<ICar>(456);
+            //var mutation = car4
+            //    .Mutate(x => x.Name, "KASdA")
+            //    .Mutate();
 
-            car = new Car().Modl().Modl().Modl().Modl();
-            Assert.True(car.IsNew());
-            Assert.False(car.IsModified());
-            car.Name = "Audi";
-            Assert.True(car.IsNew());
-            Assert.True(car.IsModified());
+            //var mutCar = car4.Mutate();
+
+            //var mutation2 = mutCar.ToMutation();
+            //var commit = mutation2.Commit();
+            
+            //mutation.Name = "fsdfs";
+            //mutation.Tags
+
+
+            //var car = Modl<ICar>.New();
+            var car = M.New<ICar>();
+            Assert.True(car.IsMutable);
+            Assert.True(car.IsNew);
+            Assert.False(car.IsModified);
+
+            car.Name = "BMW";
+            Assert.True(car.IsModified);
+            var changes = car.ToMutation();
+
+            Assert.Equal(1, changes.Modifications.Count());
+            Assert.Equal("Name", changes.Modifications.First().Property.Name);
+            Assert.Equal("BMW", (changes.Modifications.First().Property as ISimpleProperty).Value);
+
+
+            
+
+            car.Manufacturer = M.New<IManufacturer>()
+                .Mutate(x => x.Name, "Ford");
+
+            Assert.NotNull(car.Manufacturer);
+            Assert.Equal("Ford", car.Manufacturer.Name);
+            Assert.True(car.Manufacturer.IsMutable);
+            Assert.True(car.Manufacturer.IsNew);
+            Assert.True(car.Manufacturer.IsModified);
+
+            changes = car.ToMutation();
+            Assert.Equal(2, changes.Modifications.Count());
+            Assert.Equal("Manufacturer", changes.Modifications.Last().Property.Name);
+            //Assert.Equal(car.Manufacturer, (changes.Modifications.Last().Property as ISimpleProperty).Value);
+            //manufacturer
+            //    .Mutate(x => x.Name, "Ford")
+            //    .AppendTo(changes)
+            //    .Commit();
+
+
+
+            //var car2 = car.Mutate();
+            //car2.Name = "dadsdfsdf";
+            //car2.Type = new CarType { Description = "sdfsdg" };
+            //car2.Commit();
+
+
+            //car.Name = "Audi";
+            //Assert.True(car.IsNew);
+            //Assert.True(car.IsModified);
+
+            //car = Modl<ICar>.New();
+            //Assert.True(car.IsNew);
+            //Assert.False(car.IsModified);
+            //car.Name = "Audi";
+            //Assert.True(car.IsNew);
+            //Assert.True(car.IsModified);
+
+            //car = new Car().Modl().Modl().Modl().Modl();
+            //Assert.True(car.IsNew());
+            //Assert.False(car.IsModified());
+            //car.Name = "Audi";
+            //Assert.True(car.IsNew());
+            //Assert.True(car.IsModified());
 
             //car.Save();
 
-            car = Modl<Car>.New();
-            car.Manufacturer.Val = new Manufacturer("BMW");
-            Assert.True(car.IsNew());
-            Assert.True(car.IsModified());
-            Assert.Equal("BMW", car.Manufacturer.Val.Name);
-            Assert.True(car.Manufacturer.Val.IsNew());
-            Assert.True(car.Manufacturer.Val.IsModified());
+            //car = Modl<ICar>.New();
+            ////car.Manufacturer = Modl<IManufacturer>.New().AsMutable() new Manufacturer("BMW");
+            //Assert.True(car.IsNew());
+            //Assert.True(car.IsModified());
+            //Assert.Equal("BMW", car.Manufacturer.Name);
+            //Assert.True(car.Manufacturer.IsNew());
+            //Assert.True(car.Manufacturer.IsModified());
         }
 
 

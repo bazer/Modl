@@ -1,10 +1,12 @@
 ﻿using Modl.Instance;
+using System;
 
 namespace Modl
 {
     public interface IModlData
     {
         Backer Backer { get; }
+        ICommit Commit { get; }
         Identity Id { get; }
     }
 
@@ -17,6 +19,7 @@ namespace Modl
         }
 
         public Backer Backer { get; }
+        public ICommit Commit => throw new NotImplementedException();
         public Identity Id { get; }
     }
 }

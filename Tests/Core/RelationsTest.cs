@@ -19,6 +19,8 @@ namespace Tests.Core
 
             [Name("Class2-relation")]
             public ModlCollection<Class2> MultipleRelation { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         public class Class2: IModl
@@ -26,12 +28,16 @@ namespace Tests.Core
             public IModlData Modl { get; set; }
             [Name("Class1-relation")]
             public ModlValue<Class1> SingleRelation { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         public class Class3 : IModl
         {
             public IModlData Modl { get; set; }
             public Class1 SingleRelation { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
 

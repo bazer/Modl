@@ -8,7 +8,7 @@ using Modl.Structure.Storage;
 namespace Modl.Instance
 {
     public class UniqueInstancesCollection<M>
-            where M : IModl, new()
+            where M : class, IModl
     {
         internal UniqueInstancesCollection(Identity id)
         {
@@ -21,11 +21,11 @@ namespace Modl.Instance
         private Identity Id { get; set; }
         private Instances<M> Instances { get; } = new Instances<M>();
 
-        internal static UniqueInstancesCollection<M> FromNew(Identity id, M modl)
+        internal static UniqueInstancesCollection<M> FromNew(Identity id)
         {
             var collection = new UniqueInstancesCollection<M>(id);
-            collection.ReadFromInstance(modl);
-            collection.AddInstance(modl);
+            //collection.ReadFromInstance(modl);
+            //collection.AddInstance();
 
             return collection;
         }
@@ -58,8 +58,8 @@ namespace Modl.Instance
 
             this.Id = newId;
 
-            WriteNewModlDataToAllInstances();
-            WriteIdToAllInstances();
+            //WriteNewModlDataToAllInstances();
+            //WriteIdToAllInstances();
         }
 
         internal bool Delete()
@@ -81,10 +81,11 @@ namespace Modl.Instance
             if (Backer.IsDeleted)
                 throw new NotFoundException(string.Format("Trying to get a deleted object. Class: {0}, Id: {1}", Backer.ModlType, Id));
 
-            var modl = new M();
+            //var modl = new M();
+            //WriteToInstance(modl);
 
-            WriteToInstance(modl);
-            AddInstance(modl);
+            //var modl = ImmutableInstanceCreator<M>.NewInstance(new ModlData(Id, Backer));
+            var modl = AddInstance();
 
             return modl;
         }
@@ -124,19 +125,22 @@ namespace Modl.Instance
             return true;
         }
 
-        internal void Sync(M m)
-        {
-            ReadFromInstance(m);
-            WriteToAllInstances();
-        }
+        //internal void Sync(M m)
+        //{
+        //    ReadFromInstance(m);
+        //    WriteToAllInstances();
+        //}
 
-        private void AddInstance(M modl)
+        private M AddInstance()
         {
-            WriteIdToInstance(modl);
-            WriteRelationsToInstance(modl);
+            //WriteIdToInstance(modl);
+            //WriteRelationsToInstance(modl);
+            //modl.Modl = new ModlData(Id, Backer);
+            var modl = ImmutableInstanceCreator<M>.NewInstance(new ModlData(Id, Backer));
 
-            modl.Modl = new ModlData(Id, Backer);
             Instances.AddInstance(modl);
+
+            return modl;
         }
 
         private void ReadFromInstance(M m)
@@ -145,25 +149,25 @@ namespace Modl.Instance
                 Backer.SetValue(property.PropertyName, property.GetValue(m));
         }
 
-        private void WriteIdToAllInstances()
-        {
-            foreach (var instance in Instances.GetInstances())
-                WriteIdToInstance(instance);
-        }
+        //private void WriteIdToAllInstances()
+        //{
+        //    foreach (var instance in Instances.GetInstances())
+        //        WriteIdToInstance(instance);
+        //}
 
-        private void WriteIdToInstance(M m)
-        {
-            if (Definitions.HasIdProperty && (Id.IsAutomatic || Id.IsSet))
-                Definitions.IdProperty.SetValue(m, Id.Get());
-        }
+        //private void WriteIdToInstance(M m)
+        //{
+        //    if (Definitions.HasIdProperty && (Id.IsAutomatic || Id.IsSet))
+        //        Definitions.IdProperty.SetValue(m, Id.Get());
+        //}
 
-        private void WriteNewModlDataToAllInstances()
-        {
-            var data = new ModlData(Id, Backer);
+        //private void WriteNewModlDataToAllInstances()
+        //{
+        //    var data = new ModlData(Id, Backer);
 
-            foreach (var instance in Instances.GetInstances())
-                instance.Modl = data;
-        }
+        //    foreach (var instance in Instances.GetInstances())
+        //        instance.Modl = data;
+        //}
 
         private void WriteRelationsToAllInstances()
         {

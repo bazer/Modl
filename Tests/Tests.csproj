@@ -110,6 +110,7 @@
     <Compile Include="Core\ReflectionTest.cs" />
     <Compile Include="Core\EmptyClassTest.cs" />
     <Compile Include="Databases.cs" />
+    <Compile Include="Immutable\Basics.cs" />
     <Compile Include="LinqSuite.cs" />
     <Compile Include="Linq\BasicLinqTests.cs" />
     <Compile Include="MySQL.cs" />

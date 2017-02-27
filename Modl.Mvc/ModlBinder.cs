@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Modl.Mvc
 {
-    public class DbModlBinder<M> : DefaultModelBinder where M : IModl, new()
+    public class DbModlBinder<M> : DefaultModelBinder where M : class, IModl
     {
         //public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
         protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, System.Type modelType)

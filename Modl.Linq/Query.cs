@@ -11,7 +11,7 @@ using Remotion.Linq.Parsing.Structure;
 namespace Modl.Linq
 {
     public class Query<M> : QueryableBase<M>
-        where M : IModl, new()
+        where M : class, IModl
     {
         public Query(IQueryParser queryParser, IQueryExecutor executor)
             : base(new DefaultQueryProvider(typeof(Query<>), queryParser, executor))
@@ -26,7 +26,7 @@ namespace Modl.Linq
 
 
     //public class Query<M> : IQueryable<M>
-    //    where M : IModl, new()
+    //    where M : class, IModl, new()
     //{
     //    public Type ElementType
     //    {

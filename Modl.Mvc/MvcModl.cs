@@ -13,7 +13,7 @@ namespace Modl.Mvc
     }
 
     public class MvcModl<M> : Modl<M>
-        where M : IMvcModl, new()
+        where M : class, IMvcModl
     {
     }
 

@@ -5,7 +5,7 @@ using System.Linq;
 namespace Modl
 {
     public class ModlCollection<M> : BaseCollection<M>, IEnumerable<M>
-        where M : IModl, new()
+        where M : class, IModl
     {
         internal ModlCollection(string name, IModl m) : base(name, m)
         {

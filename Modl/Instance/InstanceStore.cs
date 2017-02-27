@@ -6,7 +6,7 @@ using Modl.Structure.Storage;
 namespace Modl.Instance
 {
     public class InstanceStore<M>
-        where M : IModl, new()
+        where M : class, IModl
     {
         private static InstanceStore<M> StaticInstance;
 
@@ -52,12 +52,12 @@ namespace Modl.Instance
             return collection;
         }
 
-        public UniqueInstancesCollection<M> AddNewInstance(Identity id, M modl)
+        public UniqueInstancesCollection<M> AddNewInstance(Identity id)
         {
             if (HasCollection(id))
                 throw new InvalidIdException($"There is already a collection with id '{id}'");
 
-            var collection = UniqueInstancesCollection<M>.FromNew(id, modl);
+            var collection = UniqueInstancesCollection<M>.FromNew(id);
             Collections.Add(id, collection);
 
             return collection;

@@ -14,6 +14,8 @@ namespace Tests.Core
             public IModlData Modl { get; set; }
             [Id(automatic: true)]
             public Guid CustomId { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         public class AutomaticIdIntClass : IModl
@@ -21,6 +23,8 @@ namespace Tests.Core
             public IModlData Modl { get; set; }
             [Id(automatic: true)]
             public int CustomId { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         public class AutomaticIdStringClass : IModl
@@ -28,6 +32,8 @@ namespace Tests.Core
             public IModlData Modl { get; set; }
             [Id(automatic: true)]
             public string CustomId { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         public AutomaticIdTest()

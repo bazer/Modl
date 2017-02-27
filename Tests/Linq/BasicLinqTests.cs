@@ -16,6 +16,8 @@ namespace Tests.Linq
         public class EmptyClass : IModl
         {
             public IModlData Modl { get; set; }
+
+            public bool IsMutable => throw new NotImplementedException();
         }
 
         

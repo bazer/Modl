@@ -39,7 +39,7 @@ namespace Modl.Metadata
                 LinkedModlType = PropertyType.GetGenericArguments().First();
         }
 
-        public void SetLinkValue<M>(M m) where M : IModl
+        public void SetLinkValue<M>(M m) where M : class, IModl
         {
             if (LinkType == LinkType.SimpleLink)
                 throw new NotImplementedException();
