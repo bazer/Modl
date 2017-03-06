@@ -9,14 +9,14 @@ namespace Modl.Metadata
 {
     public class PropertyFactory
     {
-        public static Property Create(PropertyInfo propertyInfo, Type modlType)
+        public static PropertyDefinition Create(PropertyInfo propertyInfo, Type modlType)
         {
             var propertyType = propertyInfo.PropertyType;
 
             if (IsLink(propertyType))
                 return new LinkProperty(propertyInfo, modlType);
             else
-                return new Property(propertyInfo, modlType);
+                return new PropertyDefinition(propertyInfo, modlType);
         }
 
         private static bool IsLink(Type propertyType) => 

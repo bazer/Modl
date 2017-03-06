@@ -30,7 +30,7 @@ namespace Modl.Instance
             return collection;
         }
 
-        internal static UniqueInstancesCollection<M> FromStorage(Identity id, IEnumerable<Container> storage)
+        internal static UniqueInstancesCollection<M> FromStorage(Identity id, IEnumerable<IContainer> storage)
         {
             var collection = new UniqueInstancesCollection<M>(id);
             collection.Backer.SetValuesFromStorage(storage);

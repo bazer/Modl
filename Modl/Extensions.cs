@@ -41,7 +41,7 @@ namespace Modl
 
         public static M Save<M>(this M m) where M : class, IModl
         {
-            Handler<M>.Save(m);
+            //Handler<M>.Save(m);
             return m;
         }
 
@@ -53,19 +53,25 @@ namespace Modl
             return m;
         }
 
-        public static ICommit Commit(this IEnumerable<IModification> m)
+        public static ICommit Commit(this IEnumerable<IMutation> modifications, IUser who)
         {
-            return new Commit();
+            return Handler.Commit(new MutationCollection(modifications), who);
         }
 
-        public static ICommit Commit(this Mutation m)
+        public static ICommit Commit(this IMutationCollection mutation, IUser who)
         {
-            return new Commit();
+            return Handler.Commit(mutation, who);
         }
 
-        public static ICommit Commit(this IMutable m)
+        public static ICommit Commit(this IMutable mutable, IUser who)
         {
-            return new Commit();
+            return Handler.Commit(mutable.ToMutation(), who);
+        }
+
+        public static ICommit Push(this ICommit commit)
+        {
+            Handler.Push(commit);
+            return commit;
         }
     }
 }

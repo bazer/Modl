@@ -46,16 +46,23 @@ namespace Tests
             Assert.True(car.IsNew);
             Assert.False(car.IsModified);
 
-            car.Name = "BMW";
+            Assert.Null(car.Name);
+            car.Name = "Mazda";
             Assert.True(car.IsModified);
-            var changes = car.ToMutation();
+            Assert.Equal("Mazda", car.Name);
+            Assert.Equal("Mazda", car["Name"]);
+            car["Name"] = "BMW";
+            Assert.Equal("BMW", car.Name);
 
-            Assert.Equal(1, changes.Modifications.Count());
-            Assert.Equal("Name", changes.Modifications.First().Property.Name);
-            Assert.Equal("BMW", (changes.Modifications.First().Property as ISimpleProperty).Value);
+            Assert.Throws<InvalidPropertyNameException>(() => car["WrongName"]);
+            Assert.Throws<InvalidPropertyNameException>(() => car["WrongName"] = "test");
 
+            var mutation = car.ToMutation();
+            Assert.Equal(1, mutation.Modifications.Count());
+            //Assert.Null(changes.Modifications.First().Modl);
+            Assert.Equal("Name", mutation.Modifications.First().NewProperty.Name);
+            Assert.Equal("BMW", (mutation.Modifications.First().NewProperty as ISimpleProperty).Value);
 
-            
 
             car.Manufacturer = M.New<IManufacturer>()
                 .Mutate(x => x.Name, "Ford");
@@ -66,10 +73,16 @@ namespace Tests
             Assert.True(car.Manufacturer.IsNew);
             Assert.True(car.Manufacturer.IsModified);
 
-            changes = car.ToMutation();
-            Assert.Equal(2, changes.Modifications.Count());
-            Assert.Equal("Manufacturer", changes.Modifications.Last().Property.Name);
+            mutation = car.ToMutation();
+            Assert.Equal(2, mutation.Modifications.Count());
+            Assert.Equal("Manufacturer", mutation.Modifications.Last().NewProperty.Name);
             //Assert.Equal(car.Manufacturer, (changes.Modifications.Last().Property as ISimpleProperty).Value);
+
+
+           
+
+
+
             //manufacturer
             //    .Mutate(x => x.Name, "Ford")
             //    .AppendTo(changes)
@@ -144,10 +157,10 @@ namespace Tests
 
             //Car car = Modl<Car>.New();
 
-            var car = new Car();
-            Assert.False(car.IsModified());
+            var car = M.New<ICar>();
+            Assert.False(car.IsModified);
             car.Name = "M3";
-            car.Manufacturer.Val = new Manufacturer("BMW");
+            car.Manufacturer = M.New<IManufacturer>().Mutate(x => x.Name, "BMW");
             car.Type = new CarType();
             car.Type.Description = "Sedan";
             car.Tags = new List<string>();
@@ -157,18 +170,34 @@ namespace Tests
             car.Tags.Add("Awful");
 
             Assert.Equal("Sedan", car.Type.Description);
-            Assert.True(car.IsModified());
-            car.Save();
-            Assert.False(car.IsNew());
-            Assert.False(car.IsModified());
-            car.Manufacturer.Val.Save();
+            Assert.True(car.IsModified);
 
-            Car car2 = Modl<Car>.Get(car.Id);
+            var mutation = car.ToMutation();
+            Assert.Equal(4, mutation.Modifications.Count());
+            var user = new User("Basic user");
+            var commit = mutation.Commit(user);
+
+            Assert.True(commit.When > DateTime.UtcNow.AddMilliseconds(-100));
+            Assert.True(commit.When <= DateTime.UtcNow);
+            Assert.Equal(0, commit.Previous.Count());
+            Assert.Equal(0, commit.Next.Count());
+            Assert.NotEqual(Guid.Empty, commit.Id);
+            Assert.Equal(mutation.Modifications.Count(), commit.Modifications.Count());
+            Assert.Equal(user, commit.User);
+
+            commit.Push();
+
+            //car.Save();
+            Assert.False(car.IsNew);
+            Assert.False(car.IsModified);
+            car.Manufacturer.Save();
+
+            var car2 = M.Get<ICar>(car.Id);
             AssertEqual(car, car2);
             Assert.Equal("Sedan", car2.Type.Description);
-            car2.Manufacturer.Val.Name = "Mercedes";
-            Assert.Equal("Mercedes", car2.Manufacturer.Val.Name);
-            car2.Manufacturer.Val.Save();
+            car2.Manufacturer.Name = "Mercedes";
+            Assert.Equal("Mercedes", car2.Manufacturer.Name);
+            car2.Manufacturer.Save();
 
             Car car3 = Modl<Car>.Get(car.Id);
             Assert.Equal("Mercedes", car3.Manufacturer.Val.Name);
@@ -183,7 +212,7 @@ namespace Tests
         [Fact]
         public void CRUDExplicitId()
         {
-            Manufacturer m1 = Modl<Manufacturer>.New(Guid.NewGuid());
+            var m1 = M.New<IManufacturer>();
             Assert.False(m1.IsModified());
             m1.Name = "BMW";
             Assert.True(m1.IsModified());
@@ -191,7 +220,7 @@ namespace Tests
             Assert.False(m1.IsNew());
             Assert.False(m1.IsModified());
 
-            Manufacturer m2 = Modl<Manufacturer>.Get(m1.ManufacturerID);
+            var m2 = M.Get<IManufacturer>(m1.ManufacturerID);
             AssertEqual(m1, m2);
 
             m2.Name = "Mercedes";
@@ -377,7 +406,7 @@ namespace Tests
         //    return list;
         //}
 
-        public void AssertEqual(Car car1, Car car2)
+        public void AssertEqual(ICar car1, ICar car2)
         {
             //Assert.Equal(car1.Database(), car2.Database());
             //Assert.Equal(car1.Database().Name, car2.Database().Name);
@@ -385,11 +414,11 @@ namespace Tests
             Assert.Equal(car1.Tags.Count, car2.Tags.Count);
             Assert.Equal(car1.Tags[0], car2.Tags[0]);
             Assert.Equal(car1.Type.Description, car2.Type.Description);
-            AssertEqual(car1.Manufacturer.Val, car2.Manufacturer.Val);
+            AssertEqual(car1.Manufacturer, car2.Manufacturer);
             Assert.Equal(car1.Name, car2.Name);
         }
 
-        public void AssertEqual(Manufacturer m1, Manufacturer m2)
+        public void AssertEqual(IManufacturer m1, IManufacturer m2)
         {
             //Assert.Equal(m1.Database(), m2.Database());
             //Assert.Equal(m1.Database().Name, m2.Database().Name);
@@ -401,13 +430,13 @@ namespace Tests
         public void SetIdExplicit()
         {
             var id = Guid.NewGuid();
-            Manufacturer m1 = Modl<Manufacturer>.New(id);
+            var m1 = M.New<IManufacturer>().Mutate(x => x.ManufacturerID, id);
             m1.Name = "Audi";
             Assert.Equal(id, m1.ManufacturerID);
             m1.Save();
             Assert.Equal(id, m1.ManufacturerID);
 
-            var m2 = Modl<Manufacturer>.Get(m1.ManufacturerID.ToString());
+            var m2 = M.Get<IManufacturer>(m1.ManufacturerID.ToString());
             AssertEqual(m1, m2);
 
             m2.Save();

@@ -10,8 +10,8 @@ namespace Modl.Interfaces
 {
     public interface ISerializer: IPipeline
     {
-        MemoryStream Serialize(Container storage);
-        Container Deserialize(Stream stream);
+        MemoryStream Serialize(IContainer storage);
+        IContainer Deserialize(Stream stream);
         object DeserializeObject(object obj, Type toType);
     }
 }

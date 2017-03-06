@@ -15,7 +15,7 @@ namespace Modl.Structure.Storage
                 .Select(x => DeserializeObject(x.Id, identity.IdType, settings));
         }
 
-        internal static IEnumerable<Container> Read(IEnumerable<StorageIdentity> identities, Settings settings)
+        internal static IEnumerable<IContainer> Read(IEnumerable<StorageIdentity> identities, Settings settings)
         {
             foreach (var identity in identities)
             {
@@ -28,7 +28,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static void Write(IEnumerable<Container> storages, Settings settings)
+        internal static void Write(IEnumerable<IContainer> storages, Settings settings)
         {
             foreach (var storage in storages)
             {
@@ -41,7 +41,7 @@ namespace Modl.Structure.Storage
             }
         }
 
-        internal static void Delete(IEnumerable<Container> storages, Settings settings)
+        internal static void Delete(IEnumerable<IContainer> storages, Settings settings)
         {
             foreach (var storage in storages)
             {

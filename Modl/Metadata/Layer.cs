@@ -20,8 +20,8 @@ namespace Modl.Metadata
         internal bool HasIdProperty => Properties.Any(x => x.IsId);
         internal bool HasAutomaticId => !HasIdProperty || (HasIdProperty && IdProperty.IsAutomaticId);
 
-        internal List<Property> Properties { get; private set; }
-        internal List<Property> AllProperties { get; private set; }
+        internal List<PropertyDefinition> Properties { get; private set; }
+        internal List<PropertyDefinition> AllProperties { get; private set; }
 
         public Layer(Type type)
         {
@@ -29,7 +29,7 @@ namespace Modl.Metadata
             //if (type.BaseType != null && type.BaseType != typeof(object))
             //    Parent = new Layer(type.BaseType);
 
-            Properties = new List<Property>();
+            Properties = new List<PropertyDefinition>();
 
             Name = type.Name;
             ModlName = type.Name;
@@ -60,7 +60,7 @@ namespace Modl.Metadata
             AllProperties = Properties;
         }
 
-        internal Property IdProperty
+        internal PropertyDefinition IdProperty
         {
             get
             {
@@ -78,7 +78,7 @@ namespace Modl.Metadata
         //    }
         //}
 
-        internal void SetValuesFromStorage(Backer instance, IEnumerable<Container> storage)
+        internal void SetValuesFromStorage(Backer instance, IEnumerable<IContainer> storage)
         {
             //if (HasParent)
             //    Parent.SetValuesFromStorage(instance, storage);
@@ -114,10 +114,7 @@ namespace Modl.Metadata
 
         public IEnumerable<Container> GetStorage(Identity id, Backer instance)
         {
-            yield return new Container(GetAbout(id, instance), GetValues(id, instance))
-            {
-                Identity = GetIdentity(id.Get())
-            };
+            yield return new Container(GetIdentity(id.Get()), GetAbout(id, instance), GetValues(id, instance));
 
             //if (HasParent)
             //    foreach (var x in Parent.GetStorage(instance))
@@ -185,7 +182,7 @@ namespace Modl.Metadata
             return Properties.Single(x => x.PropertyName == name).StorageName;
         }
 
-        private Property GetPropertyFromModlName(string modlName)
+        private PropertyDefinition GetPropertyFromModlName(string modlName)
         {
             return Properties.Single(x => x.StorageName == modlName);
         }

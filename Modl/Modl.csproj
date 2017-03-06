@@ -59,13 +59,18 @@
     <Compile Include="Helpers\IdConverter.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="ImmutableModl.cs" />
+    <Compile Include="Plugins\IRepository.cs" />
+    <Compile Include="Repository\MutationContainer.cs" />
+    <Compile Include="Repository\Commits.cs" />
     <Compile Include="Instance\InstanceCreator.cs" />
     <Compile Include="Instance\Instances.cs" />
     <Compile Include="Instance\InstanceStore.cs" />
-    <Compile Include="Instance\IValue.cs" />
-    <Compile Include="Instance\RelationValue.cs" />
+    <Compile Include="Repository\CommitContainer.cs" />
+    <Compile Include="Storage\IContainer.cs" />
+    <Compile Include="Values\IValue.cs" />
+    <Compile Include="Values\RelationValue.cs" />
     <Compile Include="Instance\UniqueInstancesCollection.cs" />
-    <Compile Include="Instance\ValueBacker.cs" />
+    <Compile Include="Values\ValueBacker.cs" />
     <Compile Include="Mutation.cs" />
     <Compile Include="Relations\BaseCollection.cs" />
     <Compile Include="Relations\ModlCollection.cs" />
@@ -88,13 +93,14 @@
     <Compile Include="Cache\CacheConfig.cs" />
     <Compile Include="Exceptions\InvalidQueryException.cs" />
     <Compile Include="Exceptions\RecordNotFoundException.cs" />
-    <Compile Include="Instance\SimpleValue.cs" />
-    <Compile Include="Instance\Backer.cs" />
+    <Compile Include="Values\SimpleValue.cs" />
+    <Compile Include="Values\Backer.cs" />
     <Compile Include="Modl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\Identity.cs" />
     <Compile Include="Storage\Materializer.cs" />
     <Compile Include="Storage\Container.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

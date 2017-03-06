@@ -41,7 +41,7 @@ namespace Modl
         {
             return (T)typeof(Modl<>)
                 .MakeGenericType(type)
-                .GetMethods().Single(x => x.Name == name && !x.IsGenericMethod && x.GetParameters().Count() == args.Length)
+                .GetMethods().Single(x => x.Name == name && !x.IsGenericMethod && x.GetParameters().Length == args.Length)
                 .Invoke(null, args);
         }
 
@@ -49,7 +49,7 @@ namespace Modl
         {
             return (T)typeof(Modl<>)
                 .MakeGenericType(type)
-                .GetMethods().Single(x => x.Name == name && x.IsGenericMethod && x.GetParameters().Count() == args.Length)
+                .GetMethods().Single(x => x.Name == name && x.IsGenericMethod && x.GetParameters().Length == args.Length)
                 .MakeGenericMethod(genericType)
                 .Invoke(null, args);
         }

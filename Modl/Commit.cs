@@ -1,30 +1,47 @@
-﻿using System;
+﻿using Modl.Structure.Storage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Modl
 {
     public interface ICommit
     {
         Guid Id { get; }
-        DateTime When { get; }
-        IUser Who { get; }
-        IEnumerable<ICommit> Previous { get; }
+        IEnumerable<IMutation> Modifications { get; }
         IEnumerable<ICommit> Next { get; }
+        IEnumerable<ICommit> Previous { get; }
+        DateTime When { get; }
+        IUser User { get; }
     }
 
     public class Commit : ICommit
     {
-        public Guid Id => throw new NotImplementedException();
+        private List<IMutation> modifications;
+        private List<ICommit> next;
+        private List<ICommit> previous;
 
-        public DateTime When => throw new NotImplementedException();
+        public Commit(IMutationCollection mutation, IUser who)
+        {
+            this.modifications = mutation.Modifications.ToList();
+            this.When = DateTime.UtcNow;
+            this.Id = Guid.NewGuid();
+            this.User = who;
+            this.next = new List<ICommit>();
+            this.previous = new List<ICommit>();
 
-        public IUser Who => throw new NotImplementedException();
+            
+        }
 
-        public IEnumerable<ICommit> Previous => throw new NotImplementedException();
+        
 
-        public IEnumerable<ICommit> Next => throw new NotImplementedException();
+        public Guid Id { get; }
+
+        public IEnumerable<IMutation> Modifications => modifications.AsEnumerable();
+        public IEnumerable<ICommit> Next => next.AsEnumerable();
+        public IEnumerable<ICommit> Previous => next.AsEnumerable();
+        public DateTime When { get; }
+
+        public IUser User { get; }
     }
 }

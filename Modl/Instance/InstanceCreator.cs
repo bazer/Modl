@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace Modl.Instance
 {
-    public class ImmutableInstanceCreator<M> where M : class, IModl
+    public static class ImmutableInstanceCreator<M> where M : class, IModl
     {
+        private static ProxyGenerator generator = new ProxyGenerator();
+
         public static M NewInstance(IModlData modlData)// where T : class
         {
-            var generator = new ProxyGenerator();
+            //var generator = new ProxyGenerator();
             var proxy = generator.CreateInterfaceProxyWithoutTarget<M>(new ImmutableInterceptor(modlData));
             return proxy;
         }
@@ -51,11 +53,13 @@ namespace Modl.Instance
         }
     }
 
-    internal class MutableInstanceCreator<M> where M : class, IMutable
+    internal static class MutableInstanceCreator<M> where M : class, IMutable
     {
+        private static ProxyGenerator generator = new ProxyGenerator();
+
         internal static M NewInstance(M immutableInstance)// where T : class
         {
-            var generator = new ProxyGenerator();
+            //var generator = new ProxyGenerator();
             var proxy = generator.CreateInterfaceProxyWithoutTarget<M>(new MutableInterceptor(immutableInstance));
             return proxy;
         }
@@ -68,7 +72,7 @@ namespace Modl.Instance
         internal class MutableInterceptor : IInterceptor //<M> : IInterceptor where M : class, IModl
         {
             private IMutable immutableInstance;
-            private Dictionary<string, object> mutatedValues = new Dictionary<string, object>();
+            private Dictionary<string, IProperty> mutatedValues = new Dictionary<string, IProperty>();
 
             public MutableInterceptor(IMutable immutableInstance)
             {
@@ -81,10 +85,17 @@ namespace Modl.Instance
 
                 if (info.CallType == CallType.Set)
                 {
-                    if (!immutableInstance.Modl.Backer.Definitions.Properties.Any(x => x.PropertyName == info.Property))
+                    //if (!immutableInstance.Modl.Backer.Definitions.Properties.Any(x => x.PropertyName == info.Property))
+                    //    throw new InvalidPropertyNameException($"Property with name '{info.Property}' doesn't exist on type '{immutableInstance.GetType()}'");
+
+                    var definition = immutableInstance.Modl.Backer.Definitions.Properties.SingleOrDefault(x => x.PropertyName == info.Property);
+                    if (definition == null)
                         throw new InvalidPropertyNameException($"Property with name '{info.Property}' doesn't exist on type '{immutableInstance.GetType()}'");
 
-                    mutatedValues[info.Property] = info.Value;
+                    if (definition.IsLink)
+                        mutatedValues[info.Property] = new RelationProperty(definition, info.Property, info.Value as IModl);
+                    else
+                        mutatedValues[info.Property] = new SimpleProperty(definition, info.Property, info.Value);
                 }
                 else
                 {
@@ -100,56 +111,28 @@ namespace Modl.Instance
                         invocation.ReturnValue = GetModifications();
                     else
                     {
-                        if (mutatedValues.ContainsKey(info.Property))
-                            invocation.ReturnValue = mutatedValues[info.Property];
+                        var definition = immutableInstance.Modl.Backer.Definitions.Properties.SingleOrDefault(x => x.PropertyName == info.Property);
+                        if (definition == null)
+                            throw new InvalidPropertyNameException($"Property with name '{info.Property}' doesn't exist on type '{immutableInstance.GetType()}'");
+
+                        if (definition.IsLink)
+                        {
+                            if (mutatedValues.ContainsKey(info.Property))
+                                invocation.ReturnValue = (mutatedValues[info.Property] as IRelationProperty).Value;
+                            else
+                                invocation.ReturnValue = immutableInstance.Modl.Backer.RelationValueBacker.GetValue(info.Property).Get();
+                        }
                         else
-                            invocation.ReturnValue = immutableInstance.Modl.Backer.SimpleValueBacker.GetValue(info.Property).Get();
+                        {
+                            if (mutatedValues.ContainsKey(info.Property))
+                                invocation.ReturnValue = (mutatedValues[info.Property] as ISimpleProperty).Value;
+                            else
+                                invocation.ReturnValue = immutableInstance.Modl.Backer.SimpleValueBacker.GetValue(info.Property).Get();
+                        }
                     }
                 }
-
-
-                //var name = invocation.Method.Name;
-
-                //if (name.StartsWith("set_", StringComparison.Ordinal))
-                //{
-                //    if (invocation.Arguments.Length == 2)
-                //    {
-                //        name = invocation.Arguments[0] as string;
-
-
-                //        mutatedValues[name] = invocation.Arguments[1];
-                //    }
-                //    else
-                //    {
-                //        name = name.Substring(4);
-                //        mutatedValues[name] = invocation.Arguments[0];
-                //    }
-                //}
-                //else if (name.StartsWith("get_", StringComparison.Ordinal))
-                //{
-                //    name = name.Substring(4);
-
-                //    if (name == "Modl")
-                //        invocation.ReturnValue = immutableInstance.Modl;
-                //    else if (name == "IsMutable")
-                //        invocation.ReturnValue = true;
-                //    else if (name == "IsNew")
-                //        invocation.ReturnValue = true;
-                //    else if (name == "IsModified")
-                //        invocation.ReturnValue = mutatedValues.Any();
-                //    else if (name == "Modifications")
-                //        invocation.ReturnValue = GetModifications();
-                //    else
-                //    {
-                //        if (mutatedValues.ContainsKey(name))
-                //            invocation.ReturnValue = mutatedValues[name];
-                //        else
-                //            invocation.ReturnValue = immutableInstance.Modl.Backer.SimpleValueBacker.GetValue(name).Get();
-                //    }
-                //}
-                //else
-                //    throw new NotImplementedException();
             }
+
 
             
 
@@ -157,16 +140,14 @@ namespace Modl.Instance
             {
                 foreach (var mutatedValue in mutatedValues)
                 {
-                    var property = new SimpleProperty(mutatedValue.Key, mutatedValue.Value);
-                    yield return new Modification(immutableInstance, property);
+                    var newProperty = mutatedValue.Value;
+                    var oldProperty = newProperty.Metadata.IsLink 
+                        ? new RelationProperty(newProperty.Metadata, mutatedValue.Key, immutableInstance.Modl.Backer.RelationValueBacker.GetValue(mutatedValue.Key).Get() as IModl) as IProperty
+                        : new SimpleProperty(newProperty.Metadata, mutatedValue.Key, immutableInstance.Modl.Backer.SimpleValueBacker.GetValue(mutatedValue.Key).Get());
+                    
+                    yield return new Modification(Guid.NewGuid(), immutableInstance, oldProperty, newProperty);
                 }
             }
-
-            
-
-            
-
-            
         }
     }
 
@@ -202,7 +183,7 @@ namespace Modl.Instance
             else
                 throw new NotImplementedException();
 
-            if (invocation.Arguments.Length == 2)
+            if ((this.CallType == CallType.Get && invocation.Arguments.Length == 1) || (this.CallType == CallType.Set && invocation.Arguments.Length == 2))
             {
                 this.MethodType = MethodType.Indexer;
                 this.Property = invocation.Arguments[0] as string;

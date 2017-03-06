@@ -17,8 +17,8 @@ namespace Modl.Metadata
         private Layer FirstLayer { get; set; }
         public bool HasIdProperty => FirstLayer.HasIdProperty;
         public bool HasAutomaticId => FirstLayer.HasAutomaticId;
-        public Property IdProperty => FirstLayer.IdProperty;
-        public List<Property> Properties => FirstLayer.AllProperties;
+        public PropertyDefinition IdProperty => FirstLayer.IdProperty;
+        public List<PropertyDefinition> Properties => FirstLayer.AllProperties;
 
         public static Definitions Get(Type type)
         {
@@ -43,7 +43,7 @@ namespace Modl.Metadata
             return FirstLayer.GetStorage(id, instance);
         }
 
-        internal void SetValuesFromStorage(Backer instance, IEnumerable<Container> storage)
+        internal void SetValuesFromStorage(Backer instance, IEnumerable<IContainer> storage)
         {
             FirstLayer.SetValuesFromStorage(instance, storage);
         }

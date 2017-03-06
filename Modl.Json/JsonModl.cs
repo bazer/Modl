@@ -12,7 +12,7 @@ namespace Modl.Json
 {
     public class JsonModl: ISerializer
     {
-        MemoryStream ISerializer.Serialize(Container storage)
+        MemoryStream ISerializer.Serialize(IContainer storage)
         {
             var stream = new MemoryStream();
             var jsonTextWriter = new JsonTextWriter(new StreamWriter(stream));
@@ -25,7 +25,7 @@ namespace Modl.Json
             return stream;
         }
 
-        Container ISerializer.Deserialize(Stream stream)
+        IContainer ISerializer.Deserialize(Stream stream)
         {
             var serializer = new JsonSerializer();
 

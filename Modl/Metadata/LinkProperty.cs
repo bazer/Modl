@@ -15,7 +15,7 @@ namespace Modl.Metadata
         MultiLink
     }
 
-    public class LinkProperty : Property
+    public class LinkProperty : PropertyDefinition
     {
         public LinkType LinkType { get; }
         public Type LinkedModlType { get; }

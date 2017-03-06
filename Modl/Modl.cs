@@ -13,12 +13,7 @@ namespace Modl
         bool IsMutable { get; }
     }
 
-    public interface IUser
-    {
-        string Name { get; }
-    }
-
-    public class Modl<M> where M : class, IModl //, new()
+    public static class Modl<M> where M : class, IModl //, new()
     {
         static Modl()
         {
@@ -60,7 +55,7 @@ namespace Modl
         }
     }
 
-    public class M
+    public static class M
     {
         public static T New<T>() where T : class, IMutable =>
             Handler<T>.New().Mutate();

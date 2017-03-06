@@ -5,9 +5,39 @@ using Modl.Instance;
 using Modl.Metadata;
 using Modl.Structure.Storage;
 using System;
+using Modl.Repository;
+using Modl.Structure.Repository;
 
 namespace Modl
 {
+    internal static class Handler
+    {
+        public static Commits CommitStore => Repository.Commits.ForThisModl;
+
+        public static ICommit Commit(IMutationCollection mutation, IUser who)
+        {
+            var commit = new Commit(mutation, who);
+
+            CommitStore.AddCommit(commit);
+
+            return commit;
+        }
+
+        public static void Push(IEnumerable<ICommit> commits)
+        {
+            var settings = Settings.Get(typeof(ICommit));
+            var commitContainers = commits.Select(x => new CommitContainer(x)) as IEnumerable<IContainer>;
+            var mutationContainers = commits.SelectMany(x => x.Modifications.Select(y => new MutationContainer(y)));
+
+            Materializer.Write(commitContainers.Concat(mutationContainers), settings);
+        }
+
+        public static void Push(ICommit commit)
+        {
+            Push(new ICommit[] { commit });
+        }
+    }
+
     internal class Handler<M> where M : class, IModl
     {
         static Handler()
@@ -16,6 +46,7 @@ namespace Modl
 
         public static Definitions Definitions => Definitions.Get(typeof(M));
         public static InstanceStore<M> InstanceStore => InstanceStore<M>.ForThisModl;
+        
         public static Settings Settings => Settings.Get(typeof(M));
 
         internal static void AddRelation(M from, IModl to)
@@ -69,18 +100,20 @@ namespace Modl
             return New().Id(id);
         }
 
+        
+
         //internal static T AsMutable<T>(T modl) where T : class, IMutable
         //{
         //    return MutableInstanceCreator<T>.NewInstance(modl);
         //}
 
-        internal static void Save(M modl)
-        {
-            //Sync(modl);
+        //internal static void Save(M modl)
+        //{
+        //    //Sync(modl);
 
-            var collection = InstanceStore.Get(modl.Modl.Id);
-            collection.Save();
-        }
+        //    var collection = InstanceStore.Get(modl.Modl.Id);
+        //    collection.Save();
+        //}
 
         //internal static void Sync(M modl)
         //{

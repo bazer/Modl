@@ -11,11 +11,11 @@ namespace ExampleModel
     {
         [Id]
         Guid ManufacturerID { get; }
-        string Name { get; }
-        ModlCollection<Car> Cars { get; }
+        string Name { get; set; }
+        IList<Car> Cars { get; set; }
 
         [ForeignKey(typeof(Vehicle), "Manufacturer_fk")]
-        ModlCollection<Vehicle> Vehicles { get; }
+        IList<Vehicle> Vehicles { get; }
         string Item { get; set; }
     }
 

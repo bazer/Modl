@@ -17,7 +17,7 @@ namespace ExampleModel
         string Name { get; set; }
         [Name("Type_fk")]
         CarType Type { get; set; }
-        ICollection<string> Tags { get; set; }
+        IList<string> Tags { get; set; }
         IManufacturer Manufacturer { get; set; }
         //ModlValue<Manufacturer> Manufacturer { get; }
     }

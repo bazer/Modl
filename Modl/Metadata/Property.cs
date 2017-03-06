@@ -8,7 +8,7 @@ using Modl.Exceptions;
 
 namespace Modl.Metadata
 {
-    public class Property
+    public class PropertyDefinition
     {
         public string PropertyName { get; }
         public string StorageName { get; }
@@ -22,7 +22,7 @@ namespace Modl.Metadata
         //public bool IsForeignKey { get { return ForeignKeyType != null; } }
         //public Type ForeignKeyType { get; private set; }
 
-        public Property(PropertyInfo property, Type modlType)
+        public PropertyDefinition(PropertyInfo property, Type modlType)
         {
             PropertyInfo = property;
             PropertyName = property.Name;
@@ -62,7 +62,7 @@ namespace Modl.Metadata
         public object GetValue<M>(M m) where M : class, IModl
         {
             if (getter == null)
-                getter = (Func<M, object>)typeof(Property)
+                getter = (Func<M, object>)typeof(PropertyDefinition)
                     .GetMethod("MakeGetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                     .MakeGenericMethod(ModlType, PropertyType)
                     .Invoke(null, new object[] { PropertyInfo.GetGetMethod(true) });
@@ -74,7 +74,7 @@ namespace Modl.Metadata
         public void SetValue<M>(M m, object value) where M : class, IModl
         {
             if (setter == null)
-                setter = (Action<M, object>)typeof(Property)
+                setter = (Action<M, object>)typeof(PropertyDefinition)
                     .GetMethod("MakeSetDelegate", BindingFlags.Static | BindingFlags.NonPublic)
                     .MakeGenericMethod(ModlType, PropertyType)
                     .Invoke(null, new object[] { PropertyInfo.GetSetMethod(true) });

@@ -54,7 +54,7 @@ namespace Modl.Instance
                 throw new NotImplementedException();
         }
 
-        public void AddValue(Property property)
+        public void AddValue(PropertyDefinition property)
         {
             if (property.IsLink)
                 RelationValueBacker.AddValue(property.PropertyName, new RelationValue());
@@ -133,7 +133,7 @@ namespace Modl.Instance
         //    return Definitions.GetStorage(this);
         //}
 
-        internal void SetValuesFromStorage(IEnumerable<Container> storage)
+        internal void SetValuesFromStorage(IEnumerable<IContainer> storage)
         {
             Definitions.SetValuesFromStorage(this, storage);
         }

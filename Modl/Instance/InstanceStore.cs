@@ -41,7 +41,7 @@ namespace Modl.Instance
 
         private Dictionary<Identity, UniqueInstancesCollection<M>> Collections { get; } = new Dictionary<Identity, UniqueInstancesCollection<M>>();
 
-        public UniqueInstancesCollection<M> AddInstanceFromStorage(Identity id, IEnumerable<Container> storage)
+        public UniqueInstancesCollection<M> AddInstanceFromStorage(Identity id, IEnumerable<IContainer> storage)
         {
             if (HasCollection(id))
                 throw new InvalidIdException($"There is already a collection with id '{id}'");
