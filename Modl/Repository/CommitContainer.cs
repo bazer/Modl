@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Modl.Structure.Repository
+namespace Modl.Repository
 {
     public class CommitContainer : IContainer
     {
@@ -45,8 +45,8 @@ namespace Modl.Structure.Repository
 
         private IEnumerable<KeyValuePair<string, object>> GetValues(ICommit commit)
         {
-            yield return new KeyValuePair<string, object>("modifications", commit
-                .Modifications
+            yield return new KeyValuePair<string, object>("changes", commit
+                .Changes
                 .Select(x => x.Id)
                 .ToList());
         }

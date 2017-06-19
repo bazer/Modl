@@ -57,11 +57,13 @@ namespace Tests
             Assert.Throws<InvalidPropertyNameException>(() => car["WrongName"]);
             Assert.Throws<InvalidPropertyNameException>(() => car["WrongName"] = "test");
 
-            var mutation = car.ToMutation();
-            Assert.Equal(1, mutation.Modifications.Count());
+            var changes = car.GetChanges();
+            Assert.Equal(2, changes.Count());
             //Assert.Null(changes.Modifications.First().Modl);
-            Assert.Equal("Name", mutation.Modifications.First().NewProperty.Name);
-            Assert.Equal("BMW", (mutation.Modifications.First().NewProperty as ISimpleProperty).Value);
+            Assert.Equal(ChangeType.Created, changes.First().Type);
+            Assert.Equal(ChangeType.Value, changes.Last().Type);
+            Assert.Equal("Name", changes.Last().Property.Name);
+            Assert.Equal("BMW", changes.Last().NewValue.Content);
 
 
             car.Manufacturer = M.New<IManufacturer>()
@@ -73,13 +75,17 @@ namespace Tests
             Assert.True(car.Manufacturer.IsNew);
             Assert.True(car.Manufacturer.IsModified);
 
-            mutation = car.ToMutation();
-            Assert.Equal(2, mutation.Modifications.Count());
-            Assert.Equal("Manufacturer", mutation.Modifications.Last().NewProperty.Name);
+            changes = car.GetChanges();
+            Assert.Equal(3, changes.Count());
+            Assert.Equal("Manufacturer", changes.Last().Property.Name);
+
+            Assert.Equal(2, car.Manufacturer.GetChanges().Count());
+
+
             //Assert.Equal(car.Manufacturer, (changes.Modifications.Last().Property as ISimpleProperty).Value);
 
 
-           
+
 
 
 
@@ -172,27 +178,34 @@ namespace Tests
             Assert.Equal("Sedan", car.Type.Description);
             Assert.True(car.IsModified);
 
-            var mutation = car.ToMutation();
-            Assert.Equal(4, mutation.Modifications.Count());
+            var changes = car.GetChanges();
+            Assert.Equal(5, changes.Count());
             var user = new User("Basic user");
-            var commit = mutation.Commit(user);
+            var commit = changes.Commit(user);
 
             Assert.True(commit.When > DateTime.UtcNow.AddMilliseconds(-100));
             Assert.True(commit.When <= DateTime.UtcNow);
             Assert.Equal(0, commit.Previous.Count());
             Assert.Equal(0, commit.Next.Count());
             Assert.NotEqual(Guid.Empty, commit.Id);
-            Assert.Equal(mutation.Modifications.Count(), commit.Modifications.Count());
+            Assert.Equal(changes.Count(), commit.Changes.Count());
             Assert.Equal(user, commit.User);
 
             commit.Push();
 
-            //car.Save();
-            Assert.False(car.IsNew);
-            Assert.False(car.IsModified);
-            car.Manufacturer.Save();
+            Assert.True(car.IsNew);
+            Assert.True(car.IsModified);
 
+            
+            //car.Save();
+            
+            //car.Manufacturer.Save();
+             
             var car2 = M.Get<ICar>(car.Id);
+
+            Assert.False(car2.IsNew);
+            Assert.False(car2.IsModified);
+
             AssertEqual(car, car2);
             Assert.Equal("Sedan", car2.Type.Description);
             car2.Manufacturer.Name = "Mercedes";

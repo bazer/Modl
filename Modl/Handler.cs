@@ -6,7 +6,6 @@ using Modl.Metadata;
 using Modl.Structure.Storage;
 using System;
 using Modl.Repository;
-using Modl.Structure.Repository;
 
 namespace Modl
 {
@@ -14,9 +13,9 @@ namespace Modl
     {
         public static Commits CommitStore => Repository.Commits.ForThisModl;
 
-        public static ICommit Commit(IMutationCollection mutation, IUser who)
+        public static ICommit Commit(IChangeCollection changes, IUser user)
         {
-            var commit = new Commit(mutation, who);
+            var commit = new Commit(changes, user);
 
             CommitStore.AddCommit(commit);
 
@@ -27,7 +26,7 @@ namespace Modl
         {
             var settings = Settings.Get(typeof(ICommit));
             var commitContainers = commits.Select(x => new CommitContainer(x)) as IEnumerable<IContainer>;
-            var mutationContainers = commits.SelectMany(x => x.Modifications.Select(y => new MutationContainer(y)));
+            var mutationContainers = commits.SelectMany(x => x.Changes.Select(y => new ChangeContainer(y)));
 
             Materializer.Write(commitContainers.Concat(mutationContainers), settings);
         }
@@ -38,7 +37,7 @@ namespace Modl
         }
     }
 
-    internal class Handler<M> where M : class, IModl
+    internal static class Handler<M> where M : class, IModl
     {
         static Handler()
         {

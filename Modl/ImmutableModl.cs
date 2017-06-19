@@ -4,6 +4,7 @@ using System.Linq;
 using Modl.Metadata;
 using System.Linq.Expressions;
 using Castle.DynamicProxy;
+using Modl.Repository;
 
 namespace Modl
 {

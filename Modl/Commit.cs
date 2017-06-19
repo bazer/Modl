@@ -8,7 +8,7 @@ namespace Modl
     public interface ICommit
     {
         Guid Id { get; }
-        IEnumerable<IMutation> Modifications { get; }
+        IEnumerable<IChange> Changes { get; }
         IEnumerable<ICommit> Next { get; }
         IEnumerable<ICommit> Previous { get; }
         DateTime When { get; }
@@ -17,27 +17,23 @@ namespace Modl
 
     public class Commit : ICommit
     {
-        private List<IMutation> modifications;
+        private List<IChange> changes;
         private List<ICommit> next;
         private List<ICommit> previous;
 
-        public Commit(IMutationCollection mutation, IUser who)
+        public Commit(IChangeCollection changes, IUser user)
         {
-            this.modifications = mutation.Modifications.ToList();
+            this.changes = changes.ToList();
             this.When = DateTime.UtcNow;
             this.Id = Guid.NewGuid();
-            this.User = who;
+            this.User = user;
             this.next = new List<ICommit>();
             this.previous = new List<ICommit>();
-
-            
         }
-
-        
 
         public Guid Id { get; }
 
-        public IEnumerable<IMutation> Modifications => modifications.AsEnumerable();
+        public IEnumerable<IChange> Changes => changes.AsEnumerable();
         public IEnumerable<ICommit> Next => next.AsEnumerable();
         public IEnumerable<ICommit> Previous => next.AsEnumerable();
         public DateTime When { get; }

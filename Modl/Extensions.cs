@@ -1,6 +1,8 @@
 ﻿using Modl.Instance;
 using System;
 using System.Collections.Generic;
+using Modl.Repository;
+using System.Linq.Expressions;
 
 namespace Modl
 {
@@ -53,19 +55,14 @@ namespace Modl
             return m;
         }
 
-        public static ICommit Commit(this IEnumerable<IMutation> modifications, IUser who)
+        public static ICommit Commit(this IEnumerable<IChange> modifications, IUser user)
         {
-            return Handler.Commit(new MutationCollection(modifications), who);
+            return new ChangeCollection(modifications).Commit(user);
         }
 
-        public static ICommit Commit(this IMutationCollection mutation, IUser who)
+        public static ICommit Commit(this IMutable mutable, IUser user)
         {
-            return Handler.Commit(mutation, who);
-        }
-
-        public static ICommit Commit(this IMutable mutable, IUser who)
-        {
-            return Handler.Commit(mutable.ToMutation(), who);
+            return new ChangeCollection(mutable.GetChanges()).Commit(user);
         }
 
         public static ICommit Push(this ICommit commit)

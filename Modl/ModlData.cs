@@ -1,5 +1,6 @@
 ﻿using Modl.Instance;
 using System;
+using Modl.Repository;
 
 namespace Modl
 {

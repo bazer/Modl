@@ -4,27 +4,51 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Collections;
+using Modl.Repository;
 
 namespace Modl
 {
-    public interface IMutation
+    public interface IValue
     {
-        Guid Id { get; }
-        IMutable Modl { get; }
-        IProperty OldProperty { get; }
-        IProperty NewProperty { get; }
+        string Hash { get; }
+        object Content { get; }
+        Type Type { get; }
+    }
+
+    public struct Value : IValue
+    {
+        public string Hash { get; }
+        public object Content { get; }
+        public Type Type { get; }
+
+        public Value(string hash, object content, Type type)
+        {
+            Hash = hash;
+            Content = content;
+            Type = type;
+        }
+
+        public Value(object content)
+        {
+            Content = content;
+            Type = content?.GetType();
+            Hash = null;
+        }
     }
 
     public interface IMutable : IModl
     {
         bool IsModified { get; }
         bool IsNew { get; }
-        IEnumerable<IMutation> Modifications { get; }
+        bool IsCommited { get; }
+        ChangeCollection GetChanges();
         object this[string property] { get; set; }
     }
 
     public interface IProperty
     {
+        Guid Id { get; }
         string Name { get; }
         PropertyDefinition Metadata { get; }
     }
@@ -37,44 +61,10 @@ namespace Modl
     public interface IRelationProperty : IProperty
     {
         IModl Value { get; }
-        Identity Id { get; }
+        Identity RelationId { get; }
     }
 
-    public interface IMutationCollection
-    {
-        IEnumerable<IMutation> Modifications { get; }
 
-        MutationCollection Concat(IEnumerable<IMutation> modifications);
-        MutationCollection Concat(IMutable mutable);
-        MutationCollection Concat(MutationCollection mutation);
-    }
-
-    public struct MutationCollection : IMutationCollection
-    {
-        private List<IMutation> modifications;
-
-        public MutationCollection(IEnumerable<IMutation> modifications)
-        {
-            this.modifications = modifications.ToList();
-        }
-
-        public IEnumerable<IMutation> Modifications => modifications.AsEnumerable();
-
-        public MutationCollection Concat(IEnumerable<IMutation> modifications)
-        {
-            return new MutationCollection(this.modifications.Concat(modifications));
-        }
-
-        public MutationCollection Concat(IMutable mutable)
-        {
-            return Concat(mutable.Modifications);
-        }
-
-        public MutationCollection Concat(MutationCollection mutation)
-        {
-            return Concat(mutation.Modifications);
-        }
-    }
 
     public struct SimpleProperty : ISimpleProperty
     {
@@ -83,11 +73,14 @@ namespace Modl
             this.Metadata = metadata;
             this.Name = name;
             this.Value = value;
+            this.Id = Guid.Empty;
         }
 
         public PropertyDefinition Metadata { get; }
         public string Name { get; }
         public object Value { get; }
+
+        public Guid Id { get; }
     }
 
     public struct RelationProperty : IRelationProperty
@@ -97,88 +90,18 @@ namespace Modl
             this.Metadata = metadata;
             this.Name = name;
             this.Value = value;
-            this.Id = value?.Id();
+            this.RelationId = value?.Id();
+            this.Id = Guid.Empty;
         }
 
         public PropertyDefinition Metadata { get; }
         public string Name { get; }
-        public Identity Id { get; }
         public IModl Value { get; }
-    }
 
-    public static class MutationExtensions
-    {
-        public static MutationCollection AppendTo(this MutationCollection mutation, MutationCollection mutationToAppendTo)
-        {
-            return mutationToAppendTo.Concat(mutation);
-        }
-
-        public static MutationCollection AppendTo(this IMutable mutable, MutationCollection mutationToAppendTo)
-        {
-            return mutationToAppendTo.Concat(mutable);
-        }
-
-        public static T Mutate<T>(this T m) where T : class, IMutable
-        {
-            if (m.IsMutable)
-                return m;
-
-            return MutableInstanceCreator<T>.NewInstance(m);
-            //return Handler<T> m;
-        }
-
-        public static T Mutate<T, V>(this T m, Expression<Func<T, V>> property, V value) where T : class, IMutable
-        {
-            var mut = m.Mutate();
-
-            //var func = e.Compile();
-            //func(mut)
-
-            var expression = (MemberExpression)property.Body;
-            var name = expression.Member.Name;
-            mut[name] = value;
-
-            return mut;
-        }
-
-        public static MutationCollection ToMutation(this IMutable mutable)
-        {
-            return new MutationCollection(mutable.Modifications);
-        }
-
-        //public static T Mutate<T>(this T m, Func<T, T> e) where T : class, IMutable
-        //{
-        //    if (m.IsMutable)
-        //        return m;
-
-        //    return MutableInstanceCreator<T>.NewInstance(m);
-        //}
-
-        //public IEnumerable<IModification> Modifications<T>(this T m) where T : class, IMutable
-        //{
-        //}
-
-        //public static Mutation ToMutation<T>(this T m) where T : IMutable
-        //{
-        //    return null;
-        //}
-    }
-
-    public class Modification : IMutation
-    {
-        public Modification(Guid id, IMutable modl, IProperty oldProperty, IProperty newProperty)
-        {
-            this.Id = id;
-            this.Modl = modl;
-            this.OldProperty = oldProperty;
-            this.NewProperty = newProperty;
-        }
-
-        public IMutable Modl { get; }
-
-        public IProperty OldProperty { get; }
-        public IProperty NewProperty { get; }
+        public Identity RelationId { get; }
 
         public Guid Id { get; }
     }
+
+
 }

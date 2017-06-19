@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Modl.Repository;
 
 namespace Modl.Instance
 {
@@ -44,6 +45,8 @@ namespace Modl.Instance
                     invocation.ReturnValue = ModlData;
                 else if (name == "IsMutable")
                     invocation.ReturnValue = false;
+                else if (name == "IsNew")
+                    invocation.ReturnValue = ModlData.Backer.IsNew;
                 else
                 {
                     var value = ModlData.Backer.SimpleValueBacker.GetValue(name).Get();
@@ -107,8 +110,8 @@ namespace Modl.Instance
                         invocation.ReturnValue = true;
                     else if (info.Property == "IsModified")
                         invocation.ReturnValue = mutatedValues.Any();
-                    else if (info.Property == "Modifications")
-                        invocation.ReturnValue = GetModifications();
+                    else if (info.Property == "GetChanges")
+                        invocation.ReturnValue = new ChangeCollection(GetChanges());
                     else
                     {
                         var definition = immutableInstance.Modl.Backer.Definitions.Properties.SingleOrDefault(x => x.PropertyName == info.Property);
@@ -136,8 +139,11 @@ namespace Modl.Instance
 
             
 
-            private IEnumerable<Modification> GetModifications()
+            private IEnumerable<Change> GetChanges()
             {
+                if (immutableInstance.IsNew)
+                    yield return new Change(Guid.NewGuid(), immutableInstance, null, null, ChangeType.Created);
+
                 foreach (var mutatedValue in mutatedValues)
                 {
                     var newProperty = mutatedValue.Value;
@@ -145,7 +151,7 @@ namespace Modl.Instance
                         ? new RelationProperty(newProperty.Metadata, mutatedValue.Key, immutableInstance.Modl.Backer.RelationValueBacker.GetValue(mutatedValue.Key).Get() as IModl) as IProperty
                         : new SimpleProperty(newProperty.Metadata, mutatedValue.Key, immutableInstance.Modl.Backer.SimpleValueBacker.GetValue(mutatedValue.Key).Get());
                     
-                    yield return new Modification(Guid.NewGuid(), immutableInstance, oldProperty, newProperty);
+                    yield return new Change(Guid.NewGuid(), immutableInstance, oldProperty, newProperty, ChangeType.Value);
                 }
             }
         }
@@ -160,7 +166,8 @@ namespace Modl.Instance
     internal enum MethodType
     {
         Property,
-        Indexer
+        Indexer,
+        Changes
     }
 
     internal struct InvocationInfo
@@ -180,10 +187,17 @@ namespace Modl.Instance
                 this.CallType = CallType.Set;
             else if (name.StartsWith("get_", StringComparison.Ordinal))
                 this.CallType = CallType.Get;
+            else if (name == "GetChanges")
+                this.CallType = CallType.Get;
             else
                 throw new NotImplementedException();
 
-            if ((this.CallType == CallType.Get && invocation.Arguments.Length == 1) || (this.CallType == CallType.Set && invocation.Arguments.Length == 2))
+            if (this.CallType == CallType.Get && name == "GetChanges")
+            {
+                this.MethodType = MethodType.Property;
+                this.Property = name;
+            }
+            else if ((this.CallType == CallType.Get && invocation.Arguments.Length == 1) || (this.CallType == CallType.Set && invocation.Arguments.Length == 2))
             {
                 this.MethodType = MethodType.Indexer;
                 this.Property = invocation.Arguments[0] as string;

@@ -11,6 +11,7 @@ namespace Modl
     {
         IModlData Modl { get; set; }
         bool IsMutable { get; }
+        //IEnumerable<ICommit> Commits { get; }
     }
 
     public static class Modl<M> where M : class, IModl //, new()
