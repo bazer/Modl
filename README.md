@@ -1,12 +1,13 @@
 # Modl
+
 Modl is a Model framework that fits in nicely as the M in MVC frameworks.
 
 The basic idea is to have a single model with objects relating to each other that spans different storage formats.
-For instance you can have some objects stored on disk in json, 
+For instance you can have some objects stored on disk in json,
 some in a database and yet others being fetched as xml over the network.
 All writes are done as transactions.
 
-The idea is also to save diffs of all edits in a merkle tree, 
+The idea is also to save diffs of all edits in a merkle tree,
 so that you can go back in history to fetch data and see who edited which objects and when.
 
 It's written in C# and has the following core features:
@@ -18,7 +19,8 @@ It's written in C# and has the following core features:
 * Keeps track of relations between models
 * Uses interfaces and extension methods to leave your classes as clean as possible
 
-##Use cases
+## Use cases
+
 * Memory storage
 * Json
 * Xml
@@ -33,41 +35,58 @@ It's written in C# and has the following core features:
 * Encryption
 * Etc.
 
-##Basic usage
+## Basic usage
+
 Some examples of usage.
 
-    public class Car : IModl
+    public interface ICar : IMutable
     {
-        public IModlData Modl { get; set; }
+        [Id(automatic: true)]
+        Guid Id { get; }
+        [Name("CarName")]
+        string Name { get; set; }
+        IManufacturer Manufacturer { get; set; }
     }
 
-    Car car = new Car();
-    Car car = Modl<Car>.New();
+    public interface IManufacturer : IMutable
+    {
+        [Id]
+        Guid ManufacturerID { get; }
+        string Name { get; set; }
+        IList<ICar> Cars { get; }
+    }
 
-    car.SetId(Guid.NewGuid());
-    Guid id = car.GetId();
+    var car = M.New<ICar>();
+    car.Name = "Model S";
+    car.Manufacturer = M.New<IManufacturer>()
+        .Change(x => x.ManufacturerID, Guid.NewGuid())
+        .Change(x => x.Name, "Tesla");
 
-    bool isModified = car.IsModified();
-    bool isNew = car.IsNew();
-    bool isDeleted = car.IsDeleted();
+    changes = car.GetChanges();
+    var user = new User("user@example.com");
+    var commit = changes.Commit(user);
+    commit.Push();
 
-    Car car = Modl<Car>.Get(id);
-    IEnumerable<Car> cars = Model<Car>.GetWhere(query);
-    IEnumerable<Car> cars = Model<Car>.GetAll();
+    var loaded_car = M.Get<ICar>(car.Id);
 
-    bool carExists = Model<Car>.Any(id);
-    bool carExists = Model<Car>.Any(query);
+    Assert.Equal("Model S", loaded_car.Name);
+    Assert.Equal("Tesla", loaded_car.Manufacturer.Name);
+    Assert.Equal("Model S", loaded_car.Manufacturer.Cars.Single(x => x.Id == loaded_car.Id).Name);
 
-    car.Save(withRelations = true);
-    car.Delete();
+## Documentation
 
-##Current status
+More comprehensive documentation can be found here.
+
+[Documentation](Documentation/index.md)
+
+## Current status
+
 Pre alpha, only some things are working.
 
 ## Requirements
-* C# 6
-* .NET 4.5
 
+* .NET Standard 2.0
 
 ## License
+
 Released under the [The MIT License (MIT)](http://opensource.org/licenses/MIT).
