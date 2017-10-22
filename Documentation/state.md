@@ -9,7 +9,17 @@ Items contains the actual data. In a database this would be a row.
     item_hash : {
         "type": "item",
         "model": model_hash,
-        "values": {
+        "identities": {
+            identity_hash: data,
+            identity_hash: data,
+            ...
+        },
+        "links": {
+            link_hash: data,
+            link_hash: data,
+            ...
+        },
+        "properties": {
             property_hash: data,
             property_hash: data,
             ...
@@ -22,6 +32,6 @@ Users contains the users of the system. A user points to the item that further d
 
     user_hash : {
         "type": "user",
-        "username": string,
+        "username": string(100),
         "item": item_hash
     }

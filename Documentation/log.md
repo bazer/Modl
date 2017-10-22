@@ -8,8 +8,9 @@ Commits are saved in a DAG where each commit includes the hash of the one or man
 
     commit_hash: {
         "type": "commit",
-        "time": "2017-06-26T21:34:00.692271Z",
+        "time": datetime,
         "user": user_hash,
+        "comment": comment_hash,
         "changes": [
             change_hash,
             change_hash,
@@ -24,12 +25,10 @@ Commits are saved in a DAG where each commit includes the hash of the one or man
 
 ## Changes
 
-A change contains a reference to a model, an item and a property. It also contains the old value and the new value. It has the hash of itself as id.
-
     change_hash: {
         "type": "change",
         "changed_type": type,
         "old_hash": hash,
         "new_hash": hash,
-        "diff": diff_string
+        "diff": jsondiffpatch
     }
